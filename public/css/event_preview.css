@@ -1,0 +1,37 @@
+/* admin css */
+.msg {
+	color:#ff0000;
+}
+
+.footer{color:#999;text-align:center;padding:30px 0;margin-top:70px;border-top:1px solid #e5e5e5;background-color:#f5f5f5}
+
+img{
+  display: block;
+  height: auto;
+  max-width: 100%;
+}
+
+pre{
+	border-width:0;
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+
+h4{
+	color:#226fc4;
+	font-weight:700;
+}
+
+.title{
+	font-size:20px;
+	font-weight:700;
+}
+
+.countdown{background:#eaefde;padding:5px 0;overflow:auto;margin-bottom:10px}
+.countdown p{text-align:center;margin:4px 0}
+.countdown .cc{overflow:auto;margin:0 auto;padding:0;width:90%}
+.countdown .cc div{float:left;min-width:0!important;text-align:center!important}
+.countdown .cc div.dot{font-size:30px!important;color:#bbb;position:relative;top:-6px;margin:0 5px}
+.countdown .cc div span{color:#444;font-size:30px;font-family:Arial;font-weight:500;display:block}
+.countdown .cc div span.ms{color:#de0000}
+.countdown .cc div i{font-style:normal;text-align:center;position:relative;top:-7px}
