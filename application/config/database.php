@@ -48,9 +48,9 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'root';
-$db['default']['password'] = '';
+$db['default']['hostname'] = '115.29.148.47'; //测试数据库
+$db['default']['username'] = 'kq';
+$db['default']['password'] = 'kq';
 $db['default']['database'] = 'kq_test';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
