@@ -97,4 +97,4 @@ ERROR - 2014-09-10 14:34:03 --> Severity: Notice  --> Undefined variable: type /
 ERROR - 2014-09-10 23:04:59 --> Severity: 8192  --> mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead /Applications/XAMPP/xamppfiles/htdocs/kq/system/database/drivers/mysql/mysql_driver.php 91
 ERROR - 2014-09-10 23:05:04 --> Severity: 8192  --> mysql_pconnect(): The mysql extension is deprecated and will be removed in the future: use mysqli or PDO instead /Applications/XAMPP/xamppfiles/htdocs/kq/system/database/drivers/mysql/mysql_driver.php 91
 aaassssssbasssssss
-ssssss
+sssssswef
