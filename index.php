@@ -18,7 +18,8 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	// local is testing
+	// local is testing, 也应该使用测试数据库
+	//
 	define('ENVIRONMENT', 'testing');
 	
 	// remote is rtesting
