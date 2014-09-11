@@ -246,10 +246,10 @@ class Coupon_m extends CI_Model{
 		$results = json_decode($json,true);
    	
 		if (empty($results['error'])){
-   				return $results['results'];
+   			return $results['results'];
    		}
    		else{
-   				return Error_Retrieve_Object;
+   			return Error_Retrieve_Object;
    		}
 		
 	}

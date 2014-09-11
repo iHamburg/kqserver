@@ -1,12 +1,7 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 class Users extends CI_Controller{
 	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var My_m
-	 */
-	var $my;
+	
 	
 	/**
 	 * 
@@ -14,6 +9,13 @@ class Users extends CI_Controller{
 	 * @var User_m;
 	 */
 	var $model;
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var User2_m
+	 */
+	var $model2;
 	
 	function __construct(){
 		parent::__construct();
@@ -54,10 +56,10 @@ class Users extends CI_Controller{
 			
 			$user = $this->model->get($uid,'favoritedCoupons,favoritedShops');
 
-			$cards = $this->model->get_user_cards($uid);
+//			$cards = $this->model->get_user_cards($uid);
 //			$cards = $this->model->get_user_cards2($uid);
 
-			
+			$cards = $this->model2->get_all();
 			
 //			$cards = $this->model2->get_all();
 			

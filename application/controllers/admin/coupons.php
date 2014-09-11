@@ -11,6 +11,13 @@ class Coupons extends CI_Controller{
 	 */
 	var $model;
 
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Coupon2_m
+	 */
+	var $model2;
 
 	/**
 	 * 
@@ -28,6 +35,8 @@ class Coupons extends CI_Controller{
 		
 		$this->load->model('coupon_m','model');
 		
+		$this->load->model('coupon2_m','model2');
+		
 		$this->load->library('pagination');
 	}
 	
@@ -35,7 +44,10 @@ class Coupons extends CI_Controller{
 
 		$limit = 20;
 		
-		$models = $this->model->get_all($skip,$limit); 
+//		$models = $this->model->get_all($skip,$limit); 
+
+		$models = $this->model2->get_all();
+		
 		$total_rows = $this->model->count_all();
 		
 		
