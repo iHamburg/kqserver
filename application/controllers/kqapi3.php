@@ -280,6 +280,7 @@ class Kqapi3 extends REST_Controller
 	  	}
 	  }
    
+	  
    /**
     * 返回快券: dictionary: location -> array of coupons 
     * 先搜子商户
@@ -341,10 +342,7 @@ class Kqapi3 extends REST_Controller
    		else if(!empty($districtKeyword)){
    			$where['district']=array('$inQuery'=>array('where'=>array('title'=>array('$regex'=>$districtKeyword)),'className'=>'District'));
    		}
-   		
-  
-   		
-   		
+ 		
    		$where = json_encode($where);
 
    		$coupons = $this->coupon_m->search($where,$skip,$limit);
@@ -445,11 +443,9 @@ class Kqapi3 extends REST_Controller
 			
   		   }		
 
-  		   
 			if (!isLocalhost())
 				$this->output->cache(CacheTime);
 				
-			
 
 			return $this->output_results($array);
 	}
