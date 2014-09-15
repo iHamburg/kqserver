@@ -57,7 +57,7 @@ class Kqapi4 extends REST_Controller
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var User_m;
+	 * @var User2_m;
 	 */
 	var $user_m;
 	
@@ -69,6 +69,8 @@ class Kqapi4 extends REST_Controller
 		header("Content-type: text/html; charset=utf-8");
 		
 	}
+	
+	
 	
 	/**
 	 * 
@@ -91,11 +93,9 @@ class Kqapi4 extends REST_Controller
 
    			return output_response('-1','没有用户名或密码');
 		}
-			
 
 		$json = $this->user_m->login($username, $password);
-		
-//	
+			
 		$response = json_decode($json,true);
 		
 		if(empty($response['error'])){
@@ -109,8 +109,7 @@ class Kqapi4 extends REST_Controller
 		
 			return $error;
 		}
-
-		
+	
 	}
 	
 	/**
@@ -119,51 +118,58 @@ class Kqapi4 extends REST_Controller
 	 */
    public function user_get(){
 
-   		$id = $this->get('uid');
+   	
+   		$this->load->model('user2_m','user');
+   		
+   		$id = $this->get('id');
    		
    		if(!empty($id)){
    			
  			
-   			$result = $this->user_m->get($id);
+   			$result = $this->user->get($id);
+   	
+   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl','sessionToken'));
+   			return $this->output_results($result);
    			
-   			if($result<0){
-   				
-   				return $this->output_results($result,'获取用户信息失败');
-   			}
-   			
-   			$user = array_slice_keys($result,array('objectId','phone','nickname'));
+//   			if($result<0){
+//   				
+//   				return $this->output_results($result,'获取用户信息失败');
+//   			}
+//   			
+//   			$user = array_slice_keys($result,array('objectId','phone','nickname'));
+//
+//   			$avatar = $result['avatar'];
+//   			if(!empty($avatar)){
+//				$user['avatarUrl']=$avatar['url'];
+//			}			
+//			
+//			//favoritedCoupons只传递Coupon 的 objectId
+//   			$favoritedCoupons =  $result['favoritedCoupons'];
+//
+//   			///如果不做判断会出现Warning
+//   			if(!empty($favoritedCoupons)){
+//   				foreach ($favoritedCoupons as $coupon) {
+//	   				$fcs[]=$coupon['objectId'];
+//	   			}
+//	   			$user['favoritedCoupons'] = $fcs;
+//   			}
+//   			
+//   			
+//   			//favoritedShops只传递Shop 的 objectId
+//  			$favoritedShops = $result['favoritedShops'];
+//   			if (!empty($favoritedShops)){
+//   				foreach ($favoritedShops as $shop) {
+//  					$fss[] = $shop['objectId'];
+//  				}
+//  				$user['favoritedShops'] = $fss;
+//   			}
+//  			
+//   			
+//   			return $this->output_results($user);
 
-   			$avatar = $result['avatar'];
-   			if(!empty($avatar)){
-				$user['avatarUrl']=$avatar['url'];
-			}
-			
-			
-			//favoritedCoupons只传递Coupon 的 objectId
-   			$favoritedCoupons =  $result['favoritedCoupons'];
-
-   			///如果不做判断会出现Warning
-   			if(!empty($favoritedCoupons)){
-   				foreach ($favoritedCoupons as $coupon) {
-	   				$fcs[]=$coupon['objectId'];
-	   			}
-	   			$user['favoritedCoupons'] = $fcs;
-   			}
-   			
-   			
-   			//favoritedShops只传递Shop 的 objectId
-  			$favoritedShops = $result['favoritedShops'];
-   			if (!empty($favoritedShops)){
-   				foreach ($favoritedShops as $shop) {
-  					$fss[] = $shop['objectId'];
-  				}
-  				$user['favoritedShops'] = $fss;
-   			}
-  			
-  
-   			
-   			return $this->output_results($user);
-
+   		}
+   		else{
+   			return $this->output_results(-1,'missing id');
    		}
 
    }
@@ -174,8 +180,6 @@ class Kqapi4 extends REST_Controller
     * 
     * @param string username
     * @param string password
-    * @param string phone
-    * @param string nickname
     * 
     *  @return
     *  status: 1: 成功
@@ -185,33 +189,32 @@ class Kqapi4 extends REST_Controller
     *  msg: username is taken
     */
    public function user_post(){
-   		$url = HOST."/users";
-   		
-   		$inputKeys = array('username','password','phone','nickname');
+   	
+   		$this->load->model('user2_m','user');
+   	
+   		$inputKeys = array('username','password');
    		
    		foreach ($inputKeys as $key) {
    			$inputs[$key] = $this->post($key);
-   		}
+   		}   		
 
-   		
-	
-   		$json = $this->user_m->create($inputs);
-   			
-
- 	  $response = json_decode($json,true);
+		$count = $this->user->count_by('username',$inputs['username']);
+		
+		if($count>0){
+			//用户名已经有了
+			return $this->output_results(-1);
 			
-		if(empty($response['error'])){
-			return $this->output_results($response);
 		}
 		else{
-			$error = array('status'=>$response['code'],'msg'=>$response['error']);
-		
-			$error = json_encode($error);
-			echo $error;
-		
-			return $error;
+			$id = $this->user->insert($array);
+			
+			$result = $this->user->get($id);
+			
+			return $this->output_results($result);
 		}
-   
+   		
+   		
+   			
    }
    
    
