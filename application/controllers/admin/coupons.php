@@ -44,9 +44,9 @@ class Coupons extends CI_Controller{
 
 		$limit = 20;
 		
-//		$models = $this->model->get_all($skip,$limit); 
+		$models = $this->model->get_all($skip,$limit); 
 
-		$models = $this->model2->get_all();
+//		$models = $this->model2->get_all();
 		
 		$total_rows = $this->model->count_all();
 		

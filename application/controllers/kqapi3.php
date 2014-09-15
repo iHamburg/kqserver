@@ -478,6 +478,19 @@ class Kqapi3 extends REST_Controller
 	}
 	
 
+	/**
+	 * 
+	 * 用户忘记密码时点击获得验证码
+	 * @param string username
+	 */
+	public function requestCaptchaForgetPassword_get(){
+	
+		$username = $this->get('username');
+		//TODO: 
+		
+		$captcha = $username;
+		return $this->output_results($captcha);
+	}
 	
 	
 	/**

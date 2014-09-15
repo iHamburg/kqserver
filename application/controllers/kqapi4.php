@@ -4,7 +4,7 @@ require(APPPATH.'libraries/REST_Controller.php');
 
 /**
  * 
- *
+ * 从测试服务器中获取数据
  * @author Forest
  *
  */
@@ -130,42 +130,6 @@ class Kqapi4 extends REST_Controller
    	
    			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl','sessionToken'));
    			return $this->output_results($result);
-   			
-//   			if($result<0){
-//   				
-//   				return $this->output_results($result,'获取用户信息失败');
-//   			}
-//   			
-//   			$user = array_slice_keys($result,array('objectId','phone','nickname'));
-//
-//   			$avatar = $result['avatar'];
-//   			if(!empty($avatar)){
-//				$user['avatarUrl']=$avatar['url'];
-//			}			
-//			
-//			//favoritedCoupons只传递Coupon 的 objectId
-//   			$favoritedCoupons =  $result['favoritedCoupons'];
-//
-//   			///如果不做判断会出现Warning
-//   			if(!empty($favoritedCoupons)){
-//   				foreach ($favoritedCoupons as $coupon) {
-//	   				$fcs[]=$coupon['objectId'];
-//	   			}
-//	   			$user['favoritedCoupons'] = $fcs;
-//   			}
-//   			
-//   			
-//   			//favoritedShops只传递Shop 的 objectId
-//  			$favoritedShops = $result['favoritedShops'];
-//   			if (!empty($favoritedShops)){
-//   				foreach ($favoritedShops as $shop) {
-//  					$fss[] = $shop['objectId'];
-//  				}
-//  				$user['favoritedShops'] = $fss;
-//   			}
-//  			
-//   			
-//   			return $this->output_results($user);
 
    		}
    		else{

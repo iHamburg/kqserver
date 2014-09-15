@@ -15,7 +15,6 @@ define('Error_Search_Shop',-8207);
 class Avoslibrary{
 	
 	
-	
 	 public $header;
      
 	 public $jsonHeader;
