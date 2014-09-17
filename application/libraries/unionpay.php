@@ -96,348 +96,51 @@ class Unionpay{
 		return $encrypted;
 	} 
 
-	/**
-	 * 
-	 * 用户表单的数组字段增加元素
-	 * @param  $uid
-	 * @param  $sessionToken
-	 * @param  $field
-	 * @param array $pointer
-	 * @return json
-	 */
-	function addPointerInArrayForUser($uid,$sessionToken,$field,$pointer){
-		$data = json_encode(array($field=>array('__op'=>'AddUnique','objects'=>array($pointer))));
-		return $this->updateUser($uid,$sessionToken,$data);
-	}
-	
-	/**
-	 * 
-	 * 用户表单的数组字段删除元素
-	 * @param unknown_type $uid
-	 * @param unknown_type $sessionToken
-	 * @param unknown_type $field
-	 * @param unknown_type $pointer
-	 */
-	function removePointerInArrayForUser($uid,$sessionToken,$field,$pointer){
-		$data = json_encode(array($field=>array('__op'=>'Remove','objects'=>array($pointer))));
-		return $this->updateUser($uid,$sessionToken,$data);
-	}
-	
-/**
- * 
- * 表单的数组字段增加元素
- * @param  $className
- * @param  $objectId
- * @param  $field
- * @param array $pointer
- */
-	function addPointerInArray($className,$objectId,$field,$pointer){
-		$data = json_encode(array($field=>array('__op'=>'AddUnique','objects'=>array($pointer))));
-		return $this->updateObject($className,$objectId,$data);
-	}
-	
-	/**
-	 * 表单的数组字段增加多个元素
-	 * @param string $className 
-	 * @param string $objectId
-	 * @param string $field
-	 * @param string $pointerClassName: 新元素的Class
-	 * @param array $pointers: 新元素Id数组;
-	 * @return json;
-	 */
-	function addPointersInArray($className,$objectId,$field,$pointerClassName,$pointerIds){
-	
-		foreach ($pointerIds as $id) {
-			$array[] = avosPointer($pointerClassName,$id);
-		}
-		$data = json_encode(array($field=>array('__op'=>'AddUnique','objects'=>$array)));
+	function sign($plain){
 		
-		return $this->updateObject($className,$objectId,$data);
 	}
 	
-	/**
-	 * 
-	 * 表单的数组字段删除元素
-	 * @param str $className
-	 * @param str $objectId
-	 * @param str $field
-	 * @param array $pointer
-	 */
-	function removePointerInArray($className,$objectId,$field,$pointer){
-		$data = json_encode(array($field=>array('__op'=>'Remove','objects'=>array($pointer))));
-		return $this->updateObject($className,$objectId,$data);
+	function verify($plain){
+		
 	}
 	
-	/**
-	 * 
-	 * 给A的key增加relationB
-	 * @param unknown_type $fatherClassName
-	 * @param unknown_type $fatherId
-	 * @param unknown_type $relationName
-	 * @param unknown_type $sonClassName
-	 * @param unknown_type $sonId
-	 */
-	function addRelation($fatherClassName,$fatherId,$relationName,$sonClassName,$sonId){
+	function testSign(){
+		$data = "Beeeeer is really good.. hic...";
+		$binary_signature = "";
+		openssl_sign($data, $binary_signature, union_test_private_key);
 		
-		$url =  HOST.'/classes/'.$fatherClassName.'/'.$fatherId;
+		echo 'binary signature:'.$binary_signature;
+		echo "\n";
 		
-		$data = array($relationName=>array('__op'=>'AddRelation','objects'=>array(avosPointer($sonClassName,$sonId))));
+		$signature = base64_encode($binary_signature);
 		
-		return $this->put($url,json_encode($data));
+		echo 'signature:'.$signature;
+		echo "\n";
+		
+//		$ok = openssl_verify($data, $binary_signature, union_test_public_key);
+//		
+//		echo 'ok: '.$ok;
+	
+	$ok = openssl_verify($data, $binary_signature, union_test_public_key);
+echo "check #1: ";
+if ($ok == 1) {
+    echo "signature ok (as it should be) ";
+} elseif ($ok == 0) {
+    echo "bad (there's something wrong) ";
+} else {
+    echo "ugly, error checking signature ";
+}
 
-	}
-	
-	function removeRelation($fatherClassName='',$fatherId='',$relationName='',$sonClassName='',$sonId=''){
-		$url =  HOST.'/classes/'.$fatherClassName.'/'.$fatherId;
-	
-		$data = array($relationName=>array('__op'=>'RemoveRelation','objects'=>array(avosPointer($sonClassName,$sonId))));
-		
-		return $this->put($url,json_encode($data));
-	}
-	
-
-		
-//		$url = 'https://cn.avoscloud.com/1/classes/Logo?where={"$relatedTo":{"object":{"__type":"Pointer","className":"UserStatus","objectId":"5370171de4b0fd29fa265c91"},"key":"unlockedLogos"}}';
-//		$url = HOST.'/classes/'.$sonClassName.'?where={"$relatedTo":{"object":{"__type":"Pointer","className":"'.$fatherClassName.'","objectId":"'.$fatherId.'"},"key":"'.$relationName.'"}}';
-	/**
-	 * 
-	 * 获得fatherClass的relate的所有sonClass, 不能是_User 
-	 * @param unknown_type $fatherClassName
-	 * @param unknown_type $fatherId
-	 * @param unknown_type $key
-	 * @param unknown_type $sonClassName
-	 */
-	function retrieveRelation($fatherClassName,$fatherId,$key,$sonClassName){
-		
-		$where = json_encode(array('$relatedTo'=>array('object'=>avosPointer($fatherClassName,$fatherId),'key'=>$key)));
-		
-		$url = HOST.'/classes/'.$sonClassName.'?where='.$where;
-		
-		return $this->get($url);
-	}
-	
-	function increment($className,$objectId,$field,$increment=1){
-	
-		$url = HOST.'/classes/'.$className.'/'.$objectId;
-
-		$data = array($field=>array('__op'=>'Increment','amount'=>intval($increment)));
-		
-		return $this->put($url,json_encode($data));
-	}
-	
-
-	function count($className,$whereJson=''){
-		
-		$url = HOST.'/classes/'.$className.'?count=1&limit=0';
-		
-		if (!empty($whereJson)){
-			$url.='&where='.$whereJson;
-		}
-   		
-   		$json = $this->get($url);
-   		
-   		return $json;
-	}
-	
-	function countUsers($whereJson=''){
-		$url = HOST.'/users?count=1&limit=0';
-		
-		if (!empty($whereJson)){
-			$url.='&where='.$whereJson;
-		}
-   		
-   		$json = $this->get($url);
-   		
-   		return $json;
-	}
-	
-	/**
-	 * 返回判断field是否有xxvalue
-	 * @param unknown_type $className
-	 * @param unknown_type $field
-	 * @param id $value
-	 */
-	function isFieldHasValue($className,$field,$value){
-		$where = array($field=>$value);
-		$json = $this->retrieveObjects($className,json_encode($where));
-		
-		$results = resultsWithJson($json);
-		if (empty($results))
-			return false;
-		else 
-			return true;
-	}
-	
-//----------------------Intern -------------------
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param string $objJson
-	 */
-	function createUser($objJson){
-		
-		$url = HOST.'/users';
-		
-		return $this->post($url,$objJson);
-	}
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param string $userId
-	 * @param string $include
-	 */
-	function retrieveUser($userId,$include='',$keys=''){
-		
-		$url = HOST."/users/$userId?limit=1";
-		
-		if(!empty($include)){
-			$url.="&include=$include";
-		}
-		
-		if(!empty($keys)){
-			$url.="&keys=$keys";
-		}
-		
-		return $this->get($url);
-
-	}
-	
-	
-	/**
-	 * 
-	 * 
-	 * @param string $where 
-	 * @param unknown_type $order
-	 * @param unknown_type $limit
-	 * @param unknown_type $skip
-	 */
-	function retrieveUsers($where='',$order='',$include='',$limit=100,$skip=0){
-				
-		$url = HOST.'/users?limit='.$limit.'&skip='.$skip;;
-		
-		if(!empty($where)){
-			$url .="&where=$where";
-		}
-		
-		if(!empty($order)){
-			$url = $url.'&order='.$order;
-		}
-		
-		if(!empty($include)){
-			$url.="&include=$include";
-		}
-
-		
-		return $this->get($url);
-	
-	}
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $userId
-	 * @param unknown_type $session
-	 * @param string $objJson
-	 */
-	function updateUser($userId,$session,$objJson){
-			
-		
-		$url = HOST.'/users/'.$userId;
-		$header = $this->jsonHeader;
-		$header[]='X-AVOSCloud-Session-Token:'.$session;
-		
-		return $this->put($url,$objJson,$header);
-
-	}
-	
-	function deleteUser($userId,$session){
-	
-		$url = HOST.'/users/'.$userId;
-		$header = $this->jsonHeader;
-		$header[]='X-AVOSCloud-Session-Token:'.$session;
-	
-		return $this->delete($url,$header);
-	}
-
-	
-	/**
-	 * 
-	 * @param unknown_type $className
-	 * @param string $objJson
-	 */
-	function createObject($className,$objJson){
-	
-		$url = HOST.'/classes/'.$className;
-
-		return $this->post($url,$objJson);
-	}
-
-	
-	function retrieveObject($className,$objectId,$include=''){
-		
-		$url = HOST.'/classes/'.$className.'/'.$objectId;
-		
-		if(!empty($include)){
-			$url.="?include=$include";
-		}
-		return $this->get($url);
-	}
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $className
-	 * @param string $where 
-	 * @param unknown_type $order
-	 * @param unknown_type $limit
-	 * @param unknown_type $skip
-	 */
-	function retrieveObjects($className,$where='',$include='',$order='',$keys='',$skip=0,$limit=30){
-		
-		$url = HOST.'/classes/'.$className.'?limit='.$limit.'&skip='.$skip;
-		
-		if(!empty($where)){
-			$url = $url.'&where='.$where;
-		}
-		
-		if(!empty($include)){
-			$url.="&include=$include";
-		}
-		
-		if(!empty($order)){
-			$url = $url.'&order='.$order;
-		}
-		
-		if(!empty($keys)){
-			$url.= "&keys=$keys";
-		}
-
-		
-		return $this->get($url);
-	}
-	
-	
-	/**
-	 * 更新Object
-	 * @param string $className
-	 * @param string $objectId
-	 * @param string $objJson
-	 */
-	function updateObject($className,$objectId,$objJson){
-
-		$url = HOST.'/classes/'.$className.'/'.$objectId;
-		
-		$output = $this->put($url,$objJson);
-		
-		return patchUpdateLast1($output);
-
-	}
-	
-	function deleteObject($className,$objectId){
-
-		$url = HOST.'/classes/'.$className.'/'.$objectId;
-		return $this->delete($url);
+//$ok = openssl_verify('tampered'.$data, $binary_signature, union_test_public_key);
+$ok = openssl_verify($data.'a', $binary_signature, union_test_public_key);
+echo "check #2: ";
+if ($ok == 1) {
+    echo "ERROR: Data has been tampered, but signature is still valid! Argh! ";
+} elseif ($ok == 0) {
+    echo "bad signature (as it should be, since data has beent tampered) ";
+} else {
+    echo "ugly, error checking signature ";
+}
 	}
 
 	

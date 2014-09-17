@@ -193,7 +193,7 @@ class Kqapi3 extends REST_Controller
    			$inputs[$key] = $this->post($key);
    		}
 
-   		
+
 	
    		$json = $this->user_m->create($inputs);
    			
