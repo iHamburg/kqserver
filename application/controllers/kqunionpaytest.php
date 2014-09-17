@@ -128,6 +128,7 @@ Bd6h4wrbbHA2XE1sq21ykja/Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o
 	echo $decrypted,"\n";  
 	
 //	openssl_verify(base64_decode($encrypted2), $signature, $pub_key_id)
+
 	}
 	
 	/*
