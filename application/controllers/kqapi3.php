@@ -94,8 +94,7 @@ class Kqapi3 extends REST_Controller
 			
 
 		$json = $this->user_m->login($username, $password);
-		
-//	
+	
 		$response = json_decode($json,true);
 		
 		if(empty($response['error'])){

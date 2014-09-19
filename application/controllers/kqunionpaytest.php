@@ -25,6 +25,7 @@ class Kqunionpaytest extends CI_Controller{
 		
 		$this->load->library('unionpay');
 		$this->load->library('rsa');
+		
 	}
 	
 

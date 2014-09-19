@@ -24,6 +24,7 @@ class apiunittest extends CIUnit_TestCase
 		
 		$this->CI = &get_instance();
 		$this->api_host = 'http://localhost/kq/index.php/kqapi3';
+
 		$this->uid = '539676b4e4b09baa2ad7ac78';
 	}
 	
