@@ -17,233 +17,219 @@ class Kqunionpaytest extends CI_Controller{
 	 */
 	var $unionpay;
 	
+	var $private_key =  '-----BEGIN PRIVATE KEY-----
+MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9F1ub3EmcROVb9
+TuwbvGEwZaDeldcDtQNYvHpC5Xm+0v32pGCCJ05qK3zEpumz8bpHcBqVw94cZVia
+4iVaEWkFnWm710b7NdNeMBFhC/L9NYl0jDsoRhCL/57OxbttvMPi0YbpQc0Qfn80
+QnYZYcwic640UVUz5DzJ/sVOrleFAgMBAAECgYBUSTfQmIxE/k5ClGyuw35yhgfm
+yUHjQg0LpsCOGO6ZGl1c1PtGe9K4zrGO+/8IKDkos22MD+G1Zi9VLQooujeTJtps
+fHsp9DhGgglfhOwH8kkCtgVaH6sovgzIj5plln6la/GDAcRe5kGn1xoTDusnVqw9
+OqC27gybn/hM3lFOaQJBAP14rXdpap1EKbigSSEGP0PwiA0c2yu1EknxQ8fRJWS7
+DyIRn9K1vsxCbxfLY2PYlPWFz8fCPMRJhqO3BP4OxacCQQDxqOavBS0UT4iqJ1+W
+zz7dV6sTd/p3gbVBy5It7wGWnDiBa9Z2beLm1k84oc7mb56Mf6VDCuAeILEs3jJ1
+PLbzAkBvVzc7oP7IHk0FYMM+0nOv8FSTDf3ocR2bhXN0rpZybQj0ujEuac9qAjSy
+ixEZpuWoBCOFZ/kxb+rIt3hl8S85AkEA6TZEmTb3kBhJHVwuBY4vbtBCCuHIVzhX
+wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
++18qzzh7budS3A1kPTDx4xeT+Rtt6bhz0nfmuBuUGRa2Mt4CVNVspkAXMU7j+0mF
+sp5Ykcw0iwSbUA==
+-----END PRIVATE KEY-----';
+	
+	var $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+	var $appId = 'ALLPERM';
+	var $version = '1.0';
+	var $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
+	
 	function __construct(){
 		parent::__construct();
 		
 	
-		header( 'Content-Type:text/plain;charset=utf-8 '); 
+//		header( 'Content-Type:application/json;charset=utf-8 '); 
 		
 		$this->load->library('unionpay');
 		$this->load->library('rsa');
-		
+		$this->load->library('aes');
+		$this->load->helper('html');
 	}
 	
 
 	function index() {
 
-		echo 'union pay test';
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		echo 'union pay test<br>';
+		
+//		$key = '1aabac6d068eef6a7bad3fdf50a05cc8';
+		
+		$plain = '12';
+		
+		$content = '6288888888888888';
+		$key = 'lvANHSNZCYTZRNmX';
+		
+		
+//		echo $this->generateKey($plain);
+
+//		echo $this->pad2Length($plain, 16);
+		
+		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
+		$iv_size = mcrypt_enc_get_iv_size($cipher);      
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+
+		
+		echo '自动生成iv的长度:'.strlen($iv).'位:'.bin2hex($iv).'<br>';
+		
+		if (mcrypt_generic_init($cipher, $key, $iv) != -1)      
+		{      
+		    // PHP pads with NULL bytes if $content is not a multiple of the block size..      
+		    $cipherText = mcrypt_generic($cipher,$content);      
+		    mcrypt_generic_deinit($cipher);      
+		    mcrypt_module_close($cipher);      
+		         
+		    // Display the result in hex.      
+//		    printf("128-bit encrypted result:\n%s\n\n",bin2hex($cipherText));
+//  			 printf("128-bit encrypted result:\n%s\n\n",base64_encode($cipherText));
+
+		    echo base64_encode($cipherText);
+		    print("<br />");      
+		         
+		}      
+	}
+	
+	function aes() {
+
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		echo 'union pay test<br>';
+		
+//		$plain = '1aabac6d068eef6a7bad3fdf50a05cc8';
+		
+		$plain = '12';
+		
+		$content = '6288888888888888';
+		$key = 'lvANHSNZCYTZRNmX';
+		
+		$content = $this->pad2Length($content, 16);
+		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
+		$iv_size = mcrypt_enc_get_iv_size($cipher);      
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+
+		
+		echo '自动生成iv的长度:'.strlen($iv).'位:'.bin2hex($iv).'<br>';
+		
+		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv);
+		 
+		
+		echo base64_encode($cipherText);
 		
 	}
 	
-	function testSignature(){
+	function testSuit(){
 		
-		$public_key = '-----BEGIN PUBLIC KEY-----  
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3//sR2tXw0wrC2DySx8vNGlqt  
-3Y7ldU9+LBLI6e1KS5lfc5jlTGF7KBTSkCHBM3ouEHWqp1ZJ85iJe59aF5gIB2kl  
-Bd6h4wrbbHA2XE1sq21ykja/Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o  
-2n1vP1D+tD3amHsK7QIDAQAB  
------END PUBLIC KEY-----';  
+		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-//	
-//	$plain = '111';
+		$linkPrepend = 'kqunionpaytest/';
 		
-		$plain = '+X4c15qsPe4WmkuswtWCI32abzR62wrLBZx/OjWBwVQjSFZVMJf1oz8LWgtLA47S2zJsWtoahcPfRxe4kJn5';
+		$apiTitle = array('用户注册','用户信息查询','银行卡开通服务','银行卡关闭服务');
+		$apiLink = array('testRegByMobile','testGetUserByMobile','testBindCard','testUnbindCard');
+		foreach ($apiLink as $link) {
+			$newApiLink[] = $linkPrepend.$link;
+		}
 		
-		$encrypted = $this->unionpay->private_key_signature($plain);	
 		
-		echo 'encrypted :'.$encrypted;
-		echo "\n";
-		$encrypted2 = $this->rsa->sign($plain);
+		$data['title'] = '银联接口测试套装';
 		
-		echo '    encrypted :'.$encrypted;
-		echo "\n";
-		echo 'sss';
-		$decrypted='';
-			$pu_key = openssl_pkey_get_public($public_key);//这个函数可用来判断公钥是否是可用的 
-		openssl_public_decrypt(base64_decode($encrypted),$decrypted,$pu_key);//私钥加密的内容通过公钥可用解密出来  
-		echo $decrypted,"\n";  
+		$data['titles'] = $apiTitle;
+		$data['links'] = $newApiLink;
+		
+		$this->load->view('vUnionPayTest', $data);
+		
 	}
-	
-	
-	
-	function testRSA(){
-		$private_key = '-----BEGIN RSA PRIVATE KEY-----  
-MIICXQIBAAKBgQC3//sR2tXw0wrC2DySx8vNGlqt3Y7ldU9+LBLI6e1KS5lfc5jl  
-TGF7KBTSkCHBM3ouEHWqp1ZJ85iJe59aF5gIB2klBd6h4wrbbHA2XE1sq21ykja/  
-Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o2n1vP1D+tD3amHsK7QIDAQAB  
-AoGBAKH14bMitESqD4PYwODWmy7rrrvyFPEnJJTECLjvKB7IkrVxVDkp1XiJnGKH  
-2h5syHQ5qslPSGYJ1M/XkDnGINwaLVHVD3BoKKgKg1bZn7ao5pXT+herqxaVwWs6  
-ga63yVSIC8jcODxiuvxJnUMQRLaqoF6aUb/2VWc2T5MDmxLhAkEA3pwGpvXgLiWL  
-3h7QLYZLrLrbFRuRN4CYl4UYaAKokkAvZly04Glle8ycgOc2DzL4eiL4l/+x/gaq  
-deJU/cHLRQJBANOZY0mEoVkwhU4bScSdnfM6usQowYBEwHYYh/OTv1a3SqcCE1f+  
-qbAclCqeNiHajCcDmgYJ53LfIgyv0wCS54kCQAXaPkaHclRkQlAdqUV5IWYyJ25f  
-oiq+Y8SgCCs73qixrU1YpJy9yKA/meG9smsl4Oh9IOIGI+zUygh9YdSmEq0CQQC2  
-4G3IP2G3lNDRdZIm5NZ7PfnmyRabxk/UgVUWdk47IwTZHFkdhxKfC8QepUhBsAHL  
-QjifGXY4eJKUBm3FpDGJAkAFwUxYssiJjvrHwnHFbg0rFkvvY63OSmnRxiL4X6EY  
-yI9lblCsyfpl25l7l5zmJrAHn45zAiOoBrWqpM5edu7c  
------END RSA PRIVATE KEY-----';  
-  
-	$public_key = '-----BEGIN PUBLIC KEY-----  
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3//sR2tXw0wrC2DySx8vNGlqt  
-3Y7ldU9+LBLI6e1KS5lfc5jlTGF7KBTSkCHBM3ouEHWqp1ZJ85iJe59aF5gIB2kl  
-Bd6h4wrbbHA2XE1sq21ykja/Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o  
-2n1vP1D+tD3amHsK7QIDAQAB  
------END PUBLIC KEY-----';  
 
-//	echo 'private key '.$private_key;
-//	echobr();
-//	echo 'public key '.$public_key;
+	/**
+	 * 
+	 * 用户信息查询-手机号码方式
+	 */
+	function testGetUserByMobile(){
+	
+		header( 'Content-Type:text/html;charset=utf-8');
+		$mobile = '15166412999';
+		$response = $this->unionpay->getUserByMobile($mobile);
+		echo $response;
 		
-	$pi_key =  openssl_pkey_get_private($private_key);//这个函数可用来判断私钥是否是可用的，可用返回资源id Resource id  
-	$pu_key = openssl_pkey_get_public($public_key);//这个函数可用来判断公钥是否是可用的  
-	//print_r($pi_key);echo "\n";  
-	//print_r($pu_key);echo "\n";  
-
-	$data = "aassssasssddd";//原始数据  
-	$encrypted = "";   
-	$encrypted2 = "";
-	$decrypted = ""; 
-	
-	echo "source data:",$data."\n";  
-  
-	
-	echo "private key encrypt:\n";  
-  
-	openssl_private_encrypt($data,$encrypted,$pi_key);//私钥加密  
-	
-	$encrypted = base64_encode($encrypted);//加密后的内容通常含有特殊字符，需要编码转换下，在网络间通过url传输时要注意base64编码是否是url安全的  
-	echo 'pi_key after base64'.$encrypted,"\n";
-
-	
-	openssl_sign($data,$encrypted2,$pi_key);
-	$encrypted2 = base64_encode($encrypted2);
-	echo 'pi_key after sign'.$encrypted2,"\n";
-	
-	
-	
-	echo "public key decrypt:\n";  
-  
-	openssl_public_decrypt(base64_decode($encrypted),$decrypted,$pu_key);//私钥加密的内容通过公钥可用解密出来  
-	echo $decrypted,"\n";  
-	
-//	openssl_verify(base64_decode($encrypted2), $signature, $pub_key_id)
-
-	}
-	
-	/*
-	 * 增值服务查询：
-	 *	https://202.101.25.188:10385/cardholder/qryacctsvcWSProxy
-	 * */
-	function testQueryService(){
-	
-		$url = 'https://202.101.25.188:10385/cardholder/qryacctsvcWSProxy';
 		
-		echo $this->get($url);
+//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
+//		$url = $this->host.'getUserByMobile';
+//		
+//		$data = array('mobile'=>'15166412999');
+//		
+//		$data = json_encode($data);
+//		
+//		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+//		
+//		$signToken = bin2hex($signToken);
+//		
+//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+//
+//		$post = json_encode($post);
+//		
+////		var_dump($url);
+////		var_dump($post);
+//		
+//		
+//		$response = $this->post($url, $post);
+////		
+//		echo $response;
 	
+
 	}
 	
 	/**
-	 * 用户信息查询
-	 * https://202.101.25.188:10385/cardholder/UC/UCUserService/UCUserServiceProxy/outer/user/getuserbylogin
+	 * 
+	 * 用户注册-银联生成密码
 	 */
-	function testUser(){
+	function testRegByMobile(){
 		
-		$private_key = '-----BEGIN PRIVATE KEY-----
-MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN6SDIGnM3oL5LOZ
-qDcZzn95XO9ICZiiYj/vNlJX9kuVgg4bJ8897lSYFfG0ZVcWY2xofQjz8ePkKQ7/
-WtiZigbONo7lHFw/GIcdnhb/7MRsHodk3/XU6wXoi7fuvct3tEFuwIZk4EJLoyC2
-TOzkPcaritLtU00QNP9ol0VSFJFdAgMBAAECgYEAouXF3YbgeC0IQCLwKRPsPQQ4
-brEMxPfkbOLJoU7b5soQG/7oDhhHvQZq2TKtESZDsm5vRQQ2QBMXsfBXLzyA9cgy
-lhWGk/XqhqY4Ykez4am2B8luggLSNM98yiOrlsUjXJF7AUTi//ku4pHUGAg6msrX
-6J5v+eg4Crnppuyz/YECQQD8oFTyFnnMhLdwwhUkr4cDY+siV8+hnwVaci7wlY4Z
-NIGn4iycw+VK3IVJspJSsIJq0Wnpiy9qOodeekqDDTfxAkEA4Yr2q0cpAyLHYJue
-Ha932khzw8YYQLPai7i2EU7mQL0S+lpGRQ/WfEWkdiRkxXqBrN8tsjz0PfKY0f8s
-PTl8LQJBAPupoVXVrBpgr/mlbriwH5jyBgCdZ5tDNmsGytoisn9LfkpHl1fIEvjD
-vAhR21CCxDkzSwY8AM0bZ1VoECiDl5ECQEqjai4URoY7JC/cT98TCl66S1UmYTBI
-VLKYVeg0bA5Qg89FwKtqKljF0z8lnBOeDvvef4jUkx9NATW9dC5ur6ECQQDs135T
-sl3scJ9I++rAnBlnPBh7cLfWSqg5i9M3h//GoKdPVxbtjTczyI2uffuZrqiXFQeb
-P9q4YCRkEkgYb4ZZ
------END PRIVATE KEY-----';
 		
-		$url = 'https://202.101.25.188:10385/cardholder/UC/UCUserService/UCUserServiceProxy/outer/user/getuserbylogin';
 		
-//		$venderId = 'T00000000000159';
-//		$onlTransPwd = '12345678998765432111111100000099';
-
-		$venderId = 'kuaiquanwang';
-		$onlTransPwd = '2014091600';
+		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$data = array('mobile'=>'13123456789');
-		$data = json_encode($data); // 打成JSON串
-		openssl_sign($data, $signToken, $private_key); //用私钥进行签名
-//		$signToken = base64_encode($signToken);
-		$post = array('venderId'=>$venderId,'$onlTransPwd'=>$onlTransPwd,'data'=>$data,'signToken'=>$signToken);
-		//
-//	  $response = $this->post($url,$post);
-
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post);	
+		$mobile = '15166412998';
 		
-		$output = curl_exec($ch);
-
-		curl_close($ch);
+		$response = $this->unionpay->regByMobile($mobile);
 		
-     	echo 'response get user:'.$output;	
-
+		echo $response;
+	}
+	
+	/**
+	 * 
+	 * 银行卡开通服务
+	 */
+	function testBindCard(){
+	
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		
+		$userId = 'c00050001956';
+		$cardNo = '6222021001128509532';
+		
+		$response = $this->unionpay->bindCard($userId, $cardNo);
+		echo $response;
+	}
+	
+	
+	/**
+	 * 
+	 * 银行卡关闭服务
+	 */
+	function testUnbindCard(){
+	
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		
+		$userId = 'c00050001956';
+		$cardNo = '6222021001128509532';
+		
+		$response = $this->unionpay->unbindCard($userId, $cardNo);
+		echo $response;
 		
 	}
 	
 	
-	
-	
-	function testSign(){
-		$this->unionpay->testSign();
-	}
-	
-	
-	//https://202.101.25.188:10385/cardholder/UC/UCUserService/UCUserServiceProxy/outer/user/mobileregister
-	function testRegister(){
-			$private_key = '-----BEGIN PRIVATE KEY-----
-MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN6SDIGnM3oL5LOZ
-qDcZzn95XO9ICZiiYj/vNlJX9kuVgg4bJ8897lSYFfG0ZVcWY2xofQjz8ePkKQ7/
-WtiZigbONo7lHFw/GIcdnhb/7MRsHodk3/XU6wXoi7fuvct3tEFuwIZk4EJLoyC2
-TOzkPcaritLtU00QNP9ol0VSFJFdAgMBAAECgYEAouXF3YbgeC0IQCLwKRPsPQQ4
-brEMxPfkbOLJoU7b5soQG/7oDhhHvQZq2TKtESZDsm5vRQQ2QBMXsfBXLzyA9cgy
-lhWGk/XqhqY4Ykez4am2B8luggLSNM98yiOrlsUjXJF7AUTi//ku4pHUGAg6msrX
-6J5v+eg4Crnppuyz/YECQQD8oFTyFnnMhLdwwhUkr4cDY+siV8+hnwVaci7wlY4Z
-NIGn4iycw+VK3IVJspJSsIJq0Wnpiy9qOodeekqDDTfxAkEA4Yr2q0cpAyLHYJue
-Ha932khzw8YYQLPai7i2EU7mQL0S+lpGRQ/WfEWkdiRkxXqBrN8tsjz0PfKY0f8s
-PTl8LQJBAPupoVXVrBpgr/mlbriwH5jyBgCdZ5tDNmsGytoisn9LfkpHl1fIEvjD
-vAhR21CCxDkzSwY8AM0bZ1VoECiDl5ECQEqjai4URoY7JC/cT98TCl66S1UmYTBI
-VLKYVeg0bA5Qg89FwKtqKljF0z8lnBOeDvvef4jUkx9NATW9dC5ur6ECQQDs135T
-sl3scJ9I++rAnBlnPBh7cLfWSqg5i9M3h//GoKdPVxbtjTczyI2uffuZrqiXFQeb
-P9q4YCRkEkgYb4ZZ
------END PRIVATE KEY-----';
-		
-		$url = 'https://202.101.25.188:10385/cardholder/UC/UCUserService/UCUserServiceProxy/outer/user/mobileregister';
-		
-		$venderId = 'kuaiquanwang';
-		$onlTransPwd = '2014091600';
-		
-		$mobile = '1312345678';
-		$openService = '208';
-		$data = array('mobile'=>$mobile,'openService'=>$openService);
-		$data = json_encode($data);
-		
-		openssl_sign($data, $signToken, $private_key); //用私钥进行签名
-//		$signToken = base64_encode($signToken);
-		$post = array('venderId'=>$venderId,'$onlTransPwd'=>$onlTransPwd,'data'=>$data,'signToken'=>$signToken);
-	
-		
-		$response = $this->post($url,$post);
-		 
-			echo 'response register:'.$response;	
-	}
 	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
@@ -263,11 +249,37 @@ P9q4YCRkEkgYb4ZZ
 	
 	/////////////////
 	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $url
-	 */
+	private function  generateKey($key){
+		
+		$md5 = md5($key,TRUE);
+		$result = base64_encode($md5);
+		
+		while (strlen($result)<16) {
+			$result.='%';
+		}
+		
+		return $result;
+	}
+	
+	private  function pad2Length($text, $padlen){    
+    $len = strlen($text)%$padlen;    
+    $res = $text;    
+    $span = $padlen-$len;    
+    for($i=0; $i<$span; $i++){    
+        $res .= chr($span);
+    
+    }    
+    return $res;    
+}    
+
+private static function pkcs5_pad ($text, $blocksize) {
+
+$pad = $blocksize - (strlen($text) % $blocksize);
+
+return $text . str_repeat(chr($pad), $pad);
+
+}
+
 	function get($url){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
@@ -283,15 +295,21 @@ P9q4YCRkEkgYb4ZZ
 		return $output;
 	}
 
-	function post($url='',$data=''){
+	function post($url,$data){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);	
-		
+
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(  
+            'Content-Type: application/json; charset=utf-8')  
+        );  // 要求用json格式传递参数
+
+ 	
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        
 		$output = curl_exec($ch);
 
 		curl_close($ch);
@@ -299,70 +317,7 @@ P9q4YCRkEkgYb4ZZ
 		return $output;
 	}
 	
-	function vpost($url,$data){ // 模拟提交数据函数
-    $curl = curl_init(); // 启动一个CURL会话
-    curl_setopt($curl, CURLOPT_URL, $url); // 要访问的地址
-    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
-    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0); // 从证书中检查SSL加密算法是否存在
-//    curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // 模拟用户使用的浏览器
-//    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
-//    curl_setopt($curl, CURLOPT_AUTOREFERER, 1); // 自动设置Referer
-    curl_setopt($curl, CURLOPT_POST, 1); // 发送一个常规的Post请求
-    curl_setopt($curl, CURLOPT_POSTFIELDS, $data); // Post提交的数据包
-    curl_setopt($curl, CURLOPT_TIMEOUT, 30); // 设置超时限制防止死循环
-    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1); // 获取的信息以文件流的形式返回
-
-    $tmpInfo = curl_exec($curl); // 执行操作
-    if (curl_errno($curl)) {
-       echo 'Errno:'.curl_error($curl);//捕抓异常
-    }
-    curl_close($curl); // 关闭CURL会话
-    return $tmpInfo; // 返回数据
-}
-	
-	
-	function put($url='',$objJson='',$header=''){
-		
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-		
-		if(empty($header)){
-			$header = $this->jsonHeader;
-		}
-		
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-	
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
-		$output = curl_exec($ch);
-		curl_close($ch);
-		
-		return $output;
-	}
 	
 
-	function delete($url='',$header=''){
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-		
-		if(empty($header)){
-			$header = $this->jsonHeader;
-		}
-		
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		
-		$output = curl_exec($ch);
-		curl_close($ch);
-		
-		return $output;
-	}
-	
 
 }

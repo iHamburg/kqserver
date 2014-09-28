@@ -1,148 +1,181 @@
 <?php
 
-define('HOST','https://cn.avoscloud.com/1');
-
-
-define('Error_Create_Object', -8201);
-define('Error_Add_Object_In_Array', -8202);
-define('Error_Delete_Object', -8203);
-define('Error_Remove_Object_In_Array', -8204);
-define('Error_Retrieve_Object', -8205);
-define('Error_Update_Object', -8206);
-define('Error_Search_Shop',-8207);
-
-
-define('union_test_private_key','-----BEGIN RSA PRIVATE KEY-----  
-MIICXQIBAAKBgQC3//sR2tXw0wrC2DySx8vNGlqt3Y7ldU9+LBLI6e1KS5lfc5jl  
-TGF7KBTSkCHBM3ouEHWqp1ZJ85iJe59aF5gIB2klBd6h4wrbbHA2XE1sq21ykja/  
-Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o2n1vP1D+tD3amHsK7QIDAQAB  
-AoGBAKH14bMitESqD4PYwODWmy7rrrvyFPEnJJTECLjvKB7IkrVxVDkp1XiJnGKH  
-2h5syHQ5qslPSGYJ1M/XkDnGINwaLVHVD3BoKKgKg1bZn7ao5pXT+herqxaVwWs6  
-ga63yVSIC8jcODxiuvxJnUMQRLaqoF6aUb/2VWc2T5MDmxLhAkEA3pwGpvXgLiWL  
-3h7QLYZLrLrbFRuRN4CYl4UYaAKokkAvZly04Glle8ycgOc2DzL4eiL4l/+x/gaq  
-deJU/cHLRQJBANOZY0mEoVkwhU4bScSdnfM6usQowYBEwHYYh/OTv1a3SqcCE1f+  
-qbAclCqeNiHajCcDmgYJ53LfIgyv0wCS54kCQAXaPkaHclRkQlAdqUV5IWYyJ25f  
-oiq+Y8SgCCs73qixrU1YpJy9yKA/meG9smsl4Oh9IOIGI+zUygh9YdSmEq0CQQC2  
-4G3IP2G3lNDRdZIm5NZ7PfnmyRabxk/UgVUWdk47IwTZHFkdhxKfC8QepUhBsAHL  
-QjifGXY4eJKUBm3FpDGJAkAFwUxYssiJjvrHwnHFbg0rFkvvY63OSmnRxiL4X6EY  
-yI9lblCsyfpl25l7l5zmJrAHn45zAiOoBrWqpM5edu7c  
------END RSA PRIVATE KEY-----');
-
-define('union_test_public_key','-----BEGIN PUBLIC KEY-----  
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC3//sR2tXw0wrC2DySx8vNGlqt  
-3Y7ldU9+LBLI6e1KS5lfc5jlTGF7KBTSkCHBM3ouEHWqp1ZJ85iJe59aF5gIB2kl  
-Bd6h4wrbbHA2XE1sq21ykja/Gqx7/IRia3zQfxGv/qEkyGOx+XALVoOlZqDwh76o  
-2n1vP1D+tD3amHsK7QIDAQAB  
------END PUBLIC KEY-----');
-
-define('union_private_key','-----BEGIN PRIVATE KEY-----
-MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAN6SDIGnM3oL5LOZ
-qDcZzn95XO9ICZiiYj/vNlJX9kuVgg4bJ8897lSYFfG0ZVcWY2xofQjz8ePkKQ7/
-WtiZigbONo7lHFw/GIcdnhb/7MRsHodk3/XU6wXoi7fuvct3tEFuwIZk4EJLoyC2
-TOzkPcaritLtU00QNP9ol0VSFJFdAgMBAAECgYEAouXF3YbgeC0IQCLwKRPsPQQ4
-brEMxPfkbOLJoU7b5soQG/7oDhhHvQZq2TKtESZDsm5vRQQ2QBMXsfBXLzyA9cgy
-lhWGk/XqhqY4Ykez4am2B8luggLSNM98yiOrlsUjXJF7AUTi//ku4pHUGAg6msrX
-6J5v+eg4Crnppuyz/YECQQD8oFTyFnnMhLdwwhUkr4cDY+siV8+hnwVaci7wlY4Z
-NIGn4iycw+VK3IVJspJSsIJq0Wnpiy9qOodeekqDDTfxAkEA4Yr2q0cpAyLHYJue
-Ha932khzw8YYQLPai7i2EU7mQL0S+lpGRQ/WfEWkdiRkxXqBrN8tsjz0PfKY0f8s
-PTl8LQJBAPupoVXVrBpgr/mlbriwH5jyBgCdZ5tDNmsGytoisn9LfkpHl1fIEvjD
-vAhR21CCxDkzSwY8AM0bZ1VoECiDl5ECQEqjai4URoY7JC/cT98TCl66S1UmYTBI
-VLKYVeg0bA5Qg89FwKtqKljF0z8lnBOeDvvef4jUkx9NATW9dC5ur6ECQQDs135T
-sl3scJ9I++rAnBlnPBh7cLfWSqg5i9M3h//GoKdPVxbtjTczyI2uffuZrqiXFQeb
-P9q4YCRkEkgYb4ZZ
------END PRIVATE KEY-----');
 
 class Unionpay{
 	
+	  
+	private $private_key='-----BEGIN PRIVATE KEY-----
+MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9F1ub3EmcROVb9
+TuwbvGEwZaDeldcDtQNYvHpC5Xm+0v32pGCCJ05qK3zEpumz8bpHcBqVw94cZVia
+4iVaEWkFnWm710b7NdNeMBFhC/L9NYl0jDsoRhCL/57OxbttvMPi0YbpQc0Qfn80
+QnYZYcwic640UVUz5DzJ/sVOrleFAgMBAAECgYBUSTfQmIxE/k5ClGyuw35yhgfm
+yUHjQg0LpsCOGO6ZGl1c1PtGe9K4zrGO+/8IKDkos22MD+G1Zi9VLQooujeTJtps
+fHsp9DhGgglfhOwH8kkCtgVaH6sovgzIj5plln6la/GDAcRe5kGn1xoTDusnVqw9
+OqC27gybn/hM3lFOaQJBAP14rXdpap1EKbigSSEGP0PwiA0c2yu1EknxQ8fRJWS7
+DyIRn9K1vsxCbxfLY2PYlPWFz8fCPMRJhqO3BP4OxacCQQDxqOavBS0UT4iqJ1+W
+zz7dV6sTd/p3gbVBy5It7wGWnDiBa9Z2beLm1k84oc7mb56Mf6VDCuAeILEs3jJ1
+PLbzAkBvVzc7oP7IHk0FYMM+0nOv8FSTDf3ocR2bhXN0rpZybQj0ujEuac9qAjSy
+ixEZpuWoBCOFZ/kxb+rIt3hl8S85AkEA6TZEmTb3kBhJHVwuBY4vbtBCCuHIVzhX
+wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
++18qzzh7budS3A1kPTDx4xeT+Rtt6bhz0nfmuBuUGRa2Mt4CVNVspkAXMU7j+0mF
+sp5Ykcw0iwSbUA==
+-----END PRIVATE KEY-----';
+	 
+	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+	private $appId = 'ALLPERM';
+	private $version = '1.0';
+	private $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';  //AES加密用
+	private $infSource = 'ALLPERM';
 	
-	 public $header;
-     
-	 public $jsonHeader;
-     
-
      public function __construct(){
 		
 		
-//		$appid = 'ezxvldwk94k38d6fki1ks4yq55jkl2t15tttu5ezdqbk8mio';
-//		$appkey = 'mtbrztjctplgnho2qf49cs70gd4lfggiayww7u6h4mv5s60t';
-//		
-//		$this->header =  array(
-//			'X-AVOSCloud-Application-Id:'.$appid,
-//			'X-AVOSCloud-Application-Key:'.$appkey,
-//		);
-//		
-//		$this->jsonHeader = array(
-//			'X-AVOSCloud-Application-Id:'.$appid,
-//			'X-AVOSCloud-Application-Key:'.$appkey,
-//		  	'Content-Type: application/json;charset=utf-8');
 	}
 	
 	/**
 	 * 
-	 * 是经过base64转码的，但没有经过url处理
-	 * @param unknown_type $plain
+	 * Enter description here ...
+	 * @param unknown_type $mobile
+	 * respCd":"300304"  用户名被占用 
+	 * 成功： {"data":{"mobile":"15166412998","userId":"c00050001982"},"respCd":"000000","msg":""}
 	 */
-	function private_key_signature($plain){
-		$pi_key =  openssl_pkey_get_private(union_private_key);
+	public function regByMobile($mobile){
 		
-//		print_r($pi_key);echo "\n";
-		$encrypted = "";   
-		$decrypted = ""; 
+		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
+		$url = $this->host.'regByMobile';
 		
-		openssl_private_encrypt($data,$encrypted,$pi_key);//私钥加密  
-	
-		$encrypted = base64_encode($encrypted);//加密后的内容通常含有特殊字符，需要编码转换下，在网络间通过url传输时要注意base64编码是否是url安全的  
+		$data = array('mobile'=>$mobile,
+					'infSource'=>$this->infSource);
 		
-		return $encrypted;
-	} 
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
 
-	function sign($plain){
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+		$response = $this->post($url, $post);
+
+		
+		return $response;
+	}
+	
+	/**
+	 * 
+	 * 用户信息查询-手机号码方式
+	 */
+	public function getUserByMobile($mobile){
+
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile' => $mobile);
+		
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		
+		$response = $this->post($url, $post);
+
+		
+		return $response;
+	}
+	
+	/**
+	 * 
+	 * 银行卡开通服务
+	 * respCd: 300500   无效的卡号
+	 */
+	function bindCard($userId,$cardNo){
+	
+//	    'https://120.204.69.183:8090/PreWallet/restlet/outer/bindCard';
+		$url = $this->host.'bindCard';
+
+		$cardNo = strlen($cardNo).$cardNo; //卡号前带两位长度位
+		
+		$needAuth = '0';
+
+		$key = $this->generateAESKey($this->appSecret);
+		
+		$content = $this->pad2Length($cardNo, 16);  //把明文padding
+		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
+		$iv_size = mcrypt_enc_get_iv_size($cipher);      
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);//ECB模式，iv不同最后的结果也是一样的
+		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv); 
+		$encrypted = base64_encode($cipherText);
+
+		
+		$data = array('userId'=>$userId, 'cardNo'=>$encrypted, 'needAuth'=>$needAuth);
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		$signToken = bin2hex($signToken);
+		
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		
+		$response = $this->post($url, $post);
+		return $response;
 		
 	}
 	
-	function verify($plain){
+	function unbindCard($userId,$cardNo){
+	
+//	    'https://120.204.69.183:8090/PreWallet/restlet/outer/unBindCard';
+		$url = $this->host.'unBindCard';
+
+		$cardNo = strlen($cardNo).$cardNo; //卡号前带两位长度位
+		
+
+		$key = $this->generateAESKey($this->appSecret);
+		
+		$content = $this->pad2Length($cardNo, 16);
+		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
+		$iv_size = mcrypt_enc_get_iv_size($cipher);      
+		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+		
+		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv); 
+		
+		$encrypted = base64_encode($cipherText);
+		
+		$data = array('userId'=>$userId, 'cardNo'=>$encrypted);
+		
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+		
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		
+		$response = $this->post($url, $post);
+		
+		return $response;
 		
 	}
 	
-	function testSign(){
-		$data = "Beeeeer is really good.. hic...";
-		$binary_signature = "";
-		openssl_sign($data, $binary_signature, union_test_private_key);
-		
-		echo 'binary signature:'.$binary_signature;
-		echo "\n";
-		
-		$signature = base64_encode($binary_signature);
-		
-		echo 'signature:'.$signature;
-		echo "\n";
-		
-//		$ok = openssl_verify($data, $binary_signature, union_test_public_key);
-//		
-//		echo 'ok: '.$ok;
-	
-	$ok = openssl_verify($data, $binary_signature, union_test_public_key);
-echo "check #1: ";
-if ($ok == 1) {
-    echo "signature ok (as it should be) ";
-} elseif ($ok == 0) {
-    echo "bad (there's something wrong) ";
-} else {
-    echo "ugly, error checking signature ";
-}
-
-//$ok = openssl_verify('tampered'.$data, $binary_signature, union_test_public_key);
-$ok = openssl_verify($data.'a', $binary_signature, union_test_public_key);
-echo "check #2: ";
-if ($ok == 1) {
-    echo "ERROR: Data has been tampered, but signature is still valid! Argh! ";
-} elseif ($ok == 0) {
-    echo "bad signature (as it should be, since data has beent tampered) ";
-} else {
-    echo "ugly, error checking signature ";
-}
-	}
-
 	
 	/////////////////
 	
@@ -151,14 +184,14 @@ if ($ok == 1) {
 	 * Enter description here ...
 	 * @param unknown_type $url
 	 */
-	function get($url){
+	private function get($url){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
+	
 	
 		$output = curl_exec($ch);
 		curl_close($ch);
@@ -166,60 +199,20 @@ if ($ok == 1) {
 		return $output;
 	}
 
-	function post($url='',$objJson=''){
+	private function post($url='',$objJson=''){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(  
+            'Content-Type: application/json; charset=utf-8')  
+        );  // 要求用json格式传递参数
 		
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->jsonHeader);
+	
 	
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
-		$output = curl_exec($ch);
-		curl_close($ch);
-		
-		return $output;
-	}
-	
-	function put($url='',$objJson='',$header=''){
-		
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-		
-		if(empty($header)){
-			$header = $this->jsonHeader;
-		}
-		
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-	
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
-		$output = curl_exec($ch);
-		curl_close($ch);
-		
-		return $output;
-	}
-	
-
-	function delete($url='',$header=''){
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-		
-		if(empty($header)){
-			$header = $this->jsonHeader;
-		}
-		
-		curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-		
 		$output = curl_exec($ch);
 		curl_close($ch);
 		
@@ -227,14 +220,47 @@ if ($ok == 1) {
 	}
 	
 	/**
-	 * 执行Batch命令
-	 * @param array $requests
+	 * 
+	 * 给明文加padding， PKCS5Padding
+	 * @param unknown_type $text
+	 * @param unknown_type $padlen
 	 */
-	function batch($requests=''){
-	   	 $requestsJson = json_encode(array('requests'=>$requests));
-
-         return $this->post('https://cn.avoscloud.com/1/batch',$requestsJson);
+	private  function pad2Length($text, $padlen){    
+	    $len = strlen($text)%$padlen;    
+	    $res = $text;    
+	    $span = $padlen-$len;    
+	    for($i=0; $i<$span; $i++){    
+	        $res .= chr($span);
+	    
+	    }    
+	    return $res;    
+	
+	}    
+	
+	/**
+	 * 
+	 * 把secret 转成16位的密码
+	 * @param unknown_type $key
+	 */
+	private function  generateAESKey($key){
+		
+		$md5 = md5($key,TRUE);
+		$result = base64_encode($md5);
+		
+		while (strlen($result)<16) {
+			$result.='%';
+		}
+		
+		if(strlen($result)>16){
+		
+			$nbegin = (strlen($result) - 16) / 2;
+			$result = substr($result,$nbegin,16);
+		}
+		
+		return $result;
 	}
+
+
 }
 
 /* End of file Someclass.php */
