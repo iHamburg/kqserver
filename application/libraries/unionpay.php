@@ -31,6 +31,7 @@ sp5Ykcw0iwSbUA==
 		
 		
 	}
+
 	
 	/**
 	 * 
@@ -38,6 +39,8 @@ sp5Ykcw0iwSbUA==
 	 * @param unknown_type $mobile
 	 * respCd":"300304"  用户名被占用 
 	 * 成功： {"data":{"mobile":"15166412998","userId":"c00050001982"},"respCd":"000000","msg":""}
+	 * 		 {"data":{"mobile":"15166412996","userId":"c00050001984"},"respCd":"000000","msg":""}
+	 * 		 {"data":{"mobile":"13166361023","userId":"c00050001985"},"respCd":"000000","msg":""}
 	 */
 	public function regByMobile($mobile){
 		
@@ -153,6 +156,7 @@ sp5Ykcw0iwSbUA==
 		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv); 
 		
 		$encrypted = base64_encode($cipherText);
+		
 		
 		$data = array('userId'=>$userId, 'cardNo'=>$encrypted);
 		
