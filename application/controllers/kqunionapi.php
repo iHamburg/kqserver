@@ -48,6 +48,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 
 		$post = json_decode($post);
 		
+		//判断post是否是json值
 		if(json_last_error() != JSON_ERROR_NONE){
 			
 			//'不是json字串';
@@ -55,6 +56,15 @@ transFwdInsId 	string 	可选 	交易发送机构
 			echo json_encode($response);
 		}
 		else{
+
+			$param = array('mchntId','couponId','userId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
+			
+			$mchntId = $post['mchntId'];
+			$couponId = $post['couponId'];
+			$userId = $post['userId'];
+			$chnlUsrId = $post['chnlUsrId'];
+			$cardNo = $post['cardNo'];
+			
 			
 			$response = array('respCd'=>'00000','msg'=>'');
 			echo json_encode($response);
