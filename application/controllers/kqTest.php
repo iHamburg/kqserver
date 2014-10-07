@@ -24,7 +24,9 @@ class KqTest extends CI_Controller{
 	 */
 	var $user;
 	
-	
+	//
+	//
+	//
 	function __construct(){
 		parent::__construct();
 		
@@ -68,7 +70,7 @@ class KqTest extends CI_Controller{
 		$count = $this->user->count_by('username',$array['username']);
 		
 		if($count>0){
-			//用户名已经有了
+			//��ㄦ�峰��宸茬�����浜�
 			
 		}
 		else{
@@ -85,7 +87,7 @@ class KqTest extends CI_Controller{
 //		var_dump($id);
 	}
 	/**
-	 * Shop发行新的Coupon <br>
+	 * Shop���琛���扮��Coupon <br>
 	 * coupon.shop = shop;
 	 * shop.coupons add coupon 
 	 * @param $couponId
@@ -115,10 +117,10 @@ class KqTest extends CI_Controller{
 	}
 	
 	/**
-	 * 把分店和总店连起来 <br>
+	 * ������搴������诲��杩�璧锋�� <br>
 	 * shopBranch.parent = headShop
 	 * headShop.shopBranches add shopBranch
-	 * @param array $shopBranchIds: 分店的Id数组
+	 * @param array $shopBranchIds: ���搴����Id��扮��
 	 * @param string $shopId
 	 * 
 	 * 
@@ -157,8 +159,8 @@ class KqTest extends CI_Controller{
 	
 	function testAddShopBranchesToShop(){
 	
-		//大家乐总店：539d8817e4b0a98c8733f287
-		//大家乐分店： 539d8817e4b0a98c8733f285, 539d8817e4b0a98c8733f284, 539d8817e4b0a98c8733f283
+		//澶у�朵����诲��锛�539d8817e4b0a98c8733f287
+		//澶у�朵�����搴�锛� 539d8817e4b0a98c8733f285, 539d8817e4b0a98c8733f284, 539d8817e4b0a98c8733f283
 		
 //		$branches = array('539d8817e4b0a98c8733f285','539d8817e4b0a98c8733f284','539d8817e4b0a98c8733f283');
 //		
