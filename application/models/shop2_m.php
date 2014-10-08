@@ -1,12 +1,11 @@
 <?php
 
 
-class Coupon2_m extends MY_Model{
+class Shop2_m extends MY_Model{
 	
 	
-	public $_table = 'coupon';
+	public $_table = 'shop';
 	protected $return_type = 'array';
-	public $has_many = array('couponcontent'=>array('model'=>'couponcontent2_m', 'primary_key' => 'couponId' ));
 	
 	/**
 	 * 

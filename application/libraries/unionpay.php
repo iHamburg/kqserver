@@ -23,9 +23,9 @@ sp5Ykcw0iwSbUA==
 	 
 	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
 	private $appId = 'ALLPERM';
-	private $version = '1.0';
 	private $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';  //AES加密用
-	private $infSource = 'ALLPERM';
+	private $infSource = 'ALLPERM';  //业务来源，接入机构需向运营方申请 
+	private $version = '1.0';
 	
      public function __construct(){
 		
@@ -173,13 +173,39 @@ sp5Ykcw0iwSbUA==
 //		var_dump($url);
 //		var_dump($post);
 		
-		
 		$response = $this->post($url, $post);
 		
 		return $response;
 		
 	}
 	
+	
+	function couponDwnById($transSeq,$userId,$couponId,$chnlUsrId,$chnlUsrMobile,$couponSceneId='000'){
+	
+		$url = $this->host.'couponDwnById';
+		
+		$data = array('transSeq' => $transSeq,'userId'=>$userId, 'couponId'=>$couponId,'chnlUsrId'=>$chnlUsrId,'chnlUsrMobile'=>$chnlUsrMobile,'couponSceneId'=>$couponSceneId);
+		
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		
+		$response = $this->post($url, $post);
+
+		
+		return $response;
+		
+	}
 	
 	/////////////////
 	

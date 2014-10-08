@@ -46,8 +46,8 @@ sp5Ykcw0iwSbUA==
 //		header( 'Content-Type:application/json;charset=utf-8 '); 
 		
 		$this->load->library('unionpay');
-		$this->load->library('rsa');
-		$this->load->library('aes');
+//		$this->load->library('rsa');
+//		$this->load->library('aes');
 		$this->load->helper('html');
 	}
 	
@@ -149,8 +149,9 @@ sp5Ykcw0iwSbUA==
 	function testGetUserByMobile(){
 	
 		header( 'Content-Type:text/html;charset=utf-8');
-		$mobile = '15166412999';
+		$mobile = '13166361023';
 		$response = $this->unionpay->getUserByMobile($mobile);
+
 		echo $response;
 		
 		
@@ -179,6 +180,31 @@ sp5Ykcw0iwSbUA==
 	
 
 	}
+	
+		function testGetUserByMobile2(){
+//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile'=>'15166412999');
+		
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+		
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		
+		$response = $this->post($url, $post);
+//		
+		echo $response;
+		}
 	
 	/**
 	 * 
@@ -228,7 +254,17 @@ sp5Ykcw0iwSbUA==
 		
 	}
 	
+	function testCouponDwnById(){
 	
+	header( 'Content-Type:text/html;charset=utf-8 ');
+	
+		$transSeq = '123456789900';
+		$userId = 'c00050001985';
+//		function couponDwnById($transSeq,$userId,$couponId,$chnlUsrId,$chnlUsrMobile,$couponSceneId='000'){
+	
+	}
+	
+//	function testD
 	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";

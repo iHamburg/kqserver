@@ -1,6 +1,14 @@
 <?php
 
 
+function randomCharacter($number){
+		$m = '0123456789abcdefghijkpqrstuvwxyzABCDEFGHIJKPQRSTUVWXYZ';
+		$s = str_shuffle($m);
+		$str = substr($s,1,$number);
+		return $str;
+}
+
+
 /**
  * 
  * update 如果最后一个字符是1，删除1
@@ -250,4 +258,37 @@ function show_custom_error($message, $status_code = 500, $heading = 'An Error Wa
 	$_error =& load_class('Exceptions', 'core');
 	echo $_error->show_error($heading, $message, 'error_general', $status_code);
 		
+}
+
+
+function get($url){
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	//curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
+
+	$output = curl_exec($ch);
+	curl_close($ch);
+
+	return $output;
+}
+
+function post($url='',$data=''){
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_POST, 1);
+
+	//curl_setopt($ch, CURLOPT_HTTPHEADER, $this->jsonHeader);
+
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	$output = curl_exec($ch);
+	curl_close($ch);
+
+	return $output;
 }

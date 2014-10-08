@@ -17,18 +17,16 @@ class Kqservice extends CI_Controller{
 	var $coupon_m;
   
 	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var Avoslibrary
-	 */
-	var $avoslibrary;
 	
 	
 	function __construct(){
 		parent::__construct();
 		
-	
+	header("Content-type: text/html; charset=utf-8");
+		
+	$this->load->model('couponcontent2_m','couponContent');
+	$this->load->model('coupon2_m','coupon');
+	$this->load->model('user2_m','user');
 	}
 	
 
@@ -38,68 +36,28 @@ class Kqservice extends CI_Controller{
 		
 	}
 	
-	/**
-	 * Shop发行新的Coupon <br>
-	 * coupon.shop = shop;
-	 * shop.coupons add coupon 
-	 * @param $couponId
-	 * @param $shopId
-	 */
-	function addCouponToShop($couponId, $shopId){
+	function testRegister(){
+	
+		$url = 'localhost/kq/index.php/kqapi4/user';
+		$data = array('username'=>'131112','password'=>'222');
 		
-		// coupon.shop = shop;
-		
-		$data = array('shop'=>avosPointer('Shop',$shopId));
-		$this->updateObject('Coupon',$couponId,json_encode($data));
-		
-		
-		$where = array('parent'=>avosPointer('Shop',$shopId));
-		$json = $this->retrieveObjects('Shop',json_encode($where));
-		
-		$error = checkResponseError($json);
-		if(!empty($error))
-				return $error;
-				
-		//shop.coupons add coupon 		
-		
-		$json = $this->addPointerInArray('Shop',$shopId,'coupons',avosPointer('Coupon',$couponId));
-		$error = checkResponseError($json);
-		if(!empty($error))	return $error;
-		
+		$response = post($url,$data);
+		echo $response;
 	}
 	
-	/**
-	 * 把分店和总店连起来 <br>
-	 * shopBranch.parent = headShop
-	 * headShop.shopBranches add shopBranch
-	 * @param array $shopBranchIds: 分店的Id数组
-	 * @param string $shopId
-	 * 
-	 * 
-	 */
-	function addShopBranchesToShop($shopBranchIds,$headShopId){
-	
-		//batch: shopBranch.parent = headShop
-
-          foreach ($shopBranchIds as $id) {
-               $requests[]=avosBatch('PUT',"/1/classes/Shop/$id",array('parent'=>avosPointer('Shop',$headShopId)));
-          }
-
-          $json = $this->batch($requests);
-          
-          $error = checkResponseError($json);
-	      if(!empty($error))	return $error;
+	function testRelation(){
 		
-	      
-		///headShop.shopBranches add shopBranch
 		
-	    $json = $this->addPointersInArray('Shop',$headShopId,'shopBranches','Shop',$shopBranchIds);
-	    
-	       $error = checkResponseError($json);
-	      if(!empty($error))	return $error;
+//		$response = $this->couponContent->with('coupon')->get(1);
+		
+		$response = $this->coupon->with('couponcontent')->get(22);
+		
+		print_r($response);
 	}
 	
-	
+	function testCount(){
+		echo $this->user->isSessionValid('24','ZVvW9HygCAsa4RTBQG6t');
+	}
 
 	function testKeys(){
 		$url = HOST."/users?keys=phone,username";

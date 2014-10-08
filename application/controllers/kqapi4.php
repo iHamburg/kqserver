@@ -15,13 +15,6 @@ class Kqapi4 extends REST_Controller
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var Avoslibrary
-	 */
-	var $avoslibrary;
-	
-	/**
-	 * 
-	 * Enter description here ...
 	 * @var District_m
 	 */
 	var $district_m;
@@ -59,9 +52,14 @@ class Kqapi4 extends REST_Controller
 	 * Enter description here ...
 	 * @var User2_m;
 	 */
-	var $user_m;
+	var $user;
 	
-	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var User2_m
+	 */
+	var $user2_m;
 	
 	function __construct(){
 		parent::__construct();
@@ -87,29 +85,42 @@ class Kqapi4 extends REST_Controller
 	 */
 	public function login_get(){
 		$username = $this->get('username');
-		$password = $this->get('password');
+		$password = $this->get('password'); //md5加密
 		
+		
+		$this->load->model('user2_m','user');
+		
+		//用户名或密码不能为空
 		if(empty($username) || empty($password)){
-
-   			return output_response('-1','没有用户名或密码');
+			$status = 401;
+			$msg = '用户名或密码不能为空';
+			return $this->output_error($status,$msg);
 		}
-
-		$json = $this->user_m->login($username, $password);
-			
-		$response = json_decode($json,true);
 		
-		if(empty($response['error'])){
-			return $this->output_results($response);
-		}
-		else{
-			$error = array('status'=>$response['code'],'msg'=>$response['error']);
-		
-			$error = json_encode($error);
-			echo $error;
-		
-			return $error;
-		}
 	
+		$results = $this->user->get_by(array('username'=>$username,'password'=>$password));
+		//用户名或密码错误
+		if(empty($results)){
+			$status = 1001;
+			$msg = '用户名或密码错误';
+			return $this->output_error($status,$msg);
+		}
+		
+	
+		//重设session和expireDate
+		$id = $results['id'];
+		$sessionToken = randomCharacter(20);
+		$expireDate = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
+	
+		$this->user->update($id,array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate));
+		
+		
+		$results['sessionToken'] = $sessionToken;
+		
+		return $this->output_results($results);
+		
+
+		
 	}
 	
 	/**
@@ -124,11 +135,10 @@ class Kqapi4 extends REST_Controller
    		$id = $this->get('id');
    		
    		if(!empty($id)){
-   			
- 			
+ 
    			$result = $this->user->get($id);
    	
-   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl','sessionToken'));
+   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl'));
    			return $this->output_results($result);
 
    		}
@@ -153,32 +163,43 @@ class Kqapi4 extends REST_Controller
     *  msg: username is taken
     */
    public function user_post(){
-   	
-   		$this->load->model('user2_m','user');
-   	
-   		$inputKeys = array('username','password');
-   		
-   		foreach ($inputKeys as $key) {
-   			$inputs[$key] = $this->post($key);
-   		}   		
 
-		$count = $this->user->count_by('username',$inputs['username']);
+
+ 	  	$username = $this->post('username');
+   		$password = $this->post('password');
+   		
+   		 
+		$this->load->model('user2_m','user');
 		
-		if($count>0){
-			//用户名已经有了
-			return $this->output_results(-1);
-			
-		}
-		else{
-			$id = $this->user->insert($array);
-			
-			$result = $this->user->get($id);
-			
-			return $this->output_results($result);
-		}
+   		
+   		if(empty($username) ||empty($password)){
+	   		$status = 401;
+	   		$msg = '用户名或密码不能为空';
+	   		return $this->output_error($status,$msg);
+   		}
+
+   		$count = $this->user->count_by('username',$username);
+
+   		if($count>0){
+   			$status = 1002;
+   			$msg = '用户名已存在';
+   			return $this->output_error($status,$msg);
+   		}
    		
    		
-   			
+		$data['username'] = $username;
+		$data['password'] = $password;
+		$data['sessionToken'] = randomCharacter(20);
+		$data['expireDate'] = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
+		$data['nickname'] ='KQ_'.randomCharacter(8);
+		$data['createdAt'] = NULL;
+		
+   		$id = $this->user->insert($data);
+   		
+   		$this->db->select('id,username,nickname,avatarUrl,sessionToken');
+   		$user = $this->user->get($id);
+   		return $this->output_results($user);
+		
    }
    
    
@@ -217,34 +238,38 @@ class Kqapi4 extends REST_Controller
     * @param limit optional
     */
 	function newestCoupons_get(){
+
 	  	
-	  	$skip = intval($this->input->get('skip'));
-	  	$limit = intval($this->input->get('limit'));
-	  	
+		$this->load->model('coupon2_m','coupon');
+		
+		$skip = intval($this->get('skip'));
+	  	$limit = intval($this->get('limit'));
+
+		$limit = $this->get('limit');
 	  	
 	  	if (empty($skip))
-	  		$skip = 0;
+ 	  		$skip = 0;
 	  	
-	  	if (empty($limit))
-	  		$limit = 30;
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
 	  	
-	  		
-	  	$results = $this->coupon_m->get_newest_coupons($skip,$limit);
+ 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
+ 	  	$this->db->limit($limit,$skip);
+ 	  	$this->db->order_by('createdAt','desc');
+ 	  	$this->db->from('coupon');
+		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
+ 	  	
+		$query = $this->db->get();
+		
+		foreach ($query->result_array() as $row)
+		{
+		  $results[] = $row;
+		}
 	  	
-	  	if ($results<0){
-	  		return output_response(Error_Retrieve_Object,'获取最新快券失败');
-
-	  	}
-	  	else{
-	  		$array = array('status'=>1,'data'=>$results);
-
-	  		$response = json_encode($array);
-			
-			$data['response']=$response;
-			$this->load->view('response',$data);
-			
-			return $response;
-	  	}
+	  	return $this->output_results(array('coupons'=>$results));
+	  	
+	  	//print_r($results);exit;
+	 
 	  }
    
    /**
@@ -464,11 +489,43 @@ class Kqapi4 extends REST_Controller
     */
      public function myCard_get(){
    		
-			$uid = $this->get('uid');
+     	$this->load->model('user2_m','user');
+     	
+		$uid = $this->get('uid');
 
-			$results = $this->user_m->get_user_cards($uid);
-			
-			return $this->output_results($results,'获取银行卡失败');
+		$sessionToken = $this->get('sessionToken');
+	
+		if(empty($uid)){
+		
+			$status = 402;
+			$msg = '用户id不能为空';
+			return $this->output_error($status,$msg);
+		}
+	
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			$status = 403;
+			$msg = '无效的session';
+			return $this->output_error($status,$msg);
+		}
+		 
+		// 
+		
+		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
+		$this->db->from('card as A');
+		$this->db->where('A.userId',$uid);
+		$this->db->join('bank as B','A.bankId = B.id','left');
+
+		
+		$query = $this->db->get();
+		
+		foreach ($query->result_array() as $row)
+		{
+		  $results[] = $row;
+		}
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('cards'=>$results));
    }
    
    /**
@@ -476,6 +533,7 @@ class Kqapi4 extends REST_Controller
     * 用户绑定银行卡
     */
    public function myCard_post(){
+   	
   		 $uid = $this->post('uid');
   		 $cardNumber = $this->post('cardNumber');
 
@@ -497,26 +555,80 @@ class Kqapi4 extends REST_Controller
 	/**
 	 * 
 	 * 获得用户所有downloadedcoupon信息, join Table: DownloadedCoupon
+	 * 如果
 	 * 
+	 * 
+select  count(A.couponId) as number,B.*,C.*
+from downloadedcoupon as A
+inner join coupon B
+on A.`couponId` = B.id 
+left join couponcontent as C
+on A.`couponId` = C.couponId
+where uid='22'
+group by A.couponId
 	 * @return 
 	 */
 	public function myDownloadedCoupon_get(){
+
 		
 		$uid = $this->get('uid');
 
-		$results = $this->my_m->get_my_downloaded_coupons($uid);
-   			
-		//重新处理results
-		if (empty($results['error'])){
-			foreach ($results as $result) {
-				$array[] = $result['coupon'];
-			
-	  	    }
-	  	    $results = $array;
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+		$mode = $this->get('mode');
+		if(empty($mode)){
+			$mode = 'unused';
 		}
 	
-		return $this->output_results($results);
+		if(empty($uid)){
 		
+			$status = 402;
+			$msg = '用户id不能为空';
+			return $this->output_error($status,$msg);
+		}
+	
+		 	
+		
+		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->from('downloadedcoupon as A');
+		$this->db->where('uid',$uid);
+		if($mode=='unused'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate <','now()');
+		}
+		else if($mode == 'used'){
+			$this->db->where('status','used');
+		}
+		else if($mode == 'expired'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate >','now()');
+		}
+		$this->db->join('coupon as B','A.couponId = B.id','left');
+		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->group_by('A.couponId');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		foreach ($query->result_array() as $row)
+		{
+		  $results[] = $row;
+		}
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('coupons'=>$results));
+	
+
+			
+	
 	}
 	
 	
@@ -547,24 +659,47 @@ class Kqapi4 extends REST_Controller
 	 * @return array: (coupon)
 	 */
 	public function myFavoritedCoupon_get(){
-		$uid = $this->get('uid');
-		
-		
-		if(empty($uid)){
-
-			return $this->output_results(-1,'没有用户信息');
-   		}
-		
-
-		$results = $this->user_m->get($uid,'favoritedCoupons','favoritedCoupons');
 	
-   		if(is_array($results)){
-   			//没有error
-   			
-   			$results = $results['favoritedCoupons'];
+		$uid = $this->get('uid');
 
-			return $this->output_results($results,'获取用户信息出错');
-   		}
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+	
+		if(empty($uid)){
+		
+			$status = 402;
+			$msg = '用户id不能为空';
+			return $this->output_error($status,$msg);
+		}
+	
+		 	
+		
+		$this->db->select('A.couponId,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->from('favoritedcoupon as A');
+		$this->db->where('A.userId',$uid);
+		$this->db->join('coupon as B','A.couponId = B.id','left');
+		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		foreach ($query->result_array() as $row)
+		{
+		  $results[] = $row;
+		}
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('coupons'=>$results));
+	
+	
 	
 	}
 	
@@ -627,21 +762,43 @@ class Kqapi4 extends REST_Controller
 	 */
 	public function myFavoritedShop_get(){
 		$uid = $this->get('uid');
-		
-		if(empty($uid)){
-			return outputError(-1,'没有用户信息');
-   		}
-	
-   		$results = $this->user_m->get($uid,'favoritedShops','favoritedShops');
-	
-   		if(is_array($results)){
-   			//没有error
-   			
-   			$results = $results['favoritedShops'];
 
-			return $this->output_results($results,'获取用户信息出错');
-   		}
-   		
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+	
+		if(empty($uid)){
+		
+			$status = 402;
+			$msg = '用户id不能为空';
+			return $this->output_error($status,$msg);
+		}
+	
+		 
+		// 
+		
+		$this->db->select('shopId,title,logoUrl');
+		$this->db->from('favoritedshop as A');
+		$this->db->where('userId',$uid);
+		$this->db->join('shop as B','A.shopId = B.id','left');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		foreach ($query->result_array() as $row)
+		{
+		  $results[] = $row;
+		}
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('shops'=>$results));
 	}
 	
 	
@@ -718,6 +875,12 @@ class Kqapi4 extends REST_Controller
    	
    }
    
+   private function output_error($status,$errorMsg=''){
+  			 $error = array('status'=>$status,'msg'=>$errorMsg);
+   			$response = json_encode($error);
+			echo $response;
+			return $response;
+   }
 
    
    // --------------- TEST -----------------
