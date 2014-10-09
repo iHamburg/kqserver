@@ -59,6 +59,50 @@ class Kqservice extends CI_Controller{
 		echo $this->user->isSessionValid('24','ZVvW9HygCAsa4RTBQG6t');
 	}
 
+	function testDownloadCoupon(){
+		$url = 'localhost/kq/index.php/kqapi4/myDownloadedCoupon';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+		
+		$response = post($url,$data);
+		echo $response;
+	}
+	
+	function testFavoriteCoupon(){
+		$url = 'localhost/kq/index.php/kqapi4/myFavoritedCoupon';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testDeleteFavoriteCoupon(){
+		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedCoupon';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	
+	function testFavoriteShop(){
+		$url = 'localhost/kq/index.php/kqapi4/myFavoritedShop';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testDeleteFavoriteShop(){
+		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedShop';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
 	function testKeys(){
 		$url = HOST."/users?keys=phone,username";
 		$json = $this->avoslibrary->get($url);

@@ -26,6 +26,8 @@ class User2_m extends MY_Model{
 		
 	}
 	
+//	public function down
+	
 	
 //	public function get_all($skip,$limit=20,$include=''){
 //		$this->db->select('id,nickname,username')->from('user');
