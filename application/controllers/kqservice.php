@@ -152,6 +152,65 @@ class Kqservice extends CI_Controller{
 	
 	}
 	
+	function testAroundShopBranches(){
+		$url = 'localhost/kq/index.php/kqapi4/aroundShopbranches';
+		
+		$url.='/districtId/13';
+		$url.='/shopTypeId/1';
+		$url.='/longitude/121.4/latitude/31.2';
+		
+		$response = get($url);
+		
+		echo $response;
+		
+		
+	}
+	
+	function testSearchCoupons(){
+		$url = 'localhost/kq/index.php/kqapi4/searchCoupons';
+		
+		$url.='/districtId/13';
+		$url.='/shopTypeId/1';
+		$url.='/longitude/121.4/latitude/31.2';
+		$url.='/keyword/85';
+		
+		$response = get($url);
+		
+		echo $response;
+	
+		
+	}
+	
+	
+	function testCouponAccepted(){
+		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted';
+
+//		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
+		
+//		$data = array('mchntId'=>'32','couponId'=>'999999');
+
+		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
+		$data = json_encode($data);
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testCouponAccepted2(){
+		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted2';
+
+//		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
+		
+//		$data = array('mchntId'=>'32','couponId'=>'999999');
+
+		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
+		$data = json_encode($data);
+		$data2 = array('params'=>$data);
+		$response = post($url,$data2);
+		
+		echo $response;
+	}
+	
 	function testKeys(){
 		$url = HOST."/users?keys=phone,username";
 		$json = $this->avoslibrary->get($url);

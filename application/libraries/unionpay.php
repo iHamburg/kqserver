@@ -132,11 +132,11 @@ sp5Ykcw0iwSbUA==
 //		var_dump($url);
 //		var_dump($post);
 		
-		
 		$response = $this->post($url, $post);
 		return $response;
 		
 	}
+	
 	
 	function unbindCard($userId,$cardNo){
 	
@@ -180,11 +180,28 @@ sp5Ykcw0iwSbUA==
 	}
 	
 	
-	function couponDwnById($transSeq,$userId,$couponId,$chnlUsrId,$chnlUsrMobile,$couponSceneId='000'){
+	/**
+	 * transSeq 	string 	必填 	接入机构侧的交易主键
+userId 	string 	必填 	持卡人用户ID
+couponId 	string 	必填 	用户下载的票券ID
+couponNum 	string 	必填 	用户下载的票券数量，必须为正整数
+							注：不能超过票券配置的单用户最大获取张数
+chnlUsrId 	string 	可选 	用户在接入机构侧的用户ID（主键），用于票券承兑通知交易供交易接收方识别用户
+chnlUsrMobile 	string 	可选 	用户在接入机构侧留存的手机号码，用于票券承兑通知交易供交易接收方识别用户
+couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种场景
+									000：普通场景，包含普通优惠券、普通电子票
+									001：电影票场景 .
+	 * @param unknown_type $data
+	 * @param unknown_type $couponSceneId
+	 * {"data":{"transSeq":"123456789900","couponNum":1.0},"respCd":"000000","msg":""}
+	 */
+	function couponDwnById($data,$couponSceneId='000'){
 	
 		$url = $this->host.'couponDwnById';
 		
-		$data = array('transSeq' => $transSeq,'userId'=>$userId, 'couponId'=>$couponId,'chnlUsrId'=>$chnlUsrId,'chnlUsrMobile'=>$chnlUsrMobile,'couponSceneId'=>$couponSceneId);
+//		$data = array('transSeq' => $transSeq,'userId'=>$userId, 'couponId'=>$couponId,'chnlUsrId'=>$chnlUsrId,'couponNum'=>$couponNum,'chnlUsrMobile'=>$chnlUsrMobile,'couponSceneId'=>$couponSceneId);
+
+		$data['couponSceneId'] = $couponSceneId;
 		
 		$data = json_encode($data);
 		
@@ -195,9 +212,6 @@ sp5Ykcw0iwSbUA==
 		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
 
 		$post = json_encode($post);
-		
-//		var_dump($url);
-//		var_dump($post);
 		
 		
 		$response = $this->post($url, $post);

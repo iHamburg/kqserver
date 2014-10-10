@@ -252,12 +252,30 @@ sp5Ykcw0iwSbUA==
 	
 	function testCouponDwnById(){
 	
-	header( 'Content-Type:text/html;charset=utf-8 ');
+		header( 'Content-Type:text/html;charset=utf-8 ');
 	
-		$transSeq = '123456789900';
-		$userId = 'c00050001985';
-//		function couponDwnById($transSeq,$userId,$couponId,$chnlUsrId,$chnlUsrMobile,$couponSceneId='000'){
+//		$transSeq = '123456789900';
+//		$userId = 'c00050001985';
+//		$couponId = 'Z00000000010074';
+//		$couponNum = '1';
+//		$chnlUsrId = '111';
+//		$chnlUsrMobile = '13166361023';
+//		$couponSceneId = '000';
+		
+		$data['transSeq'] = '123456789900';
+		$data['userId'] = 'c00050001985';
+		$data['couponId'] = 'Z00000000010074';
+		$data['couponNum'] = '1';
+		$data['chnlUsrId'] = '111';
+		$data['chnlUsrMobile'] = '13166361023';
+		$data['$couponSceneId'] = '000';
+		
+//		$response = $this->unionpay->couponDwnById($transSeq, $userId, $couponId,$couponNum, $chnlUsrId, $chnlUsrMobile);
 	
+		$response = $this->unionpay->couponDwnById($data);
+		
+		
+		echo $response;
 	}
 	
 //	function testD

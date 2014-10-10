@@ -391,81 +391,7 @@ class Kqapi4 extends REST_Controller
 	  	//print_r($results);exit;
 	 
 	  }
-   
-   /**
-    * 返回快券: dictionary: location -> array of coupons 
-    * 先搜子商户
-    * 返回的快券是有重复的，（因为不同的子商户会有同样的主商户，因此会返回重复的快券，需要客户端处理）
-    * @param districtId
-    * @param subDistrictId
-    * @param couponTypeId
-    * @param subTypeId
-    * @param districtKeyword
-    * @param couponTypeKeyword
-    * @param latitude
-    * @param longitude
-    * @param skip
-    * @param limit
-    */
-	public function searchCoupons_get(){
-	
-  	 	$districtId = $this->get('districtId');
-  	 	$subDistrictId = $this->get('subDistrictId');
-   		$couponTypeId = $this->get('couponTypeId');
-   		$subTypeId = $this->get('subTypeId');
-   		
-   		$latitude = doubleval($this->get('latitude'));
-   		$longitude = doubleval($this->get('longitude'));
-   		
-   		$districtKeyword = $this->get('districtKeyword');
-   		$couponTypeKeyword = $this->get('couponTypeKeyword');
-   		
-   		$skip = $this->get('skip');
-   		$limit = $this->get('limit');
-   		if(empty($skip)) $skip = 0;
-   		if(empty($limit))  $limit = 50;
-   		
-   		
-   		$where['parent'] = array('$exists'=>true);
-   		
-		if(!empty($districtId)){
-
-			$where['district'] = avosPointer('District', $districtId);
-		}
-   		else if(!empty($subDistrictId)){
-   			$where['subDistrict'] = avosPointer('District',$subDistrictId);
-   		}
-		
-   		if(!empty($couponTypeId)){
-   			$where['couponType'] = avosPointer('CouponType', $couponTypeId);
-   		}
-   		else if(!empty($subTypeId)){
-   			$where['subType'] = avosPointer('CouponType', $subTypeId);
-   		}
-   		
-   		if (!empty($latitude)) {
-   		 	$where['location'] = array('$nearSphere'=>avosGeoPoint($latitude,$longitude));	
-   		}
-		
-   		if (!empty($couponTypeKeyword)){
-   			$where['couponType']=array('$inQuery'=>array('where'=>array('title'=>array('$regex'=>$couponTypeKeyword)),'className'=>'CouponType'));
-   		}
-   		else if(!empty($districtKeyword)){
-   			$where['district']=array('$inQuery'=>array('where'=>array('title'=>array('$regex'=>$districtKeyword)),'className'=>'District'));
-   		}
-   		
   
-   		
-   		
-   		$where = json_encode($where);
-
-   		$coupons = $this->coupon_m->search($where,$skip,$limit);
-   		
-   		return $this->output_results($coupons,'搜索商户失败');
-
-			
-	}
-   
   
 //   
 //   /**
@@ -530,69 +456,179 @@ class Kqapi4 extends REST_Controller
 	 * 返回总店的所有分店信息
 	 * param: parentId
 	 */
-	public function shopbranches_get(){
-			$url = HOST."/classes/Shop?";
-   		
-   			$parentId = $this->get('parentId');
-   			
-   			if(empty($parentId)){
-				outputError(-1,'没有总店信息');
-   			}
-   	
-   			
-   			$where = array('parent'=>avosPointer('Shop',$parentId));
-
-   			$url.='where='.json_encode($where);
-   			
-   			$json = $this->kq->get($url);
-   			
-   			$error = checkResponseError($json);
-			if(!empty($error))
-				return $error;
-
-			$results = resultsWithJson($json);
+	public function shopbranch_get(){
 		
-  		   foreach ($results as $result) {
-				$array[] = array_slice_keys($result, array('title','objectId','phone','address','openTime','location'));
-			
-  		   }		
-
-  		   
-			if (!isLocalhost())
-				$this->output->cache(CacheTime);
-				
-			
-
-			return $this->output_results($array);
+		$shopId = $this->get('id');
+		
+	 	if(empty($shopId)){
+ 	  		$status = '602';
+	   		$msg = '总商户Id不能为空';
+	   		return $this->output_error($status,$msg);
+ 	  	}
+		
+		$this->load->model('shopbranch2_m','shopBranch');
+		
+		$results = $this->shopBranch->get_by('shopId',$shopId);
+		
+		
+		
+		return $this->output_results(array('shopbranches'=>$results));
 	}
 	
-
-//	public function headDistricts_get(){
-//		
-//		
-//		$results = $this->district_m->get_all_headDistrict();	
-//
-//		return $this->output_results($results);
-//	
-//	}
-//
-//	public function headCouponTypes_get(){
-//	
-//		$results = $this->ctype_m->get_all_headType();
-//		
-//		return $this->output_results($results);
-//	}
-//	
-//
-//
-//	/**
-//	 * 
-//	 * 返回最热的搜索
-//	 */
-//	public function hotSearch_get(){
-//		
-//	}
+	public function shopType_get(){
 	
+		$this->load->model('shoptype2_m','shopType');
+		$results = $this->shopType->get_all();
+		
+		return $this->output_results(array('types'=>$results));
+		
+	}
+	
+	public function district_get(){
+	
+		$this->load->model('district2_m','district');
+		$this->db->select('id,title');
+		$results = $this->district->get_all();
+		
+		return $this->output_results(array('districts'=>$results));
+		
+	}
+	
+	public function aroundShopbranches_get(){
+
+		$shopTypeId = $this->get('shopTypeId');
+		$districtId = $this->get('districtId');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
+		$order =  $this->get('order');
+		if(empty($order)){
+			$order = 'distance';
+		}
+		
+		$skip = intval($this->get('skip'));
+	  	$limit = intval($this->get('limit'));
+	  	
+	  	if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+ 	  		
+// 	  	
+		if(empty($latitude) || empty($longitude)){
+			$this->db->select('A.id,shopId,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId');
+		}
+		else{
+			$this->db->select("A.id,shopId,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+		}
+		
+		
+ 	  	$this->db->from('shopbranch as A');
+		$this->db->join('shop as B', 'A.shopId = B.id');
+		if (!empty($districtId)){
+			$this->db->where('districtId',$districtId);
+		}
+		if(!empty($shopTypeId)){
+			$this->db->where('typeId',$shopTypeId);
+		}
+	
+		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
+//			$this->db->order_by("ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380");
+
+				$this->db->order_by('distance');
+		}
+ 	  	$this->db->limit($limit,$skip);
+ 	  	
+ 	  	$query = $this->db->get();
+		
+		$results = $query->result_array();	
+		
+//		$this->output->enable_profiler(TRUE);
+		
+		return $this->output_results(array('shopbranches'=>$results));
+		
+	}
+
+	 
+   /**
+    * 返回快券: dictionary: location -> array of coupons 
+    * 先搜子商户
+    * 返回的快券是有重复的，（因为不同的子商户会有同样的主商户，因此会返回重复的快券，需要客户端处理）
+    * @param districtId
+    * @param subDistrictId
+    * @param couponTypeId
+    * @param subTypeId
+    * @param districtKeyword
+    * @param couponTypeKeyword
+    * @param latitude
+    * @param longitude
+    * @param skip
+    * @param limit
+    */
+	public function searchCoupons_get(){
+	
+  	 	$shopTypeId = $this->get('shopTypeId');
+		$districtId = $this->get('districtId');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
+		$order =  $this->get('order');
+		$keyword = $this->get('keyword');
+		if(empty($order)){
+			$order = 'distance';
+		}
+		
+		$skip = intval($this->get('skip'));
+	  	$limit = intval($this->get('limit'));
+	  	
+	  	if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+
+ 	  	if(empty($keyword)){
+ 	  		$status = 601;
+	   		$msg = '关键词不能为空';
+	   		return $this->output_error($status,$msg);
+ 	  	}
+ 	  		
+ 	  		
+		if(empty($latitude) || empty($longitude)){
+			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount');
+		}
+		else{
+			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+		}
+		
+		
+ 	  	$this->db->from('coupon as A');
+		$this->db->join('shop as B', 'A.shopId = B.id','left');
+		$this->db->join('shopbranch as C', 'A.shopId = C.shopId','left');
+		$this->db->join('couponcontent as D', 'A.id = D.couponId','left');
+		
+		$this->db->like('A.title',$keyword);
+		if (!empty($districtId)){
+			$this->db->where('districtId',$districtId);
+		}
+		if(!empty($shopTypeId)){
+			$this->db->where('typeId',$shopTypeId);
+		}
+	
+		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
+			
+				$this->db->order_by('distance');
+		}
+ 	  	$this->db->limit($limit,$skip);
+ 	  	
+ 	  	$query = $this->db->get();
+		
+		$results = $query->result_array();	
+		
+		$this->output->enable_profiler(TRUE);
+		
+		return $this->output_results(array('coupons'=>$results));
+	}
+   
 
 	
 	
@@ -865,6 +901,8 @@ group by A.couponId
 		$this->load->model('downloadedcoupon2_m');
 
 		$result = $this->downloadedcoupon2_m->insert($data);
+		
+		
 		
 		return $this->output_success();
 	}
