@@ -27,6 +27,7 @@ class Kqservice extends CI_Controller{
 	$this->load->model('couponcontent2_m','couponContent');
 	$this->load->model('coupon2_m','coupon');
 	$this->load->model('user2_m','user');
+	$this->load->model('card2_m','card');
 	}
 	
 
@@ -103,6 +104,54 @@ class Kqservice extends CI_Controller{
 		
 		echo $response;
 	}
+	
+	function testMyCard(){
+		$url = 'localhost/kq/index.php/kqapi4/myCard/uid/32/sessionToken/ptHKUzWr17FwxVQqjube';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
+		
+		$response = get($url);
+		
+		echo $response;
+	
+	}
+	
+	function testAddCard(){
+		$url = 'localhost/kq/index.php/kqapi4/myCard';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testDeleteCard(){
+		$url = 'localhost/kq/index.php/kqapi4/deleteMyCard';
+		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testResetPassword(){
+		$url = 'localhost/kq/index.php/kqapi4/resetPassword';
+		$data = array('username'=>'131112','password'=>'333');
+		
+		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+	function testCouponDetails(){
+		$url = 'localhost/kq/index.php/kqapi4/couponDetails/id/26/longitude/122';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
+		
+		$response = get($url);
+		
+		echo $response;
+	
+	}
+	
 	function testKeys(){
 		$url = HOST."/users?keys=phone,username";
 		$json = $this->avoslibrary->get($url);
@@ -126,18 +175,8 @@ class Kqservice extends CI_Controller{
 	}
 	
 	function test(){
-//		$url = HOST."/users?keys=phone,username";
-//		echo $this->avoslibrary->get($url);
-		
-//	$data = array('shop'=>avosPointer('Shop', '53bbece4e4b0dea5ac1c8907'));
-//		
-//		echo $this->updateObject('Coupon','539e8dfce4b023daacbd6fa3',json_encode($data));
-	
-//		echo $this->addShopBranchesToShop(array('539e8c51e4b0c92f1847dc23','539e8c52e4b0c92f1847dc24'), '539e8c52e4b0c92f1847dc25');
 
-//		echo $this->addCouponToShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287');
-
-//		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
+		print_r($this->card->get_id(296));
 	}
 	
 

@@ -65,10 +65,6 @@ sp5Ykcw0iwSbUA==
 		$key = 'lvANHSNZCYTZRNmX';
 		
 		
-//		echo $this->generateKey($plain);
-
-//		echo $this->pad2Length($plain, 16);
-		
 		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
 		$iv_size = mcrypt_enc_get_iv_size($cipher);      
 		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);

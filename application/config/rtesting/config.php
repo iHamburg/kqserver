@@ -14,9 +14,8 @@
 | path to your installation.
 |
 */
-//$config['base_url']	= 'http://localhost/codeigniter/';
-$config['base_url']	= 'http://115.29.148.47/kq/';
 
+$config['base_url']	= 'http://115.29.148.47/kq/';
 /*
 |--------------------------------------------------------------------------
 | Index File

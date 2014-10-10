@@ -123,30 +123,30 @@ class Kqapi4 extends REST_Controller
 		
 	}
 	
-	/**
-	 * 
-	 * 返回用户信息，如果是多用户会有Cache
-	 */
-   public function user_get(){
-
-   	
-   		$this->load->model('user2_m','user');
-   		
-   		$id = $this->get('id');
-   		
-   		if(!empty($id)){
- 
-   			$result = $this->user->get($id);
-   	
-   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl'));
-   			return $this->output_results($result);
-
-   		}
-   		else{
-   			return $this->output_results(-1,'missing id');
-   		}
-
-   }
+//	/**
+//	 * 
+//	 * 返回用户信息，如果是多用户会有Cache
+//	 */
+//   public function user_get(){
+//
+//   	
+//   		$this->load->model('user2_m','user');
+//   		
+//   		$id = $this->get('id');
+//   		
+//   		if(!empty($id)){
+// 
+//   			$result = $this->user->get($id);
+//   	
+//   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl'));
+//   			return $this->output_results($result);
+//
+//   		}
+//   		else{
+//   			return $this->output_results(-1,'missing id');
+//   		}
+//
+//   }
    
    /**
     * 
@@ -202,34 +202,122 @@ class Kqapi4 extends REST_Controller
 		
    }
    
-   
-   /** 
-    * 返回优惠券的详情, 包括shop和shopBranches
-    * @param id
+   /**
     * 
-    * @return coupon: coupon的数据
-    * 
-    * 
-   */
-   public function coupon_get(){
-   		$id = $this->get('id');
-
+    * 用户重置密码（忘记密码后）
+    */
+   public function resetPassword_post(){
+   		$username = $this->post('username');
+   		$password = $this->post('password');
    		
-   		if(!empty($id)){
-		//优惠券id不为空
-   			
-   			$result = $this->coupon_m->get($id,'shop,shop.shopBranches');
-   		
-  			return $this->output_results($result,'获得对象失败');
+   		if(empty($username) ||empty($password)){
+	   		$status = 401;
+	   		$msg = '用户名或密码不能为空';
+	   		return $this->output_error($status,$msg);
    		}
-   		else{
-		//优惠券id为空
-  			
-   			return $this->output_results(-1,'确实优惠券id');
-  		
-  		}
-
+		$this->load->model('user2_m','user');
+		
+		$updateId = $this->user->update_by(array('username'=>$username),array('password'=>$password));
+		
+		return $this->output_success();
+		
+		
    }
+   
+	function couponDetails_get(){
+
+	  	
+		$this->load->model('coupon2_m','coupon');
+		
+		$cid = $this->get('id');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
+	  	
+ 	  	$this->db->select('A.id,A.title,shopId,startDate,endDate,downloadedCount,avatarUrl,discountContent,short_desc,description,message,usage');
+ 	  	$this->db->from('coupon as A');
+		$this->db->join('couponcontent as B', 'A.id = B.couponId');
+		$this->db->where('A.id',$cid);
+
+		$query = $this->db->get();
+		
+		$results = $query->result_array();	
+	  	
+		$coupon = $results[0];
+		
+		if(empty($coupon)){
+			$status = 1011;
+			$msg = '无效的couponId';
+			return $this->output_error($status,$msg);
+		}
+		
+		///shopCoupons
+		$shopId = $coupon['shopId'];
+		$this->db->select('A.id,A.title,discountContent');
+ 	  	$this->db->from('coupon as A');
+		$this->db->join('couponcontent as B', 'A.id = B.couponId');
+		$this->db->where('A.shopId',$shopId);
+		$this->db->where('A.id !=',$cid);
+		
+		$query = $this->db->get();
+		$results = $query->result_array();	
+		if(empty($results))
+			$results = (object)array();
+		
+		$coupon['shopCoupons'] = $results;
+		
+		/// otherCoupons
+		$coupon['otherCoupons'] = (object)array();
+		
+		///nearestShop
+//		$this->db->select('id,title,address,longitude,latitude,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(111.86141967773438-`latitude`)/360),2)+COS(PI()*33.07078170776367/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*(50.07078170776367-`longitude`)/360),2)))) as juli');
+
+//		$this->db->select('*,(PI()*(111.86141967773438-`latitude`)/360) as juli');
+// 	
+//		$this->db->from('shopbranch as A');
+//		$this->db->where('A.shopId',$shopId);
+//		$this->db->order_by('juli');
+//		$query = $this->db->get();
+
+		$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($-`longitude`)/360),2)))) as juli FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `juli`");
+		$results = $query->result_array();	
+		
+		$coupon['nearestShop'] = $results[0];
+		
+	
+		
+	  	return $this->output_results($coupon);
+	  	
+	  	//print_r($results);exit;
+	 
+	  }
+   
+//   /** 
+//    * 返回优惠券的详情, 包括shop和shopBranches
+//    * @param id
+//    * 
+//    * @return coupon: coupon的数据
+//    * 
+//    * 
+//   */
+//   public function coupon_get(){
+//   		$id = $this->get('id');
+//
+//   		
+//   		if(!empty($id)){
+//		//优惠券id不为空
+//   			
+//   			$result = $this->coupon_m->get($id,'shop,shop.shopBranches');
+//   		
+//  			return $this->output_results($result,'获得对象失败');
+//   		}
+//   		else{
+//		//优惠券id为空
+//  			
+//   			return $this->output_results(-1,'确实优惠券id');
+//  		
+//  		}
+//
+//   }
    
    /**
     * 
@@ -244,8 +332,6 @@ class Kqapi4 extends REST_Controller
 		
 		$skip = intval($this->get('skip'));
 	  	$limit = intval($this->get('limit'));
-
-		$limit = $this->get('limit');
 	  	
 	  	if (empty($skip))
  	  		$skip = 0;
@@ -261,11 +347,45 @@ class Kqapi4 extends REST_Controller
  	  	
 		$query = $this->db->get();
 		
-		foreach ($query->result_array() as $row)
-		{
-		  $results[] = $row;
-		}
+		$results = $query->result_array();	
 	  	
+	  	return $this->output_results(array('coupons'=>$results));
+	  	
+	  	//print_r($results);exit;
+	 
+	  }
+	  
+ /**
+    * 
+    * 返回最新的快券
+    * @param skip
+    * @param limit optional
+    */
+	function hotestCoupons_get(){
+
+	  	
+		$this->load->model('coupon2_m','coupon');
+		
+		$skip = intval($this->get('skip'));
+	  	$limit = intval($this->get('limit'));
+
+	  	
+	  	if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+	  	
+ 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
+ 	  	$this->db->limit($limit,$skip);
+ 	  	$this->db->order_by('createdAt','desc');
+ 	  	$this->db->from('coupon');
+		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
+ 	  	
+		$query = $this->db->get();
+		
+		$results = $query->result_array();	
+		
 	  	return $this->output_results(array('coupons'=>$results));
 	  	
 	  	//print_r($results);exit;
@@ -447,31 +567,31 @@ class Kqapi4 extends REST_Controller
 	}
 	
 
-	public function headDistricts_get(){
-		
-		
-		$results = $this->district_m->get_all_headDistrict();	
-
-		return $this->output_results($results);
-	
-	}
-
-	public function headCouponTypes_get(){
-	
-		$results = $this->ctype_m->get_all_headType();
-		
-		return $this->output_results($results);
-	}
-	
-
-
-	/**
-	 * 
-	 * 返回最热的搜索
-	 */
-	public function hotSearch_get(){
-		
-	}
+//	public function headDistricts_get(){
+//		
+//		
+//		$results = $this->district_m->get_all_headDistrict();	
+//
+//		return $this->output_results($results);
+//	
+//	}
+//
+//	public function headCouponTypes_get(){
+//	
+//		$results = $this->ctype_m->get_all_headType();
+//		
+//		return $this->output_results($results);
+//	}
+//	
+//
+//
+//	/**
+//	 * 
+//	 * 返回最热的搜索
+//	 */
+//	public function hotSearch_get(){
+//		
+//	}
 	
 
 	
@@ -512,16 +632,13 @@ class Kqapi4 extends REST_Controller
 		
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
 		$this->db->from('card as A');
-		$this->db->where('A.userId',$uid);
 		$this->db->join('bank as B','A.bankId = B.id','left');
-
+		$this->db->where('A.userId',$uid);
 		
 		$query = $this->db->get();
 		
-		foreach ($query->result_array() as $row)
-		{
-		  $results[] = $row;
-		}
+		$results = $query->result_array();
+		
 	  	
 //		$this->output->enable_profiler(TRUE);
 		
@@ -561,16 +678,75 @@ class Kqapi4 extends REST_Controller
 		}
    		
 
-		$data['uid'] = $uid;
+		$data['userId'] = $uid;
 		$data['title'] = $card;
 		
-		$this->load->model('downloadedcoupon2_m');
+		$this->load->model('card2_m','card');
 
-		$result = $this->downloadedcoupon2_m->insert($data);
+		$card = $this->card->get_by($data);
 		
-		return $this->output_results(array());
+		//如果没有卡，加上一条记录
+		if(empty($card)){
+			$data['bankId'] = '2';
+			$cardId = $this->card->insert($data);
+		}
+		else{
+			$cardId = $card['id'];
+		}
+		
+		$result = $this->card->get_id($cardId);
+		return $this->output_results($result);
+
   		
    }
+   
+   /**
+	 * 
+	 * 用户取消收藏快券
+	 * 
+	 * @return
+	 * 正常： status:1
+	 * 异常： status: -1, input 不全
+	 */
+	public function deleteMyCard_post(){
+		$uid = $this->post('uid');
+		$card = $this->post('card');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+		if(empty($uid)){
+		
+			$status = 402;
+			$msg = '用户id不能为空';
+			return $this->output_error($status,$msg);
+		}
+		
+		if(empty($card)){
+		
+			$status = 409;
+			$msg = 'card不能为空';
+			return $this->output_error($status,$msg);
+		}
+	
+		$this->load->model('user2_m','user');
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			$status = 403;
+			$msg = '无效的session';
+			return $this->output_error($status,$msg);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['title'] = $card;
+		
+		$this->load->model('card2_m','card');
+
+		$result = $this->card->delete_by($data);
+		
+		return $this->output_success();
+		
+	}
+	
    
 	/**
 	 * 
@@ -636,10 +812,8 @@ group by A.couponId
 		
 		$query = $this->db->get();
 		
-		foreach ($query->result_array() as $row)
-		{
-		  $results[] = $row;
-		}
+		$results = $query->result_array();
+	
 	  	
 //		$this->output->enable_profiler(TRUE);
 		
@@ -692,7 +866,7 @@ group by A.couponId
 
 		$result = $this->downloadedcoupon2_m->insert($data);
 		
-		return $this->output_results(array());
+		return $this->output_success();
 	}
 	
 	
@@ -734,10 +908,7 @@ group by A.couponId
 		
 		$query = $this->db->get();
 		
-		foreach ($query->result_array() as $row)
-		{
-		  $results[] = $row;
-		}
+		$results = $query->result_array();
 	  	
 //		$this->output->enable_profiler(TRUE);
 		
@@ -795,7 +966,7 @@ group by A.couponId
 			$result = $this->favoritedcoupon->insert($data);
 		}
 		
-		return $this->output_results(array());
+		return $this->output_success();
 		
 	}
 	
@@ -842,8 +1013,7 @@ group by A.couponId
 
 		$result = $this->favoritedcoupon->delete_by($data);
 		
-		return $this->output_results(array());
-		
+		return $this->output_success();
 	}
 	
 
@@ -872,11 +1042,9 @@ group by A.couponId
 			$msg = '用户id不能为空';
 			return $this->output_error($status,$msg);
 		}
-	
-		 
-		// 
+
 		
-		$this->db->select('shopId,title,logoUrl');
+		$this->db->select('A.shopId,B.title,B.logoUrl');
 		$this->db->from('favoritedshop as A');
 		$this->db->where('userId',$uid);
 		$this->db->join('shop as B','A.shopId = B.id','left');
@@ -884,10 +1052,7 @@ group by A.couponId
 		
 		$query = $this->db->get();
 		
-		foreach ($query->result_array() as $row)
-		{
-		  $results[] = $row;
-		}
+		$results = $query->result_array();
 	  	
 //		$this->output->enable_profiler(TRUE);
 		
@@ -940,7 +1105,7 @@ group by A.couponId
 			$result = $this->favoritedshop->insert($data);
 		}
 		
-		return $this->output_results(array());
+		return $this->output_success();
 	}
 
 /**
@@ -986,7 +1151,7 @@ group by A.couponId
 
 		$result = $this->favoritedshop->delete_by($data);
 		
-		return $this->output_results(array());
+		return $this->output_success();
 		
 	}
 
@@ -1022,6 +1187,17 @@ group by A.couponId
 			return $response;
    	}
    	
+   }
+   
+   //
+   private function output_success(){
+   		 $array = array('status'=>1,'data'=>(object)array());
+			$response = json_encode($array);
+			
+			$data['response']=$response;
+			$this->load->view('response',$data);
+			
+			return $response;
    }
    
    private function output_error($status,$errorMsg=''){
