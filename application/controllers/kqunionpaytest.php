@@ -145,39 +145,18 @@ sp5Ykcw0iwSbUA==
 	function testGetUserByMobile(){
 	
 		header( 'Content-Type:text/html;charset=utf-8');
-		$mobile = '13166361023';
+		$mobile = '15166412998';
+		
 		$response = $this->unionpay->getUserByMobile($mobile);
 
 		echo $response;
 		
-		
-//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
-//		$url = $this->host.'getUserByMobile';
-//		
-//		$data = array('mobile'=>'15166412999');
-//		
-//		$data = json_encode($data);
-//		
-//		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
-//		
-//		$signToken = bin2hex($signToken);
-//		
-//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-//
-//		$post = json_encode($post);
-//		
-////		var_dump($url);
-////		var_dump($post);
-//		
-//		
-//		$response = $this->post($url, $post);
-////		
-//		echo $response;
-	
 
 	}
 	
-		function testGetUserByMobile2(){
+
+	// 原始命令
+	function testGetUserByMobile2(){
 //		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
 		$url = $this->host.'getUserByMobile';
 		
@@ -196,11 +175,22 @@ sp5Ykcw0iwSbUA==
 //		var_dump($url);
 //		var_dump($post);
 		
-		
 		$response = $this->post($url, $post);
-//		
+		
 		echo $response;
 		}
+
+	
+	function testGetUserByMobile3(){
+	
+		header( 'Content-Type:text/html;charset=utf-8');
+		$mobile = '13166361024';
+		$response = $this->unionpay->getUserByMobile2($mobile);
+
+		echo $response;
+		
+	}
+		
 	
 	/**
 	 * 
@@ -211,7 +201,7 @@ sp5Ykcw0iwSbUA==
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$mobile = '13166361023';
+		$mobile = '13166361023555';
 		
 		$response = $this->unionpay->regByMobile($mobile);
 		
@@ -262,19 +252,19 @@ sp5Ykcw0iwSbUA==
 //		$chnlUsrMobile = '13166361023';
 //		$couponSceneId = '000';
 		
-		$data['transSeq'] = '123456789900';
-		$data['userId'] = 'c00050001985';
+		$data['chnlUsrId'] = '111';
+		$data['chnlUsrMobile'] = '131663610235555';
 		$data['couponId'] = 'Z00000000010074';
 		$data['couponNum'] = '1';
-		$data['chnlUsrId'] = '111';
-		$data['chnlUsrMobile'] = '13166361023';
-		$data['$couponSceneId'] = '000';
+		$data['couponSceneId'] = '000';
+		$data['transSeq'] = '123456789900';
+		$data['userId'] = 'c00050001985';
+	
 		
-//		$response = $this->unionpay->couponDwnById($transSeq, $userId, $couponId,$couponNum, $chnlUsrId, $chnlUsrMobile);
 	
 		$response = $this->unionpay->couponDwnById($data);
-		
-		
+//		
+//		
 		echo $response;
 	}
 	

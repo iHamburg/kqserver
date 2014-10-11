@@ -501,6 +501,7 @@ class Kqapi4 extends REST_Controller
 		$longitude = $this->get('longitude');
 		$latitude =  $this->get('latitude');
 		$order =  $this->get('order');
+
 		if(empty($order)){
 			$order = 'distance';
 		}
@@ -516,10 +517,10 @@ class Kqapi4 extends REST_Controller
  	  		
 // 	  	
 		if(empty($latitude) || empty($longitude)){
-			$this->db->select('A.id,shopId,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId');
+			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId');
 		}
 		else{
-			$this->db->select("A.id,shopId,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
 		}
 		
 		
@@ -586,18 +587,19 @@ class Kqapi4 extends REST_Controller
  	  	if (empty($limit))
  	  		$limit = 30;
 
- 	  	if(empty($keyword)){
- 	  		$status = 601;
-	   		$msg = '关键词不能为空';
-	   		return $this->output_error($status,$msg);
- 	  	}
+// 	  	if(empty($keyword)){
+// 	  		$status = 601;
+//	   		$msg = '关键词不能为空';
+//	   		return $this->output_error($status,$msg);
+// 	  	}
  	  		
  	  		
+ 	  	
 		if(empty($latitude) || empty($longitude)){
-			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount');
+			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address');
 		}
 		else{
-			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
 		}
 		
 		
@@ -606,7 +608,9 @@ class Kqapi4 extends REST_Controller
 		$this->db->join('shopbranch as C', 'A.shopId = C.shopId','left');
 		$this->db->join('couponcontent as D', 'A.id = D.couponId','left');
 		
-		$this->db->like('A.title',$keyword);
+		if(!empty($keyword)){
+			$this->db->like('A.title',$keyword);
+		}	
 		if (!empty($districtId)){
 			$this->db->where('districtId',$districtId);
 		}
@@ -624,7 +628,7 @@ class Kqapi4 extends REST_Controller
 		
 		$results = $query->result_array();	
 		
-		$this->output->enable_profiler(TRUE);
+//		$this->output->enable_profiler(TRUE);
 		
 		return $this->output_results(array('coupons'=>$results));
 	}
@@ -663,8 +667,7 @@ class Kqapi4 extends REST_Controller
 			$msg = '无效的session';
 			return $this->output_error($status,$msg);
 		}
-		 
-		// 
+		 	// 
 		
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
 		$this->db->from('card as A');
@@ -675,7 +678,6 @@ class Kqapi4 extends REST_Controller
 		
 		$results = $query->result_array();
 		
-	  	
 //		$this->output->enable_profiler(TRUE);
 		
 	  	return $this->output_results(array('cards'=>$results));
