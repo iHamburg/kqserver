@@ -24,19 +24,13 @@ class User2_m extends MY_Model{
 			return false;
 		
 	}
+
+	public function get_username($username){
+		
+	}
 	
-//	public function down
 	
-	
-//	public function get_all($skip,$limit=20,$include=''){
-//		$this->db->select('id,nickname,username')->from('user');
-//		$this->db->limit($limit,$skip);
-//		return $this->db->get()->result_array();
-//		
-//		
-//
-//	
-//	}
+
 	public function user_Relanding($username,$password,$data){
 		$this->db->update('user',$data,array('username'=>$username,'password'=>$password));
 		return $this->db->affected_rows();

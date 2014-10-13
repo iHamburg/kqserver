@@ -68,6 +68,9 @@ class Kqapi3 extends REST_Controller
 		
 		header("Content-type: text/html; charset=utf-8");
 		
+//			$this->kq = new Kqavos();
+
+		
 	}
 	
 	/**
@@ -234,11 +237,28 @@ class Kqapi3 extends REST_Controller
   			return $this->output_results($result,'获得对象失败');
    		}
    		else{
-		//优惠券id为空
-  			
-   			return $this->output_results(-1,'确实优惠券id');
-  		
-  		}
+   			$url = HOST."/classes/Coupon?";
+   		
+   			$json = $this->jsonWithGETUrl($url);
+
+			$error = checkResponseError($json);
+			if(!empty($error))
+				return $error;
+	   			
+			$results = resultsWithJson($json);
+	
+			$this->output_results($results);
+			
+//			if (!isLocalhost())
+//				$this->output->cache(CacheTime);
+			
+
+//			$this->load->library('avoslibrary');
+//			$json = $this->avoslibrary->get($url);
+			
+//			return $this->outputArray($results);
+	   		
+   		}
 
    }
    
@@ -759,7 +779,50 @@ class Kqapi3 extends REST_Controller
    	
    }
    
+  private function jsonWithGETUrl($url=''){
 
+   		$where = $this->get('where');
+   		$include = $this->get('include');
+   		$limit = intval($this->get('limit'));
+   		$skip = intval($this->get('skip'));
+   		$keys = $this->get('keys');
+   		
+   		
+   		if (!empty($where)){
+   			$where = json_encode($where);
+   			$url.='where='.$where.'&';
+   		}
+   		if(!empty($skip)){
+   			$url.='skip='.$skip.'&';
+   		}
+   		
+   		if(!empty($include)){
+   			$url.='include='.$include.'&';
+   		}
+  	
+   		if (!empty($limit)){
+   			$url.='limit='.$limit;
+   		}
+   		else{
+   			$url.='limit=30';
+   		}
+
+//   		echo $url;
+ 		
+//   		$json = $this->kq->get($url);
+   		
+   		return $json;
+   }
+   
+   private function outputArray($array){
+  		    $array = array('status'=>'1','data'=>$array);
+			$response = json_encode($array);
+			
+			$data['response']=$response;
+			$this->load->view('response',$data);
+			
+			return $response;
+   }
    
    // --------------- TEST -----------------
    public function test_get(){

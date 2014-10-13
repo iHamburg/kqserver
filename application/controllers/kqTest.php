@@ -42,10 +42,7 @@ class KqTest extends CI_Controller{
 	
 	function user(){
 		
-		
-		
 	
-		
 		$result = $this->user->get(2);
 		
 		
@@ -157,17 +154,13 @@ class KqTest extends CI_Controller{
 	}
 	
 	
-	function testAddShopBranchesToShop(){
+	function testresetPassword(){
 	
-		//澶у�朵����诲��锛�539d8817e4b0a98c8733f287
-		//澶у�朵�����搴�锛� 539d8817e4b0a98c8733f285, 539d8817e4b0a98c8733f284, 539d8817e4b0a98c8733f283
+		$url = 'http://localhost/kq/index.php/kqapi4/resetPassword';
+		$post = array('username'=>'1111','password'=>'2222');
 		
-//		$branches = array('539d8817e4b0a98c8733f285','539d8817e4b0a98c8733f284','539d8817e4b0a98c8733f283');
-//		
-//		echo $this->addShopBranchesToShop($branches, '539d8817e4b0a98c8733f287');
-//		$this->addShopBranchesToShop($branches, $headShopId);
-		
-		
+		$response = post($url,$post);
+		echo $response;
 	
 	}
 	

@@ -217,10 +217,18 @@ class Kqapi4 extends REST_Controller
    		}
 		$this->load->model('user2_m','user');
 		
+		$count = $this->user->count_by('username', $username);
+		
+		if($count == 0){
+			$status = 410;
+	   		$msg = '用户名不存在';
+	   		return $this->output_error($status,$msg);
+		}
 		$updateId = $this->user->update_by(array('username'=>$username),array('password'=>$password));
+
+//		$affected = $this->db->affected_rows();
 		
 		return $this->output_success();
-		
 		
    }
    
