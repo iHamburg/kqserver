@@ -58,37 +58,27 @@ transFwdInsId 	string 	可选 	交易发送机构
 		
 		$post = json_decode($post,true);
 		
-//判断post是否是json值
-//		if(json_last_error() != JSON_ERROR_NONE){
-//			
-//			//'不是json字串';
-//			$response = array('respCd'=>'100150','msg'=>'');
-//			echo json_encode($response);
-//			
-//		}
-//		else{
 
-//			var_dump($post);
 			
-			$params = array('mchntId','couponId','userId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
+		$params = array('mchntId','couponId','userId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
 
-			foreach ($params as $key) {
-				$data[$key] = $post['data'][$key];
-			}
-			
-			if(empty($data['mchntId']) ||empty($data['couponId'])){
-				$response = array('respCd'=>'300000','msg'=>'参数不可为空');
-				echo json_encode($response);
-				return;
-			}
-			
-			
-			$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-			
-			$this->uCouponAccepted->insert($data);
-			
-			$response = array('respCd'=>'00000','msg'=>'');
+		foreach ($params as $key) {
+			$data[$key] = $post['data'][$key];
+		}
+		
+		if(empty($data['mchntId']) ||empty($data['couponId'])){
+			$response = array('respCd'=>'300000','msg'=>'参数不可为空');
 			echo json_encode($response);
+			return;
+		}
+		
+		
+		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
+		
+		$this->uCouponAccepted->insert($data);
+		
+		$response = array('respCd'=>'000000','msg'=>'');
+		echo json_encode($response);
 			
 //		}
 		
