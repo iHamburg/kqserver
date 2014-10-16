@@ -186,8 +186,9 @@ sp5Ykcw0iwSbUA==
 		$data = array('cardNo'=>$encrypted,'userId'=>$userId);
 		
 		$dataJson = json_encode($data);
+		$dataJson2 = str_replace('\\','',$dataJson);
 		
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+		openssl_sign($dataJson2, $signToken, $this->private_key); //用私钥进行签名
 		
 		$signToken = bin2hex($signToken);
 		

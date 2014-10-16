@@ -261,7 +261,6 @@ sp5Ykcw0iwSbUA==
 		$data['userId'] = 'c00050001985';
 	
 		
-	
 		$response = $this->unionpay->couponDwnById($data);
 //		
 //		

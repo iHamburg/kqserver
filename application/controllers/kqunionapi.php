@@ -49,6 +49,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 //		$post = $this->input->post('params');
 		
 		$data['originRequest'] = $post;
+		
 //		var_dump($post);
 		if(empty($post)){
 			$response = array('respCd'=>'300000','msg'=>'参数不可为空');

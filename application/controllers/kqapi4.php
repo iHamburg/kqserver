@@ -286,12 +286,20 @@ class Kqapi4 extends REST_Controller
 //		$this->db->order_by('juli');
 //		$query = $this->db->get();
 
-		$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($-`longitude`)/360),2)))) as juli FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `juli`");
-		$results = $query->result_array();	
+		if(empty($longitude) || empty($latitude)){
 		
-		$coupon['nearestShop'] = $results[0];
+			$query = $this->db->query("SELECT * FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8");
+			$results = $query->result_array();	
+			$coupon['nearestShop'] = $results[0];
+		}
+		else{
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as juli FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `juli`");
+			$results = $query->result_array();	
 		
+			$coupon['nearestShop'] = $results[0];
+		}
 	
+		
 		
 	  	return $this->output_results($coupon);
 	  	
