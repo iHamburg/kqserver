@@ -68,6 +68,9 @@ class Kqapi4 extends REST_Controller
 		
 	}
 	
+	function index(){
+	
+	}
 	
 	
 	/**
@@ -232,6 +235,7 @@ class Kqapi4 extends REST_Controller
 		
    }
    
+   
 	function couponDetails_get(){
 
 	  	
@@ -240,8 +244,10 @@ class Kqapi4 extends REST_Controller
 		$cid = $this->get('id');
 		$longitude = $this->get('longitude');
 		$latitude =  $this->get('latitude');
-	  	
- 	  	$this->db->select('A.id,A.title,shopId,startDate,endDate,downloadedCount,avatarUrl,discountContent,short_desc,description,message,usage');
+
+		
+		
+ 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.downloadedCount,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
  	  	$this->db->from('coupon as A');
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
 		$this->db->where('A.id',$cid);
@@ -260,7 +266,7 @@ class Kqapi4 extends REST_Controller
 		
 		///shopCoupons
 		$shopId = $coupon['shopId'];
-		$this->db->select('A.id,A.title,discountContent');
+		$this->db->select('A.id,A.title,B.avatarUrl,B.discountContent');
  	  	$this->db->from('coupon as A');
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
 		$this->db->where('A.shopId',$shopId);
@@ -268,43 +274,51 @@ class Kqapi4 extends REST_Controller
 		
 		$query = $this->db->get();
 		$results = $query->result_array();	
-		if(empty($results))
-			$results = (object)array();
+//		if(empty($results))
+//			$results = (object)array();
 		
 		$coupon['shopCoupons'] = $results;
 		
 		/// otherCoupons
-		$coupon['otherCoupons'] = (object)array();
+//		$coupon['otherCoupons'] = array();
+		$query = $this->db->query(" SELECT A.id, A.title,  B.avatarUrl, B.discountContent
+FROM (coupon as A)
+JOIN couponcontent as B ON A.id = B.couponId
+limit 3");
+		$results = $query->result_array();
+		$coupon['otherCoupons'] = $results;
 		
 		///nearestShop
-//		$this->db->select('id,title,address,longitude,latitude,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*(111.86141967773438-`latitude`)/360),2)+COS(PI()*33.07078170776367/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*(50.07078170776367-`longitude`)/360),2)))) as juli');
-
-//		$this->db->select('*,(PI()*(111.86141967773438-`latitude`)/360) as juli');
-// 	
-//		$this->db->from('shopbranch as A');
-//		$this->db->where('A.shopId',$shopId);
-//		$this->db->order_by('juli');
-//		$query = $this->db->get();
-
 		if(empty($longitude) || empty($latitude)){
 		
 			$query = $this->db->query("SELECT * FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8");
-			$results = $query->result_array();	
-			$coupon['nearestShop'] = $results[0];
+
 		}
 		else{
-			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as juli FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `juli`");
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `distance`");
+			
+		}
+	
 			$results = $query->result_array();	
 		
 			$coupon['nearestShop'] = $results[0];
-		}
-	
-		
+//		$this->output->enable_profiler(TRUE);
 		
 	  	return $this->output_results($coupon);
 	  	
 	  	//print_r($results);exit;
 	 
+	  }
+	  
+	  
+	  public function shopDetails_get(){
+	  
+	  		$this->load->model('shop2_m','shop');
+	  		
+	  	$id = $this->get('id');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
+	  
 	  }
    
 //   /** 
@@ -403,6 +417,7 @@ class Kqapi4 extends REST_Controller
 		$results = $query->result_array();	
 		
 	  	return $this->output_results(array('coupons'=>$results));
+	  	
 	  	
 	  	//print_r($results);exit;
 	 
@@ -906,6 +921,7 @@ group by A.couponId
 		}
 	
 		$this->load->model('user2_m','user');
+
 		if(!$this->user->isSessionValid($uid,$sessionToken)){
 			$status = 403;
 			$msg = '无效的session';
@@ -1003,6 +1019,7 @@ group by A.couponId
 		}
 	
 		$this->load->model('user2_m','user');
+
 		if(!$this->user->isSessionValid($uid,$sessionToken)){
 			$status = 403;
 			$msg = '无效的session';

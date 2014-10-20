@@ -15,13 +15,31 @@ class User2_m extends MY_Model{
 
 	public function isSessionValid($uid,$sessionToken){
 		
-		$this->db->where(array('id'=>$uid,'sessionToken'=>$sessionToken,'expireDate <'=>'now()'));
-		$this->db->from('user');
-		$count = $this->db->count_all_results();
-		if($count>0)
-			return true;
-		else
+//		$this->db->where(array('id'=>$uid,'sessionToken'=>$sessionToken,'expireDate <'=>'now()'));
+//		$this->db->from('user');
+//		$count = $this->db->count_all_results();
+//		
+//		
+//		if($count>0)
+//			return true;
+//		else
+//			return false;
+
+		$query = $this->db->query(" SELECT COUNT(*) AS `numrows`FROM (`user`)
+WHERE `id` =  $uid
+AND sessionToken = '$sessionToken'
+AND `expireDate` > now()");
+		$results = $query->result_array();
+		
+		$result = $results[0];
+		$count = $result['numrows'];
+		
+		if ($count == 0){
 			return false;
+		}
+		else{
+			return true;
+		}
 		
 	}
 
@@ -112,27 +130,7 @@ class User2_m extends MY_Model{
 	public function get_user_downloaded_coupons($uid){
 		$query = $this->db->query('select couponid,downloadedcoupon.id,coupon.title,status from downloadedcoupon left join coupon on downloadedcoupon.couponid = coupon.id && downloadedcoupon.user = '.$uid);
 		return  $query->result_array();
-			
-			/*$where = json_encode(array('people'=>avosPointer('_User',$uid)));
-			
 
-   			$json = $this->avoslibrary->retrieveObjects('DownloadedCoupon',$where,'coupon','','coupon');
-   			
-   			$results = json_decode($json,true);
-   	
-			if (empty($results['error'])){
-
-
-				foreach ($results['results'] as $record) {
-					$coupons[]=$record['coupon'];
-				}
-				return $coupons;
-				
-   			}
-   			else{
-   				return $results;
-   			}*/
-   			 
 	}
 	function get_user_favorited_coupons($uid){
 		$query = $this->db->query('select couponid,favoritedcoupon.id,coupon.title from favoritedcoupon left join coupon on favoritedcoupon.couponid = coupon.id && favoritedcoupon.user = '.$uid);
@@ -148,14 +146,11 @@ class User2_m extends MY_Model{
 	
 	
 	function login($username,$password){
+
 		$this->db->select('id,username,nickname,avatarUrl,sessionToken')->from('user');
 		$this->db->where(array('username'=>$username,'password'=>$password));
 		return $this->db->get()->row_array();
-		/*$url = HOST."/login?username=$username&password=$password";
-		
-		$json = $this->avoslibrary->get($url);	
-
-		return $json;*/
+	
 
 	}
 	

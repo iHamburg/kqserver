@@ -16,12 +16,16 @@ class Admins extends CI_Controller{
 	
 	function index(){
 		
-		$session_key=$this->config->item('admin_session_key');
+//		$session_key=$this->config->item('admin_session_key');
+//		
+//		if(!isset($_SESSION[$session_key])){
+//			redirect('admin/dashboard/login','refresh');
+//		}
+//	
 		
-		if(!isset($_SESSION[$session_key])){
-			redirect('admin/dashboard/login','refresh');
-		}
 	
+		echo 'admins';
+
 		redirect('admin/coupons','refresh');
 	}
 	

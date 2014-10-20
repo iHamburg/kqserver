@@ -26,7 +26,6 @@ class KqTest extends CI_Controller{
 	
 	//
 	//
-	//
 	function __construct(){
 		parent::__construct();
 		
@@ -162,6 +161,15 @@ class KqTest extends CI_Controller{
 		$response = post($url,$post);
 		echo $response;
 	
+	}
+	
+	function testSession(){
+	
+		echo $this->user->isSessionValid('32', 'ptHKUzWr17FwxVQqjube');
+		
+		$this->output->enable_profiler(TRUE);
+		
+//		echo 'aaa';
 	}
 	
 	function test(){

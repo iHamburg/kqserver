@@ -46,10 +46,7 @@ class Coupons extends CI_Controller{
 		
 		$models = $this->model->get_all($skip,$limit); 
 
-//		$models = $this->model2->get_all();
-		
 		$total_rows = $this->model->count_all();
-		
 		
 		$this->load->library('pagination');
 //		

@@ -81,7 +81,6 @@ transFwdInsId 	string 	可选 	交易发送机构
 		$response = array('respCd'=>'000000','msg'=>'');
 		echo json_encode($response);
 			
-//		}
 		
 //		$this->output->enable_profiler(TRUE);
 		
