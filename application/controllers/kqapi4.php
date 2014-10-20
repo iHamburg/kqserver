@@ -125,31 +125,7 @@ class Kqapi4 extends REST_Controller
 
 		
 	}
-	
-//	/**
-//	 * 
-//	 * 返回用户信息，如果是多用户会有Cache
-//	 */
-//   public function user_get(){
-//
-//   	
-//   		$this->load->model('user2_m','user');
-//   		
-//   		$id = $this->get('id');
-//   		
-//   		if(!empty($id)){
-// 
-//   			$result = $this->user->get($id);
-//   	
-//   			$result = array_slice_keys($result,array('id','username','nickname','avatarUrl'));
-//   			return $this->output_results($result);
-//
-//   		}
-//   		else{
-//   			return $this->output_results(-1,'missing id');
-//   		}
-//
-//   }
+
    
    /**
     * 
@@ -203,6 +179,84 @@ class Kqapi4 extends REST_Controller
    		$user = $this->user->get($id);
    		return $this->output_results($user);
 		
+   }
+   
+   
+   public function userInfo_get(){
+   
+     	$uid = $this->get('uid');
+   		$sessionToken = $this->get('sessionToken');
+   		
+   		$this->load->model('user2_m','user');
+  	 
+   		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			$status = 403;
+			$msg = '无效的session';
+			return $this->output_error($status,$msg);
+		}
+   		
+		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
+		$results = $query->result_array();	
+		
+		$response['dCouponNum'] = $results[0]['num'];
+		
+		$query = $this->db->query("select count(*) as num from `card` where userId = $uid");
+		$results = $query->result_array();	
+		
+		$response['cardNum'] = $results[0]['num'];
+		
+		$query = $this->db->query("select count(*) as num from `favoritedcoupon` where userId = $uid");
+		$results = $query->result_array();	
+		
+		$response['fCouponNum'] = $results[0]['num'];
+		
+		$query = $this->db->query("select count(*) as num from `favoritedshop` where userId = $uid");
+		$results = $query->result_array();	
+		
+		$response['fShopNum'] = $results[0]['num'];
+		
+		return $this->output_results($response);
+   }
+   
+   public function editUserInfo_post(){
+   
+   	$uid = $this->post('uid');
+   	$sessionToken = $this->post('sessionToken');
+   	$nickname = $this->post('nickname');
+//   	$pwd = $this->post('password'); //dict
+   	$pwd = $this->input->post('password');
+   	$avatar = $this->post('avatar');
+   	
+   		$this->load->model('user2_m','user');
+   	if(!$this->user->isSessionValid($uid,$sessionToken)){
+			$status = 403;
+			$msg = '无效的session';
+			return $this->output_error($status,$msg);
+	}
+	
+	if (!empty($pwd)){
+
+//		$pwd = array('oldPassword'=>'sss','newPassword'=>'ssss');
+		var_dump($pwd);
+		echo $pwd;
+		
+		$oldPassword = $pwd['oldPassword'];
+		$newPassword = $pwd['newPassword'];
+		
+		echo 'old'.$oldPassword;
+		echo 'new'.$newPassword;
+//		$query = $this->db->query("select * from user where username = '$username'");
+//		$results = $query->result_array();	
+//		$pwd = $results[0]['password'];
+//		if($oldPassword!=$pwd){
+//			$status = 777;
+//			$msg = '原来的密码错误';
+//			return $this->output_error($status,$msg);
+//		}
+		
+	}
+	
+   	
    }
    
    /**
@@ -1228,6 +1282,37 @@ group by A.couponId
 		
 	}
 
+	
+	public function captcharegister_get(){
+		
+		$this->load->library('kqsms');
+		
+		$mobile = $this->get('mobile');
+		
+		$captcha = '123456';
+		
+		$this->kqsms->mock_send_register_sms($mobile,$captcha);
+		
+		$captchaMd5 = md5($captcha);
+		
+		return $this->output_results(array('captcha'=>$captcha));
+	}
+	
+	public function captchaforgetpwd_get(){
+		
+		$this->load->library('kqsms');
+		
+		$mobile = $this->get('mobile');
+		
+		$captcha = '123456';
+		
+		$this->kqsms->mock_send_forgetpwd_sms($mobile,$captcha);
+		
+		$captchaMd5 = md5($captcha);
+		
+		return $this->output_results(array('captcha'=>$captcha));
+	}
+	
 	
 	//----------------------Private----------------------
   

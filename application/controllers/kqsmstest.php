@@ -7,14 +7,21 @@
 
 
 
-class Kqsms extends CI_Controller{
+class Kqsmstest extends CI_Controller{
 
-	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Kqsms
+	 */
+	var $kqsms;
 	
 	function __construct(){
 		parent::__construct();
 		
 		header("Content-type: text/html; charset=utf-8");
+		
+		$this->load->library('kqsms');
 	}
 	
 
@@ -33,7 +40,6 @@ class Kqsms extends CI_Controller{
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-//		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
 	
 		$output = curl_exec($ch);
 		curl_close($ch);
@@ -60,9 +66,18 @@ class Kqsms extends CI_Controller{
 		var_dump($output);
 	}
 		
-	
+	function test_register(){
+		
+		echo $this->kqsms->send_register_sms('13166361023', '456789');
+	}
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
+
+		$this->load->library('kqsms');
+		
+		echo $this->kqsms->test();
+		
+		echo 'abc';
 
 	}
 	

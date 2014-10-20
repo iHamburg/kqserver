@@ -98,11 +98,9 @@ sp5Ykcw0iwSbUA==
 
 		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>array('mobile'=>$mobile),'signToken'=>$signToken);
 
-		
 		$post = json_encode($post);
 		
 //		echo 'post '.$post;
-		
 		
 		$response = $this->post($url, $post);
 
@@ -155,7 +153,6 @@ sp5Ykcw0iwSbUA==
 //		echo $dataJson2;
 //		echo $signToken;
 //		echo $post;	
-		
 
 		
 		$response = $this->post($url, $post);

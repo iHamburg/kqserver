@@ -172,6 +172,24 @@ class KqTest extends CI_Controller{
 //		echo 'aaa';
 	}
 	
+	function testCaptcha(){
+		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/111';
+//		$post = array('username'=>'1111','password'=>'2222');
+		
+		$response = get($url);
+		echo $response;
+	
+	
+	}
+	
+	function testEditUserInfo(){
+		$url = 'http://localhost/kq/index.php/kqapi4/edituserinfo';
+		$post = array('uid'=>'33','sessionToken'=>'9wjGdYfi50Vr12U78vua','password'=>array('oldPassword'=>'sss','newPassword'=>'ssss'));
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
 //		echo $this->avoslibrary->get($url);
