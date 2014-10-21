@@ -46,8 +46,6 @@ sp5Ykcw0iwSbUA==
 //		header( 'Content-Type:application/json;charset=utf-8 '); 
 		
 		$this->load->library('unionpay');
-//		$this->load->library('rsa');
-//		$this->load->library('aes');
 		$this->load->helper('html');
 	}
 	
@@ -184,7 +182,7 @@ sp5Ykcw0iwSbUA==
 	function testGetUserByMobile3(){
 	
 		header( 'Content-Type:text/html;charset=utf-8');
-		$mobile = '13166361024';
+		$mobile = '13166361023';
 		$response = $this->unionpay->getUserByMobile2($mobile);
 
 		echo $response;
@@ -201,9 +199,9 @@ sp5Ykcw0iwSbUA==
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$mobile = '13166361023555';
+		$mobile = '13166361026';
 		
-		$response = $this->unionpay->regByMobile($mobile);
+		$response = $this->unionpay->regByMobile2($mobile);
 		
 		echo $response;
 	}
@@ -216,8 +214,8 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$userId = 'c00050001956';
-		$cardNo = '6222021001128509532';
+		$userId = 'c00050001986';
+		$cardNo = '6222021001128509533';
 		
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 		echo $response;
@@ -232,8 +230,8 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$userId = 'c00050001956';
-		$cardNo = '6222021001128509532';
+		$userId = 'c00050001985';
+		$cardNo = '6222021001128509533';
 		
 		$response = $this->unionpay->unbindCard($userId, $cardNo);
 		echo $response;
@@ -258,7 +256,7 @@ sp5Ykcw0iwSbUA==
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = '123456789900';
-		$data['userId'] = 'c00050001985';
+		$data['userId'] = 'c00050001986';
 	
 		
 		$response = $this->unionpay->couponDwnById($data);
@@ -267,8 +265,24 @@ sp5Ykcw0iwSbUA==
 		echo $response;
 	}
 	
-//	function testD
+	function test_verify(){
+		
+//		if ($this->unionpay->verify_service()){
+//			echo '服务器正常运行';
+//		}
+//		else{
+//			echo '服务器出状况了';
+//		}
 	
+		var_dump( $this->unionpay->is_server_alive());
+	
+		
+//		var_dump($this->unionpay->is_server_alive());
+	
+//		var_dump($this->unionpay->isserveralive());
+		
+	}
+		
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
 //		echo $this->avoslibrary->get($url);

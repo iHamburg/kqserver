@@ -14,16 +14,7 @@ class User2_m extends MY_Model{
 	}
 
 	public function isSessionValid($uid,$sessionToken){
-		
-//		$this->db->where(array('id'=>$uid,'sessionToken'=>$sessionToken,'expireDate <'=>'now()'));
-//		$this->db->from('user');
-//		$count = $this->db->count_all_results();
-//		
-//		
-//		if($count>0)
-//			return true;
-//		else
-//			return false;
+
 
 		$query = $this->db->query(" SELECT COUNT(*) AS `numrows`FROM (`user`)
 WHERE `id` =  $uid

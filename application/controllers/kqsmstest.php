@@ -48,6 +48,7 @@ class Kqsmstest extends CI_Controller{
 		var_dump($output);
 	} 
 	
+	
 	function testPost(){
 		$captcha = '1245';
 		$url = 'http://106.ihuyi.cn/webservice/sms.php?method=Submit';
@@ -61,15 +62,25 @@ class Kqsmstest extends CI_Controller{
 		$output = curl_exec($ch);
 
 		curl_close($ch);
-		
 
 		var_dump($output);
 	}
 		
+
+	
+	
 	function test_register(){
 		
 		echo $this->kqsms->send_register_sms('13166361023', '456789');
 	}
+	
+	function test_coupon_accepted(){
+		
+		$result = $this->kqsms->mock_send_coupon_accepted_sms('13166361023',null);
+		echo $result;
+		
+	}
+	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
 

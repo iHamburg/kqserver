@@ -6,7 +6,6 @@
 
 
 
-
 class KqTest extends CI_Controller{
 
 	/**
@@ -35,7 +34,7 @@ class KqTest extends CI_Controller{
 
 	function index() {
 
-		echo 'kqtest';
+		echo 'kqtest '.ErrorEmptyUsernamePwd;
 		
 	}
 	
@@ -184,11 +183,16 @@ class KqTest extends CI_Controller{
 	
 	function testEditUserInfo(){
 		$url = 'http://localhost/kq/index.php/kqapi4/edituserinfo';
-		$post = array('uid'=>'33','sessionToken'=>'9wjGdYfi50Vr12U78vua','password'=>array('oldPassword'=>'sss','newPassword'=>'ssss'));
+		$password = array('oldPassword'=>'sss','newPassword'=>'aaa');
+		$post = array('uid'=>'32','sessionToken'=>'9wjGdYfi50Vr12U78vua','password'=>json_encode($password));
+		
+//		$post = json_encode($post);
 		
 		$response = post($url,$post);
 		echo $response;
 	}
+	
+
 	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";

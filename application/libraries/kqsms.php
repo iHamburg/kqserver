@@ -18,6 +18,12 @@ class Kqsms{
 		return 'kqsms'; 
 	}
 	
+	/**
+	 * 
+	 * 成功返回值 2 提交成功 33600318 
+	 * @param unknown_type $mobile
+	 * @param unknown_type $captcha
+	 */
 	public function send_register_sms($mobile, $captcha){
 		
 		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
@@ -43,7 +49,7 @@ class Kqsms{
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
 		return $this->get($url);
-//		return $url;
+
 		
 	}
 	
@@ -56,6 +62,23 @@ class Kqsms{
 		
 	}
 	
+	public function send_coupon_accepted_sms($mobile,$coupon){
+	
+		$content = "您的优惠券刚刚被承兑";
+		
+		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+		
+		return $this->get($url);
+	}
+	
+	public function mock_send_coupon_accepted_sms($mobile,$coupon){
+	
+		$content = "您的优惠券刚刚被承兑";
+		
+		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+		
+		return $url;
+	}
 	/////////////////
 	
 	/**

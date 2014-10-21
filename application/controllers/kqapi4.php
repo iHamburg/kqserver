@@ -2,6 +2,8 @@
 require(APPPATH.'libraries/REST_Controller.php'); 
 
 
+
+
 /**
  * 
  * 从测试服务器中获取数据
@@ -95,18 +97,17 @@ class Kqapi4 extends REST_Controller
 		
 		//用户名或密码不能为空
 		if(empty($username) || empty($password)){
-			$status = 401;
-			$msg = '用户名或密码不能为空';
-			return $this->output_error($status,$msg);
+
+			return $this->output_error(ErrorEmptyUsernamePwd);
 		}
 		
 	
 		$results = $this->user->get_by(array('username'=>$username,'password'=>$password));
+		
 		//用户名或密码错误
 		if(empty($results)){
-			$status = 1001;
-			$msg = '用户名或密码错误';
-			return $this->output_error($status,$msg);
+	
+			return $this->output_error(ErrorInvalidUsernamePwd);
 		}
 		
 	
@@ -152,17 +153,14 @@ class Kqapi4 extends REST_Controller
 		
    		
    		if(empty($username) ||empty($password)){
-	   		$status = 401;
-	   		$msg = '用户名或密码不能为空';
-	   		return $this->output_error($status,$msg);
+	   		
+	   		return $this->output_error(ErrorEmptyUsernamePwd);
    		}
 
    		$count = $this->user->count_by('username',$username);
 
    		if($count>0){
-   			$status = 1002;
-   			$msg = '用户名已存在';
-   			return $this->output_error($status,$msg);
+   			return $this->output_error(ErrorUsernameExists);
    		}
    		
    		
@@ -175,6 +173,7 @@ class Kqapi4 extends REST_Controller
 		
    		$id = $this->user->insert($data);
    		
+   		
    		$this->db->select('id,username,nickname,avatarUrl,sessionToken');
    		$user = $this->user->get($id);
    		return $this->output_results($user);
@@ -185,15 +184,14 @@ class Kqapi4 extends REST_Controller
    public function userInfo_get(){
    
      	$uid = $this->get('uid');
-   		$sessionToken = $this->get('sessionToken');
+//   		$sessionToken = $this->get('sessionToken');
    		
    		$this->load->model('user2_m','user');
   	 
-   		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
+//   		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//		
+//			return $this->output_error(ErrorInvalidSession);
+//		}
    		
 		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
 		$results = $query->result_array();	
@@ -220,41 +218,55 @@ class Kqapi4 extends REST_Controller
    
    public function editUserInfo_post(){
    
+//   	$post = file_get_contents("php://input");
+//   	echo $post;
+   	
    	$uid = $this->post('uid');
+   	
+   	echo $uid;
    	$sessionToken = $this->post('sessionToken');
+   	 	echo $sessionToken;
    	$nickname = $this->post('nickname');
-//   	$pwd = $this->post('password'); //dict
-   	$pwd = $this->input->post('password');
+   	$pwd = $this->post('password'); //dict
+   	
+   	echo 'pwd'.$pwd;
+   	
+//   	$pwd = $this->input->post('password');
    	$avatar = $this->post('avatar');
    	
-   		$this->load->model('user2_m','user');
+   	$this->load->model('user2_m','user');
+   		
+   	if (empty($uid) || empty($sessionToken)){
+   		return $this->output_error(ErrorEmptyParameter);
+   	}
+
+   	
    	if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
+			
+		return $this->output_error(ErrorInvalidSession);
 	}
 	
-	if (!empty($pwd)){
-
-//		$pwd = array('oldPassword'=>'sss','newPassword'=>'ssss');
-		var_dump($pwd);
-		echo $pwd;
-		
-		$oldPassword = $pwd['oldPassword'];
-		$newPassword = $pwd['newPassword'];
-		
-		echo 'old'.$oldPassword;
-		echo 'new'.$newPassword;
-//		$query = $this->db->query("select * from user where username = '$username'");
-//		$results = $query->result_array();	
-//		$pwd = $results[0]['password'];
-//		if($oldPassword!=$pwd){
-//			$status = 777;
-//			$msg = '原来的密码错误';
-//			return $this->output_error($status,$msg);
-//		}
-		
-	}
+//	if (!empty($pwd)){
+//
+////		$pwd = array('oldPassword'=>'sss','newPassword'=>'ssss');
+//		var_dump($pwd);
+//		echo $pwd;
+//		
+//		$oldPassword = $pwd['oldPassword'];
+//		$newPassword = $pwd['newPassword'];
+//		
+//		echo 'old'.$oldPassword;
+//		echo 'new'.$newPassword;
+////		$query = $this->db->query("select * from user where username = '$username'");
+////		$results = $query->result_array();	
+////		$pwd = $results[0]['password'];
+////		if($oldPassword!=$pwd){
+////			$status = 777;
+////			$msg = '原来的密码错误';
+////			return $this->output_error($status,$msg);
+////		}
+//		
+//	}
 	
    	
    }
@@ -268,26 +280,527 @@ class Kqapi4 extends REST_Controller
    		$password = $this->post('password');
    		
    		if(empty($username) ||empty($password)){
-	   		$status = 401;
-	   		$msg = '用户名或密码不能为空';
-	   		return $this->output_error($status,$msg);
+	   	
+	   		return $this->output_error(ErrorEmptyUsernamePwd);
    		}
+   		
 		$this->load->model('user2_m','user');
 		
 		$count = $this->user->count_by('username', $username);
 		
 		if($count == 0){
-			$status = 410;
-	   		$msg = '用户名不存在';
-	   		return $this->output_error($status,$msg);
+			
+	   		return $this->output_error(ErrorInvalidUsername);
 		}
 		$updateId = $this->user->update_by(array('username'=>$username),array('password'=>$password));
 
-//		$affected = $this->db->affected_rows();
-		
 		return $this->output_success();
 		
    }
+   
+   /**
+    * 
+    * 返回用户绑定的银行卡
+    * @param string uid
+    * @return array
+    */
+     public function myCard_get(){
+   		
+     	$this->load->model('user2_m','user');
+     	
+		$uid = $this->get('uid');
+
+		$sessionToken = $this->get('sessionToken');
+	
+		if(empty($uid)){
+		
+	
+			return $this->output_error(ErrorEmptyUid);
+		}
+	
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+
+			return $this->output_error(ErrorInvalidSession);
+		}
+		 	// 
+		
+		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
+		$this->db->from('card as A');
+		$this->db->join('bank as B','A.bankId = B.id','left');
+		$this->db->where('A.userId',$uid);
+		
+		$query = $this->db->get();
+		
+		$results = $query->result_array();
+		
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('cards'=>$results));
+   }
+   
+   /**
+    * 
+    * 用户绑定银行卡
+    */
+   public function myCard_post(){
+   	
+  		$uid = $this->post('uid');
+		$card = $this->post('card');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		$this->load->model('user2_m','user');
+   		
+		if(empty($uid) || empty($card) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['title'] = $card;
+		
+		$this->load->model('card2_m','card');
+
+		$card = $this->card->get_by($data);
+		
+		//如果没有卡，加上一条记录
+		if(empty($card)){
+			$data['bankId'] = '2';
+			$cardId = $this->card->insert($data);
+		}
+		else{
+			$cardId = $card['id'];
+		}
+		
+		$result = $this->card->get_id($cardId);
+		return $this->output_results($result);
+
+  		
+   }
+   
+   /**
+	 * 
+	 * 用户取消收藏快券
+	 * 
+	 * @return
+	 * 正常： status:1
+	 * 异常： status: -1, input 不全
+	 */
+	public function deleteMyCard_post(){
+		$uid = $this->post('uid');
+		$card = $this->post('card');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+//		if(empty($uid)){
+//		
+//			return $this->output_error(ErrorEmptyUid);
+//		}
+//		
+//		if(empty($card)){
+//		
+//			return $this->output_error(ErrorEmptyCard);
+//		}
+//	
+//		if(empty($sessionToken)){
+//			
+//			return $this->output_error(ErrorEmptySession);
+//		}
+		
+		$this->load->model('user2_m','user');
+		
+		if(empty($uid) || empty($card) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+
+			return $this->output_error(ErrorInvalidSession);
+		
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['title'] = $card;
+		
+		$this->load->model('card2_m','card');
+
+		$result = $this->card->delete_by($data);
+		
+		return $this->output_success();
+		
+	}
+	
+   
+	/**
+	 * 
+	 * 获得用户所有downloadedcoupon信息, join Table: DownloadedCoupon
+	 * 如果
+	 * 
+	 * 
+select  count(A.couponId) as number,B.*,C.*
+from downloadedcoupon as A
+inner join coupon B
+on A.`couponId` = B.id 
+left join couponcontent as C
+on A.`couponId` = C.couponId
+where uid='22'
+group by A.couponId
+	 * @return 
+	 */
+	public function myDownloadedCoupon_get(){
+
+		
+		$uid = $this->get('uid');
+
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+		$mode = $this->get('mode');
+		if(empty($mode)){
+			$mode = 'unused';
+		}
+	
+		if(empty($uid)){
+		
+		
+			return $this->output_error(ErrorEmptyUid);
+		}
+	
+		
+		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->from('downloadedcoupon as A');
+		$this->db->where('uid',$uid);
+		if($mode=='unused'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate <','now()');
+		}
+		else if($mode == 'used'){
+			$this->db->where('status','used');
+		}
+		else if($mode == 'expired'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate >','now()');
+		}
+		$this->db->join('coupon as B','A.couponId = B.id','left');
+		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->group_by('A.couponId');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		$results = $query->result_array();
+	
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('coupons'=>$results));
+	
+
+			
+	
+	}
+	
+	
+	/**
+	 * 
+	 * uid新增downloadedcoupon
+	 * 即使uid和couponId是错误的也会新建，所以这里需要对uid和couponid做一个validate，是否是有效的
+	 * 
+	 */
+	public function myDownloadedCoupon_post(){
+		$uid = $this->post('uid');
+		$couponId = $this->post('couponId');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+	
+		
+		$this->load->model('user2_m','user');
+
+		if(empty($uid) || empty($couponId) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['uid'] = $uid;
+		$data['couponId'] = $couponId;
+		
+		$this->load->model('downloadedcoupon2_m');
+
+		$result = $this->downloadedcoupon2_m->insert($data);
+		
+		
+		
+		return $this->output_success();
+	}
+	
+	
+	
+	/**
+	 * 
+	 * 返回用户收藏的优惠券
+	 * @return array: (coupon)
+	 */
+	public function myFavoritedCoupon_get(){
+	
+		$uid = $this->get('uid');
+
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+	
+		if(empty($uid)){
+		
+			return $this->output_error(ErrorEmptyUid);
+		}
+	
+		 	
+		
+		$this->db->select('A.couponId,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->from('favoritedcoupon as A');
+		$this->db->where('A.userId',$uid);
+		$this->db->join('coupon as B','A.couponId = B.id','left');
+		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		$results = $query->result_array();
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('coupons'=>$results));
+	
+	
+	
+	}
+	
+	
+	/**
+	 * 
+	 *  用户收藏优惠券, _User.favoritedCoupons
+	 *  
+	 *  @return 
+	 *  
+	 */
+	public function myFavoritedCoupon_post(){
+		$uid = $this->post('uid');
+		$couponId = $this->post('couponId');	
+		$sessionToken = $this->post('sessionToken');
+		
+  
+	
+		$this->load->model('user2_m','user');
+
+		if(empty($uid) || empty($couponId) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+		
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['couponId'] = $couponId;
+		
+		$this->load->model('favoritedcoupon2_m','favoritedcoupon');
+
+		$count = $this->favoritedcoupon->count_by($data);
+		
+		//当没有收藏的时候才添加记录
+		if($count==0){
+			$result = $this->favoritedcoupon->insert($data);
+		}
+		
+		return $this->output_success();
+		
+	}
+	
+	/**
+	 * 
+	 * 用户取消收藏快券
+	 * 
+	 * @return
+	 * 正常： status:1
+	 * 异常： status: -1, input 不全
+	 */
+	public function deleteMyFavoritedCoupon_post(){
+		$uid = $this->post('uid');
+		$couponId = $this->post('couponId');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+	
+	
+		$this->load->model('user2_m','user');
+
+		if(empty($uid) || empty($couponId) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+		
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['couponId'] = $couponId;
+		
+		$this->load->model('favoritedcoupon2_m','favoritedcoupon');
+
+		$result = $this->favoritedcoupon->delete_by($data);
+		
+		return $this->output_success();
+	}
+	
+
+	/**
+	 * 
+	 * 返回用户收藏的商户
+	 * @param string uid
+	 * 	@return array: shop
+	 */
+	public function myFavoritedShop_get(){
+		$uid = $this->get('uid');
+
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+	
+		if(empty($uid)){
+		
+		
+			return $this->output_error(ErrorEmptyUid);
+		}
+
+		
+		$this->db->select('A.shopId,B.title,B.logoUrl');
+		$this->db->from('favoritedshop as A');
+		$this->db->where('userId',$uid);
+		$this->db->join('shop as B','A.shopId = B.id','left');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		$results = $query->result_array();
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('shops'=>$results));
+	}
+	
+	
+	/**
+	 * 
+	 *  用户收藏优惠券
+	 */
+	public function myFavoritedShop_post(){
+	
+		$uid = $this->post('uid');
+		$shopId = $this->post('shopId');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+		if(empty($uid) || empty($shopId) || empty($sessionId)){
+					
+			return $this->output_error(ErrorEmptyParameter);
+		}
+
+	
+		$this->load->model('user2_m','user');
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['shopId'] = $shopId;
+		
+		$this->load->model('favoritedshop2_m','favoritedshop');
+
+		$count = $this->favoritedshop->count_by($data);
+		
+		//当没有收藏的时候才添加记录
+		if($count==0){
+			$result = $this->favoritedshop->insert($data);
+		}
+		
+		return $this->output_success();
+	}
+
+/**
+	 * 
+	 * 用户取消收藏快券
+	 * 
+	 * @return
+	 * 正常： status:1
+	 * 异常： status: -1, input 不全
+	 */
+	public function deleteMyFavoritedShop_post(){
+		$uid = $this->post('uid');
+		$shopId = $this->post('shopId');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+		if(empty($uid) || empty($shopId) || empty($sessionId)){
+					
+			return $this->output_error(ErrorEmptyParameter);
+		}
+	
+		$this->load->model('user2_m','user');
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		$data['userId'] = $uid;
+		$data['shopId'] = $shopId;
+		
+		$this->load->model('favoritedshop2_m','favoritedshop');
+
+		$result = $this->favoritedshop->delete_by($data);
+		
+		return $this->output_success();
+		
+	}
    
    
 	function couponDetails_get(){
@@ -313,9 +826,8 @@ class Kqapi4 extends REST_Controller
 		$coupon = $results[0];
 		
 		if(empty($coupon)){
-			$status = 1011;
-			$msg = '无效的couponId';
-			return $this->output_error($status,$msg);
+		
+			return $this->output_error(ErrorInvalidCouponId);
 		}
 		
 		///shopCoupons
@@ -328,8 +840,6 @@ class Kqapi4 extends REST_Controller
 		
 		$query = $this->db->get();
 		$results = $query->result_array();	
-//		if(empty($results))
-//			$results = (object)array();
 		
 		$coupon['shopCoupons'] = $results;
 		
@@ -345,7 +855,9 @@ limit 3");
 		///nearestShop
 		if(empty($longitude) || empty($latitude)){
 		
-			$query = $this->db->query("SELECT * FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8");
+			$query = $this->db->query("SELECT id,shopId,title,address,districtId,longitude,latitude,
+
+			openTime,phone,logoUrl FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId");
 
 		}
 		else{
@@ -423,16 +935,29 @@ limit 3");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
- 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
- 	  	$this->db->limit($limit,$skip);
- 	  	$this->db->order_by('createdAt','desc');
- 	  	$this->db->from('coupon');
-		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
- 	  	
-		$query = $this->db->get();
-		
-		$results = $query->result_array();	
+// 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
+// 	  	$this->db->limit($limit,$skip);
+// 	  	$this->db->order_by('createdAt','desc');
+// 	  	$this->db->from('coupon');
+//		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
+// 	  	
+//		$query = $this->db->get();
+//		
+//		$results = $query->result_array();	
 	  	
+		
+		$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`
+FROM (`coupon` A) 
+JOIN `couponcontent` B
+ON `A`.`id` = `B`.`couponId`
+Where A.active = 1
+ORDER BY A.`createdAt` desc
+LIMIT $skip,$limit");
+		
+		$results = $query->result_array();
+		
+		
+//		$this->output->enable_profiler(TRUE);
 	  	return $this->output_results(array('coupons'=>$results));
 	  	
 	  	//print_r($results);exit;
@@ -477,64 +1002,6 @@ limit 3");
 	 
 	  }
   
-  
-//   
-//   /**
-//    * 
-//    * APP没有使用shop
-//    */
-//   public function shop_get(){
-//   		
-//   	
-//   		$id = $this->get('id');
-//   		
-//   		if(!empty($id)){
-//
-////   			$url = HOST.'/classes/Shop/'.$id;
-////   			
-////   			$json = $this->kq->get($url);
-////   			
-////   			$error = checkResponseError($json);
-////			if(!empty($error))
-////				return $error;
-////   				/// 只返回一个obj 
-////
-////   			$result = json_decode($json,true);
-////
-////   			$result = array_slice_keys($result, array('title','objectId','phone','address','openTime','location'));
-////   				
-////   			if (!isLocalhost())
-////				$this->output->cache(CacheTime);
-////   			
-////			return $this->output_results($result);
-//
-//   		}
-//   		else{
-//   			$url = HOST."/classes/Shop?";
-//   		
-//   			$json = $this->jsonWithGETUrl($url);
-//
-//   			$error = checkResponseError($json);
-//			if(!empty($error))
-//				return $error;
-//   			
-//   			$results = resultsWithJson($json);
-//		
-//  		   foreach ($results as $result) {
-//				$array[] = array_slice_keys($result, array('title','objectId','phone','address','openTime','location'));
-//			
-//  		   }		
-//   			
-//   			
-//			if (!isLocalhost())
-//				$this->output->cache(CacheTime);
-//			
-//			return $this->output_results($array);
-//
-//	   		
-//   		}
-//	}
-
 	
 	/**
 	 * 
@@ -659,6 +1126,7 @@ limit 3");
 		$latitude =  $this->get('latitude');
 		$order =  $this->get('order');
 		$keyword = $this->get('keyword');
+		
 		if(empty($order)){
 			$order = 'distance';
 		}
@@ -671,13 +1139,7 @@ limit 3");
 	  	
  	  	if (empty($limit))
  	  		$limit = 30;
-
-// 	  	if(empty($keyword)){
-// 	  		$status = 601;
-//	   		$msg = '关键词不能为空';
-//	   		return $this->output_error($status,$msg);
-// 	  	}
- 	  		
+ 		
  	  		
  	  	
 		if(empty($latitude) || empty($longitude)){
@@ -726,562 +1188,9 @@ limit 3");
 	 */
 	
 	
-	/**
-    * 
-    * 返回用户绑定的银行卡
-    * @param string uid
-    * @return array
-    */
-     public function myCard_get(){
-   		
-     	$this->load->model('user2_m','user');
-     	
-		$uid = $this->get('uid');
-
-		$sessionToken = $this->get('sessionToken');
-	
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-		 	// 
-		
-		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
-		$this->db->from('card as A');
-		$this->db->join('bank as B','A.bankId = B.id','left');
-		$this->db->where('A.userId',$uid);
-		
-		$query = $this->db->get();
-		
-		$results = $query->result_array();
-		
-//		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results(array('cards'=>$results));
-   }
-   
-   /**
-    * 
-    * 用户绑定银行卡
-    */
-   public function myCard_post(){
-   	
-  		$uid = $this->post('uid');
-		$card = $this->post('card');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($card)){
-		
-			$status = 407;
-			$msg = '卡号不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['title'] = $card;
-		
-		$this->load->model('card2_m','card');
-
-		$card = $this->card->get_by($data);
-		
-		//如果没有卡，加上一条记录
-		if(empty($card)){
-			$data['bankId'] = '2';
-			$cardId = $this->card->insert($data);
-		}
-		else{
-			$cardId = $card['id'];
-		}
-		
-		$result = $this->card->get_id($cardId);
-		return $this->output_results($result);
-
-  		
-   }
-   
-   /**
-	 * 
-	 * 用户取消收藏快券
-	 * 
-	 * @return
-	 * 正常： status:1
-	 * 异常： status: -1, input 不全
-	 */
-	public function deleteMyCard_post(){
-		$uid = $this->post('uid');
-		$card = $this->post('card');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($card)){
-		
-			$status = 409;
-			$msg = 'card不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['title'] = $card;
-		
-		$this->load->model('card2_m','card');
-
-		$result = $this->card->delete_by($data);
-		
-		return $this->output_success();
-		
-	}
-	
-   
-	/**
-	 * 
-	 * 获得用户所有downloadedcoupon信息, join Table: DownloadedCoupon
-	 * 如果
-	 * 
-	 * 
-select  count(A.couponId) as number,B.*,C.*
-from downloadedcoupon as A
-inner join coupon B
-on A.`couponId` = B.id 
-left join couponcontent as C
-on A.`couponId` = C.couponId
-where uid='22'
-group by A.couponId
-	 * @return 
-	 */
-	public function myDownloadedCoupon_get(){
-
-		
-		$uid = $this->get('uid');
-
-		$limit = intval($this->get('limit'));
-		$skip = intval($this->get('skip'));
-		
-		if (empty($skip))
- 	  		$skip = 0;
-	  	
- 	  	if (empty($limit))
- 	  		$limit = 30;
-		
-		$mode = $this->get('mode');
-		if(empty($mode)){
-			$mode = 'unused';
-		}
-	
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		
-		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
-		$this->db->from('downloadedcoupon as A');
-		$this->db->where('uid',$uid);
-		if($mode=='unused'){
-			$this->db->where('status','unused');
-			$this->db->where('B.endDate <','now()');
-		}
-		else if($mode == 'used'){
-			$this->db->where('status','used');
-		}
-		else if($mode == 'expired'){
-			$this->db->where('status','unused');
-			$this->db->where('B.endDate >','now()');
-		}
-		$this->db->join('coupon as B','A.couponId = B.id','left');
-		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
-		$this->db->group_by('A.couponId');
-		$this->db->limit($limit,$skip);
-		
-		$query = $this->db->get();
-		
-		$results = $query->result_array();
-	
-	  	
-//		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results(array('coupons'=>$results));
-	
-
-			
-	
-	}
 	
 	
-	/**
-	 * 
-	 * uid新增downloadedcoupon
-	 * 即使uid和couponId是错误的也会新建，所以这里需要对uid和couponid做一个validate，是否是有效的
-	 * 
-	 */
-	public function myDownloadedCoupon_post(){
-		$uid = $this->post('uid');
-		$couponId = $this->post('couponId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($couponId)){
-		
-			$status = 404;
-			$msg = 'couponId不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['uid'] = $uid;
-		$data['couponId'] = $couponId;
-		
-		$this->load->model('downloadedcoupon2_m');
-
-		$result = $this->downloadedcoupon2_m->insert($data);
-		
-		
-		
-		return $this->output_success();
-	}
-	
-	
-	
-	/**
-	 * 
-	 * 返回用户收藏的优惠券
-	 * @return array: (coupon)
-	 */
-	public function myFavoritedCoupon_get(){
-	
-		$uid = $this->get('uid');
-
-		$limit = intval($this->get('limit'));
-		$skip = intval($this->get('skip'));
-		
-		if (empty($skip))
- 	  		$skip = 0;
-	  	
- 	  	if (empty($limit))
- 	  		$limit = 30;
-		
-	
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		 	
-		
-		$this->db->select('A.couponId,B.title,B.endDate,C.avatarUrl,C.discountContent');
-		$this->db->from('favoritedcoupon as A');
-		$this->db->where('A.userId',$uid);
-		$this->db->join('coupon as B','A.couponId = B.id','left');
-		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
-		$this->db->limit($limit,$skip);
-		
-		$query = $this->db->get();
-		
-		$results = $query->result_array();
-	  	
-//		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results(array('coupons'=>$results));
-	
-	
-	
-	}
-	
-	
-	/**
-	 * 
-	 *  用户收藏优惠券, _User.favoritedCoupons
-	 *  
-	 *  @return 
-	 *  
-	 */
-	public function myFavoritedCoupon_post(){
-		$uid = $this->post('uid');
-		$couponId = $this->post('couponId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($couponId)){
-		
-			$status = 404;
-			$msg = 'couponId不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['couponId'] = $couponId;
-		
-		$this->load->model('favoritedcoupon2_m','favoritedcoupon');
-
-		$count = $this->favoritedcoupon->count_by($data);
-		
-		//当没有收藏的时候才添加记录
-		if($count==0){
-			$result = $this->favoritedcoupon->insert($data);
-		}
-		
-		return $this->output_success();
-		
-	}
-	
-	/**
-	 * 
-	 * 用户取消收藏快券
-	 * 
-	 * @return
-	 * 正常： status:1
-	 * 异常： status: -1, input 不全
-	 */
-	public function deleteMyFavoritedCoupon_post(){
-		$uid = $this->post('uid');
-		$couponId = $this->post('couponId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($couponId)){
-		
-			$status = 404;
-			$msg = 'couponId不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['couponId'] = $couponId;
-		
-		$this->load->model('favoritedcoupon2_m','favoritedcoupon');
-
-		$result = $this->favoritedcoupon->delete_by($data);
-		
-		return $this->output_success();
-	}
-	
-
-	/**
-	 * 
-	 * 返回用户收藏的商户
-	 * @param string uid
-	 * 	@return array: shop
-	 */
-	public function myFavoritedShop_get(){
-		$uid = $this->get('uid');
-
-		$limit = intval($this->get('limit'));
-		$skip = intval($this->get('skip'));
-		
-		if (empty($skip))
- 	  		$skip = 0;
-	  	
- 	  	if (empty($limit))
- 	  		$limit = 30;
-		
-	
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-
-		
-		$this->db->select('A.shopId,B.title,B.logoUrl');
-		$this->db->from('favoritedshop as A');
-		$this->db->where('userId',$uid);
-		$this->db->join('shop as B','A.shopId = B.id','left');
-		$this->db->limit($limit,$skip);
-		
-		$query = $this->db->get();
-		
-		$results = $query->result_array();
-	  	
-//		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results(array('shops'=>$results));
-	}
-	
-	
-	/**
-	 * 
-	 *  用户收藏优惠券
-	 */
-	public function myFavoritedShop_post(){
-	
-		$uid = $this->post('uid');
-		$shopId = $this->post('shopId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($shopId)){
-		
-			$status = 405;
-			$msg = 'shopId不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['shopId'] = $shopId;
-		
-		$this->load->model('favoritedshop2_m','favoritedshop');
-
-		$count = $this->favoritedshop->count_by($data);
-		
-		//当没有收藏的时候才添加记录
-		if($count==0){
-			$result = $this->favoritedshop->insert($data);
-		}
-		
-		return $this->output_success();
-	}
-
-/**
-	 * 
-	 * 用户取消收藏快券
-	 * 
-	 * @return
-	 * 正常： status:1
-	 * 异常： status: -1, input 不全
-	 */
-	public function deleteMyFavoritedShop_post(){
-		$uid = $this->post('uid');
-		$shopId = $this->post('shopId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid)){
-		
-			$status = 402;
-			$msg = '用户id不能为空';
-			return $this->output_error($status,$msg);
-		}
-		
-		if(empty($shopId)){
-		
-			$status = 405;
-			$msg = 'shopId不能为空';
-			return $this->output_error($status,$msg);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			$status = 403;
-			$msg = '无效的session';
-			return $this->output_error($status,$msg);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['shopId'] = $shopId;
-		
-		$this->load->model('favoritedshop2_m','favoritedshop');
-
-		$result = $this->favoritedshop->delete_by($data);
-		
-		return $this->output_success();
-		
-	}
-
+	///---------- Capcha -------------
 	
 	public function captcharegister_get(){
 		
@@ -1358,8 +1267,13 @@ group by A.couponId
 			return $response;
    }
    
+   
+   
    private function output_error($status,$errorMsg=''){
-  			 $error = array('status'=>$status,'msg'=>$errorMsg);
+   	
+   			$msg = msg_with_error($status);
+   			
+  			$error = array('status'=>$status,'msg'=>$msg);
    			$response = json_encode($error);
 			echo $response;
 			return $response;

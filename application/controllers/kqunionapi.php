@@ -86,60 +86,6 @@ transFwdInsId 	string 	可选 	交易发送机构
 		
 	}
 	
-	function couponAccepted2(){
-	
-//		$post = file_get_contents("php://input");
-
-		$post = $this->input->post('params');
-		
-		$data['originRequest'] = $post;
-//		var_dump($post);
-		if(empty($post)){
-			$response = array('respCd'=>'300000','msg'=>'参数不可为空');
-			echo json_encode($response);
-			return;
-		}
-		
-		$post = json_decode($post,true);
-		
-//判断post是否是json值
-//		if(json_last_error() != JSON_ERROR_NONE){
-//			
-//			//'不是json字串';
-//			$response = array('respCd'=>'100150','msg'=>'');
-//			echo json_encode($response);
-//			
-//		}
-//		else{
-
-//			var_dump($post);
-			
-			$params = array('mchntId','couponId','userId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
-
-			foreach ($params as $key) {
-				$data[$key] = $post['data'][$key];
-			}
-			
-			if(empty($data['mchntId']) ||empty($data['couponId'])){
-				$response = array('respCd'=>'300000','msg'=>'参数不可为空');
-				echo json_encode($response);
-				return;
-			}
-			
-			
-			$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-			
-			$this->uCouponAccepted->insert($data);
-			
-			$response = array('respCd'=>'00000','msg'=>'');
-			echo json_encode($response);
-			
-//		}
-		
-//		$this->output->enable_profiler(TRUE);
-		
-	}
-
 	
 	//----------------------Private----------------------
   

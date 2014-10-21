@@ -56,6 +56,23 @@ sp5Ykcw0iwSbUA==
 		$data = array(
 			'infSource'=>$this->infSource,
 			'mobile'=>$mobile
+		);
+	
+		$post = $this->generate_post_json($data);
+					
+		$response = $this->post($url, $post);
+		
+		return $response;
+	}
+	
+	public function regByMobile2($mobile){
+		
+		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
+		$url = $this->host.'regByMobile';
+		
+		$data = array(
+			'infSource'=>$this->infSource,
+			'mobile'=>$mobile
 					);
 		
 		$dataJson = json_encode($data);
@@ -77,10 +94,13 @@ sp5Ykcw0iwSbUA==
 		return $response;
 	}
 	
+
+	
 	/**
 	 * 
 	 * 用户信息查询-手机号码方式
 	 * 正确： {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":null},"respCd":"000000","msg":""}
+	 * {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"中国工商银行"}]},"respCd":"000000","msg":""}
 	 * 用户不存在： {"data":null,"respCd":"300200","msg":""}
 	 */
 	public function getUserByMobile($mobile){
@@ -89,14 +109,28 @@ sp5Ykcw0iwSbUA==
 		
 		$data = array('mobile' => $mobile);
 		
-		$data = json_encode($data);
+		$post = $this->generate_post_json($data);
+		
+		$response = $this->post($url, $post);
+
+		return $response;
+	}
+
+	public function getUserByMobile2($mobile){
+
+	
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile' => $mobile);
+		
+		$dataJson = json_encode($data);
 
 //		echo 'data '.$data;
-		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
 		
 		$signToken = bin2hex($signToken);
 
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>array('mobile'=>$mobile),'signToken'=>$signToken);
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
 
 		$post = json_encode($post);
 		
@@ -107,13 +141,15 @@ sp5Ykcw0iwSbUA==
 		
 		return $response;
 	}
-
 	
 	/**
 	 * 
 	 * 银行卡开通服务
 	 * respCd: 300500   无效的卡号
 	 * {"data":null,"respCd":"300002","msg":"解密出错"}
+	 * 
+	 * 300513: 用户绑卡及解绑卡次数超限
+	 * 300519  钱包服务绑定异常，报重复绑卡  // 有另一个账户已经绑了这个卡, 如果原账户解除绑定了，就能再绑定
 	 */
 	function bindCard($userId,$cardNo){
 	
@@ -137,8 +173,6 @@ sp5Ykcw0iwSbUA==
 		$dataJson = json_encode($data);
 		$dataJson2 = str_replace('\\','',$dataJson);
 		
-//		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-
 		
 		openssl_sign($dataJson2, $signToken, $this->private_key); //用私钥进行签名
 		$signToken = bin2hex($signToken);
@@ -147,13 +181,6 @@ sp5Ykcw0iwSbUA==
 		
 		$post = json_encode($post);
 		
-		
-//		echo $encrypted;
-//		echo $dataJson;
-//		echo $dataJson2;
-//		echo $signToken;
-//		echo $post;	
-
 		
 		$response = $this->post($url, $post);
 		return $response;
@@ -221,10 +248,35 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	 * @param unknown_type $data
 	 * @param unknown_type $couponSceneId
 	 * {"data":{"transSeq":"123456789900","couponNum":1.0},"respCd":"000000","msg":""}
+	 * 
+	 * 500048： 票券下载张数超过单用户下载限制
+
+
+		$data['chnlUsrId'] = '111';
+		$data['chnlUsrMobile'] = '131663610235555';
+		$data['couponId'] = 'Z00000000010074';
+		$data['couponNum'] = '1';
+		$data['couponSceneId'] = '000';
+		$data['transSeq'] = '123456789900';
+		$data['userId'] = 'c00050001986';
+
 	 */
-	function couponDwnById($data){
+	public function couponDwnById($data){
 	
 		$url = $this->host.'couponDwnById';
+		
+		$post = $this->generate_post_json($data);
+
+		
+		$response = $this->post($url, $post);
+		return $response;
+		
+	}
+	
+	function couponDwnById2($data){
+	
+		$url = $this->host.'couponDwnById';
+		
 		$dataJson = json_encode($data);
 		
 		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
@@ -241,6 +293,35 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		return $response;
 		
 	}
+	
+	public function is_server_alive(){
+
+		$mobile = '111';
+		
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile' => $mobile);
+		
+		$dataJson = json_encode($data);
+
+//		echo 'data '.$data;
+		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		echo 'post '.$post;
+		
+		$response = $this->post($url, $post);
+
+		
+		return $response;	
+	}
+	
+	
 	
 	/////////////////
 	
@@ -324,41 +405,25 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		
 		return $result;
 	}
-
 	
-	/**
-	 * 
-	 * 用户信息查询-手机号码方式
-	 */
-	public function getUserByMobile2($mobile){
-
-		$url = $this->host.'getUserByMobile';
+	private function generate_post_json($data){
+	
 		
-		$data = array('mobile' => $mobile);
 		
 		$dataJson = json_encode($data);
 
 //		echo 'data '.$data;
-
 		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
 		
 		$signToken = bin2hex($signToken);
 
-		
 		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
 
 		$post = json_encode($post);
 		
-//		return $post;
-		
-//		var_dump($url);
-//		var_dump($post);
-		
-		$response = $this->post($url, $post);
-
-		
-		return $response;
+		return $post;
 	}
+
 }
 
 /* End of file Someclass.php */
