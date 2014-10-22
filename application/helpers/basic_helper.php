@@ -8,6 +8,16 @@ function randomCharacter($number){
 		return $str;
 }
 
+/**
+ * 
+ * 返回6位随机数
+ */
+function random_number(){
+		$m = '0123456789';
+		$s = str_shuffle($m);
+		$str = substr($s,1,6);
+		return $str;
+}
 
 /**
  * 

@@ -56,12 +56,13 @@ class Kqapi4 extends REST_Controller
 	 */
 	var $user;
 	
+	
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var User2_m
+	 * @var Kqsms
 	 */
-	var $user2_m;
+	var $kqsms;
 	
 	function __construct(){
 		parent::__construct();
@@ -297,6 +298,13 @@ class Kqapi4 extends REST_Controller
 		return $this->output_success();
 		
    }
+   
+   
+	
+	/**
+	 * *************        My     ****************
+	 */
+	
    
    /**
     * 
@@ -960,7 +968,6 @@ LIMIT $skip,$limit");
 //		$this->output->enable_profiler(TRUE);
 	  	return $this->output_results(array('coupons'=>$results));
 	  	
-	  	//print_r($results);exit;
 	 
 	  }
 	  
@@ -985,20 +992,31 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
- 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
- 	  	$this->db->limit($limit,$skip);
- 	  	$this->db->order_by('createdAt','desc');
- 	  	$this->db->from('coupon');
-		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
- 	  	
-		$query = $this->db->get();
+// 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
+// 	  	$this->db->limit($limit,$skip);
+// 	  	$this->db->order_by('createdAt','desc');
+// 	  	$this->db->from('coupon');
+//		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
+// 	  	
+//		$query = $this->db->get();
+//		
+//		$results = $query->result_array();	
+//		
+//	  	return $this->output_results(array('coupons'=>$results));
+	  	
+ 	  	$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`
+FROM (`coupon` A) 
+JOIN `couponcontent` B
+ON `A`.`id` = `B`.`couponId`
+Where A.active = 1
+ORDER BY A.`downloadedCount` desc
+LIMIT $skip,$limit");
 		
-		$results = $query->result_array();	
+		$results = $query->result_array();
 		
+		
+//		$this->output->enable_profiler(TRUE);
 	  	return $this->output_results(array('coupons'=>$results));
-	  	
-	  	
-	  	//print_r($results);exit;
 	 
 	  }
   
@@ -1013,15 +1031,14 @@ LIMIT $skip,$limit");
 		$shopId = $this->get('id');
 		
 	 	if(empty($shopId)){
- 	  		$status = '602';
-	   		$msg = '总商户Id不能为空';
-	   		return $this->output_error($status,$msg);
+ 	  		
+	   		return $this->output_error(ErrorEmptyShopId);
  	  	}
+ 	  	
 		
 		$this->load->model('shopbranch2_m','shopBranch');
 		
 		$results = $this->shopBranch->get_by('shopId',$shopId);
-		
 		
 		
 		return $this->output_results(array('shopbranches'=>$results));
@@ -1030,6 +1047,7 @@ LIMIT $skip,$limit");
 	public function shopType_get(){
 	
 		$this->load->model('shoptype2_m','shopType');
+
 		$results = $this->shopType->get_all();
 		
 		return $this->output_results(array('types'=>$results));
@@ -1085,9 +1103,10 @@ LIMIT $skip,$limit");
 			$this->db->where('typeId',$shopTypeId);
 		}
 	
+		$this->db->where('A.active','1');
+		$this->db->where('B.active','1');
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 //			$this->db->order_by("ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380");
-
 				$this->db->order_by('distance');
 		}
  	  	$this->db->limit($limit,$skip);
@@ -1164,7 +1183,10 @@ LIMIT $skip,$limit");
 		if(!empty($shopTypeId)){
 			$this->db->where('typeId',$shopTypeId);
 		}
-	
+		
+		$this->db->where('A.active','1');
+		$this->db->where('B.active','1');
+
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 			
 				$this->db->order_by('distance');
@@ -1183,11 +1205,6 @@ LIMIT $skip,$limit");
 
 	
 	
-	/**
-	 * *************        My     ****************
-	 */
-	
-	
 	
 	
 	///---------- Capcha -------------
@@ -1198,13 +1215,24 @@ LIMIT $skip,$limit");
 		
 		$mobile = $this->get('mobile');
 		
-		$captcha = '123456';
+		$captcha = random_number();
 		
-		$this->kqsms->mock_send_register_sms($mobile,$captcha);
+		
+		
+		$response = $this->kqsms->mock_send_register_sms($mobile,$captcha);
+//		$response = $this->kqsms->send_register_sms($mobile,$captcha);
+		
+		$xml = simplexml_load_string($response);
+		
+		$code = $xml->code;
+		
+		if ($code == 406){
+			echo 'code is 406';
+		}
 		
 		$captchaMd5 = md5($captcha);
 		
-		return $this->output_results(array('captcha'=>$captcha));
+		return $this->output_results(array('captcha'=>$captchaMd5));
 	}
 	
 	public function captchaforgetpwd_get(){
@@ -1283,6 +1311,8 @@ LIMIT $skip,$limit");
    // --------------- TEST -----------------
    public function test_get(){
    		
+   	echo 'acbcd';
+   	
    		$result = array('1'=>'c');
    		
    		$this->response($result);

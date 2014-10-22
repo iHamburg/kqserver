@@ -172,7 +172,7 @@ class KqTest extends CI_Controller{
 	}
 	
 	function testCaptcha(){
-		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/111';
+		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
 //		$post = array('username'=>'1111','password'=>'2222');
 		
 		$response = get($url);
@@ -192,9 +192,24 @@ class KqTest extends CI_Controller{
 		echo $response;
 	}
 	
+function test_send_email(){
+		$to = "tominfrankfurt@gmail.com";
+$subject = "Test mail";
+$message = "Hello! This is a simple email message.";
+$from = "tominfrankfurt@gmail.com";
+$headers = "From: $from";
+echo "Mail Sent.".mail($to,$subject,$message,$headers);
+
+		
+		
+	}
 
 	
 	function test(){
+		
+		
+		echo randomNumber();
+		
 //		$url = HOST."/users?keys=phone,username";
 //		echo $this->avoslibrary->get($url);
 		

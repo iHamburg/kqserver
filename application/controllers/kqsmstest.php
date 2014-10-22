@@ -19,7 +19,7 @@ class Kqsmstest extends CI_Controller{
 	function __construct(){
 		parent::__construct();
 		
-		header("Content-type: text/html; charset=utf-8");
+		header("Content-type: text/plain; charset=utf-8");
 		
 		$this->load->library('kqsms');
 	}
@@ -68,10 +68,39 @@ class Kqsmstest extends CI_Controller{
 		
 
 	
-	
+	/**
+	 * 
+	 *  2 提交成功 33745434 
+	 *   406 手机格式不正确 0 
+	 */
 	function test_register(){
 		
-		echo $this->kqsms->send_register_sms('13166361023', '456789');
+		$response = $this->kqsms->send_register_sms('131663610', '456789');
+		
+//		echo ($response);
+		
+		$xml = simplexml_load_string($response);
+		
+		$code = $xml->code;
+		
+		echo $code;
+		
+		if ($code == 2){
+			echo 'success';
+		}
+		else if ($code == 0){
+			echo 'code is 406';
+		}
+		if ($code == 406){
+			echo 'code is 406';
+		}
+		
+		
+		
+//		print_r($xml);
+//		$arr = explode(' ', $response);
+//		
+//		var_dump($arr);
 	}
 	
 	function test_coupon_accepted(){
@@ -80,6 +109,8 @@ class Kqsmstest extends CI_Controller{
 		echo $result;
 		
 	}
+	
+	
 	
 	function test(){
 //		$url = HOST."/users?keys=phone,username";
