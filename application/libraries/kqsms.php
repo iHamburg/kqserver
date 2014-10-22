@@ -37,6 +37,7 @@ class Kqsms{
 	public function mock_send_register_sms($mobile, $captcha){
 		
 		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+		
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
 		return $url;

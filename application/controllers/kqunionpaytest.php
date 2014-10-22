@@ -143,8 +143,9 @@ sp5Ykcw0iwSbUA==
 	function testGetUserByMobile(){
 	
 		header( 'Content-Type:text/html;charset=utf-8');
-		$mobile = '13166361023';
+//		$mobile = '15166412996';
 		
+			$mobile = '13166361023';
 		$response = $this->unionpay->getUserByMobile($mobile);
 
 		echo $response;
@@ -196,14 +197,31 @@ sp5Ykcw0iwSbUA==
 	 */
 	function testRegByMobile(){
 		
-		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
 		$mobile = '13166361026';
 		
 		$response = $this->unionpay->regByMobile2($mobile);
 		
-		echo $response;
+		$response = json_decode($response,true);
+		
+		$respCd = $response['respCd'];
+		
+		if($respCd == 0){
+			//success
+			echo 'success';
+		
+		}
+		else if($resCd == 300102){
+			// 无效的手机
+			echo '无效的手机';
+		}
+		else if($resCd == 300304){
+			// 已经注册
+			echo '已经注册';
+		}
+		
+		
 	}
 	
 	/**
@@ -214,8 +232,8 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$userId = 'c00050001986';
-		$cardNo = '6222021001128509533';
+		$userId = 'c00050001985';
+		$cardNo = '6222021001128509534';
 		
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 		echo $response;
@@ -231,7 +249,7 @@ sp5Ykcw0iwSbUA==
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
 		$userId = 'c00050001985';
-		$cardNo = '6222021001128509533';
+		$cardNo = '6222021001128509534';
 		
 		$response = $this->unionpay->unbindCard($userId, $cardNo);
 		echo $response;
@@ -253,6 +271,8 @@ sp5Ykcw0iwSbUA==
 		$data['chnlUsrId'] = '111';
 		$data['chnlUsrMobile'] = '131663610235555';
 		$data['couponId'] = 'Z00000000010074';
+		
+//		$data['couponId'] = 'D00000000008029';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = '123456789900';

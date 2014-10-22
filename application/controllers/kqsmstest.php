@@ -75,32 +75,24 @@ class Kqsmstest extends CI_Controller{
 	 */
 	function test_register(){
 		
-		$response = $this->kqsms->send_register_sms('131663610', '456789');
+		$response = $this->kqsms->send_register_sms('13166361023', '456789');
 		
 //		echo ($response);
 		
 		$xml = simplexml_load_string($response);
 		
 		$code = $xml->code;
-		
-		echo $code;
+
 		
 		if ($code == 2){
 			echo 'success';
 		}
-		else if ($code == 0){
-			echo 'code is 406';
-		}
-		if ($code == 406){
-			echo 'code is 406';
+		else{
+			echo 'failure';
 		}
 		
-		
-		
-//		print_r($xml);
-//		$arr = explode(' ', $response);
-//		
-//		var_dump($arr);
+		$query = $this->db->query("insert into s_sms (type,code) values ('register',$code)");
+
 	}
 	
 	function test_coupon_accepted(){

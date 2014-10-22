@@ -45,7 +45,7 @@ sp5Ykcw0iwSbUA==
 	 * 已经注册
 	 * {"data":null,"respCd":"300304","msg":""}
 	 * 
-	 * 无效的手机
+	 * 无效的手机, 应该不会出现，因为我们的用户会通过短信验证
 	 * {"data":null,"respCd":"300102","msg":""}
 	 */
 	public function regByMobile($mobile){
@@ -150,6 +150,7 @@ sp5Ykcw0iwSbUA==
 	 * 
 	 * 300513: 用户绑卡及解绑卡次数超限
 	 * 300519  钱包服务绑定异常，报重复绑卡  // 有另一个账户已经绑了这个卡, 如果原账户解除绑定了，就能再绑定
+	 * 300500   无效的卡号
 	 */
 	function bindCard($userId,$cardNo){
 	

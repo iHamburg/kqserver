@@ -38,7 +38,7 @@ class Kqapi4 extends REST_Controller
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var Shop_m
+	 * @var Shop2_m
 	 */
 	var $shop_m;
 	
@@ -64,11 +64,21 @@ class Kqapi4 extends REST_Controller
 	 */
 	var $kqsms;
 	
+	
+	/**
+	 * 
+	 * 
+	 * @var Unionpay
+	 */
+	var $unionpay;
+	
+	
 	function __construct(){
 		parent::__construct();
 		
 		header("Content-type: text/html; charset=utf-8");
 		
+		$this->load->library('unionpay');
 	}
 	
 	function index(){
@@ -174,9 +184,16 @@ class Kqapi4 extends REST_Controller
 		
    		$id = $this->user->insert($data);
    		
-   		
    		$this->db->select('id,username,nickname,avatarUrl,sessionToken');
+   		
    		$user = $this->user->get($id);
+   		
+   		// 银联注册
+   		
+//   		$response = $this->unionpay->regByMobile($mobile);
+   		
+   		
+   		
    		return $this->output_results($user);
 		
    }
@@ -185,14 +202,20 @@ class Kqapi4 extends REST_Controller
    public function userInfo_get(){
    
      	$uid = $this->get('uid');
-//   		$sessionToken = $this->get('sessionToken');
-   		
+   	
+     	$sessionToken = $this->post('sessionToken');
+		
    		$this->load->model('user2_m','user');
-  	 
-//   		if(!$this->user->isSessionValid($uid,$sessionToken)){
-//		
-//			return $this->output_error(ErrorInvalidSession);
-//		}
+		
+   		
+   		if(empty($uid)){
+   			return $this->output_error(ErrorEmptyUid);
+   		}
+  	 	if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}	
+   		
    		
 		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
 		$results = $query->result_array();	
@@ -318,7 +341,7 @@ class Kqapi4 extends REST_Controller
      	
 		$uid = $this->get('uid');
 
-		$sessionToken = $this->get('sessionToken');
+//		$sessionToken = $this->get('sessionToken');
 	
 		if(empty($uid)){
 		
@@ -326,10 +349,10 @@ class Kqapi4 extends REST_Controller
 			return $this->output_error(ErrorEmptyUid);
 		}
 	
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-
-			return $this->output_error(ErrorInvalidSession);
-		}
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//
+//			return $this->output_error(ErrorInvalidSession);
+//		}
 		 	// 
 		
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
@@ -380,13 +403,93 @@ class Kqapi4 extends REST_Controller
 		if(empty($card)){
 			$data['bankId'] = '2';
 			$cardId = $this->card->insert($data);
+		
+		
 		}
 		else{
 			$cardId = $card['id'];
 		}
 		
+		
+		
+		
 		$result = $this->card->get_id($cardId);
 		return $this->output_results($result);
+
+  		
+   }
+   
+ 	public function myCard2_post(){
+   	
+  		$uid = $this->post('uid');
+		$card = $this->post('card');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		$this->load->model('user2_m','user');
+   		
+//		if(empty($uid) || empty($card) || empty($sessionToken)){
+//		
+//			return $this->output_error(ErrorEmptyParameter);
+//		}
+//		
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//			
+//			return $this->output_error(ErrorInvalidSession);
+//		}
+   		
+
+		$data['userId'] = $uid;
+		$data['title'] = $card;
+		
+		$this->load->model('card2_m','card');
+
+		$card = $this->card->get_by($data);
+		
+		//如果没有卡，加上一条记录
+		if(empty($card)){
+//			$data['bankId'] = '2';
+//			$cardId = $this->card->insert($data);
+		
+		
+			$response = $this->unionpay->bindCard('c00050001985', $cardNo); //13166361023
+			
+		
+			
+			$response = json_decode($response,true);
+			
+			$respCd = $response['respCd'];
+		
+			
+		
+			
+			if($respCd == 0 ){
+				//success
+//				echo 'success';
+			
+				return $this->output_results('success');
+			}
+			else if($respCd == ErrorUnionInvalidCard){
+				// 无效的卡号
+				
+				
+			}
+			else if($respCd == 300519){
+				// 已经注册
+				echo '重复绑卡';
+			}
+			
+			
+			
+		}
+		else{
+			$cardId = $card['id'];
+		}
+		
+		
+		
+		
+//		$result = $this->card->get_id($cardId);
+//		return $this->output_results($result);
 
   		
    }
@@ -403,22 +506,7 @@ class Kqapi4 extends REST_Controller
 		$uid = $this->post('uid');
 		$card = $this->post('card');	
 		$sessionToken = $this->post('sessionToken');
-		
-   		
-//		if(empty($uid)){
-//		
-//			return $this->output_error(ErrorEmptyUid);
-//		}
-//		
-//		if(empty($card)){
-//		
-//			return $this->output_error(ErrorEmptyCard);
-//		}
-//	
-//		if(empty($sessionToken)){
-//			
-//			return $this->output_error(ErrorEmptySession);
-//		}
+	
 		
 		$this->load->model('user2_m','user');
 		
@@ -483,7 +571,6 @@ group by A.couponId
 	
 		if(empty($uid)){
 		
-		
 			return $this->output_error(ErrorEmptyUid);
 		}
 	
@@ -532,8 +619,6 @@ group by A.couponId
 		$uid = $this->post('uid');
 		$couponId = $this->post('couponId');	
 		$sessionToken = $this->post('sessionToken');
-		
-   		
 	
 		
 		$this->load->model('user2_m','user');
@@ -554,6 +639,16 @@ group by A.couponId
 		
 		$this->load->model('downloadedcoupon2_m');
 
+//		$data['chnlUsrId'] = $uid;
+//		$data['chnlUsrMobile'] = '131663610235555';
+//		$data['couponId'] = 'Z00000000010074';
+//		$data['couponNum'] = '1';
+//		$data['couponSceneId'] = '000';
+//		$data['transSeq'] = '123456789900';
+//		$data['userId'] = 'c00050001986';
+//		
+//		$response = $this->unionpay->couponDwnById($data);
+		
 		$result = $this->downloadedcoupon2_m->insert($data);
 		
 		
@@ -691,7 +786,111 @@ group by A.couponId
 		return $this->output_success();
 	}
 	
+	public function isFavoritedCoupon_get(){
+	
+		$uid = $this->get('uid');
+		$couponId = $this->get('couponId');
+	
+		
+	
+		if(empty($uid) || empty($couponId)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+	
+		$query = $this->db->query("select * from favoritedcoupon where userId = $uid and couponId = $couponId");
+		
+		$results = $query->result_array();
 
+//		$this->output->enable_profiler(TRUE);
+		if(empty($results)){
+			return $this->output_results('0');
+		}
+		else{
+			return $this->output_results('1');
+		}
+	
+	}
+
+	public function myFavoritedShopbranch_get(){
+	
+		$uid = $this->get('uid');
+
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+		
+	
+		if(empty($uid)){
+	
+			return $this->output_error(ErrorEmptyUid);
+		}
+		
+//		$this->db->select('A.shopId,B.title,B.logoUrl');
+//		$this->db->from('favoritedshop as A');
+//		$this->db->where('userId',$uid);
+//		$this->db->join('shop as B','A.shopId = B.id','left');
+//		$this->db->limit($limit,$skip);
+//		
+//		$query = $this->db->get();
+		
+		$query = $this->db->query("select B.* from favoritedShopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
+		
+		
+		
+		$results = $query->result_array();
+	  	
+//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results(array('shopbranches'=>$results));
+	}
+	
+	
+	public function myFavoritedShopbranch_post(){
+	
+		$uid = $this->post('uid');
+		$shopbranchId = $this->post('shopbranchId');	
+		$sessionToken = $this->post('sessionToken');
+		
+   		
+		if(empty($uid) || empty($shopbranchId) || empty($sessionToken)){
+					
+			return $this->output_error(ErrorEmptyParameter);
+		}
+
+	
+		$this->load->model('user2_m','user');
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
+
+		
+//		$this->load->model('favoritedshop2_m','favoritedshop');
+//
+//		$count = $this->favoritedshop->count_by($data);
+		
+		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
+		if (empty($query->result_array())){
+			$data['userId'] = $uid;
+			$data['shopbranchId'] = $shopId;
+			
+//			$result = $this->favoritedshop->insert($data);
+
+			$query = $this->db->query("insert into favoritedShopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
+		}
+	
+		
+		
+		return $this->output_success();
+	}
+	
 	/**
 	 * 
 	 * 返回用户收藏的商户
@@ -745,7 +944,7 @@ group by A.couponId
 		$sessionToken = $this->post('sessionToken');
 		
    		
-		if(empty($uid) || empty($shopId) || empty($sessionId)){
+		if(empty($uid) || empty($shopId) || empty($sessionToken)){
 					
 			return $this->output_error(ErrorEmptyParameter);
 		}
@@ -787,7 +986,7 @@ group by A.couponId
 		$sessionToken = $this->post('sessionToken');
 		
    		
-		if(empty($uid) || empty($shopId) || empty($sessionId)){
+		if(empty($uid) || empty($shopId) || empty($sessionToken)){
 					
 			return $this->output_error(ErrorEmptyParameter);
 		}
@@ -809,119 +1008,58 @@ group by A.couponId
 		return $this->output_success();
 		
 	}
-   
-   
-	function couponDetails_get(){
-
-	  	
-		$this->load->model('coupon2_m','coupon');
+	
+	public function deleteMyFavoritedShopbranch_post(){
+		$uid = $this->post('uid');
+		$shopbranchId = $this->post('shopbranchId');	
+		$sessionToken = $this->post('sessionToken');
 		
-		$cid = $this->get('id');
-		$longitude = $this->get('longitude');
-		$latitude =  $this->get('latitude');
-
-		
-		
- 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.downloadedCount,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
- 	  	$this->db->from('coupon as A');
-		$this->db->join('couponcontent as B', 'A.id = B.couponId');
-		$this->db->where('A.id',$cid);
-
-		$query = $this->db->get();
-		
-		$results = $query->result_array();	
-	  	
-		$coupon = $results[0];
-		
-		if(empty($coupon)){
-		
-			return $this->output_error(ErrorInvalidCouponId);
-		}
-		
-		///shopCoupons
-		$shopId = $coupon['shopId'];
-		$this->db->select('A.id,A.title,B.avatarUrl,B.discountContent');
- 	  	$this->db->from('coupon as A');
-		$this->db->join('couponcontent as B', 'A.id = B.couponId');
-		$this->db->where('A.shopId',$shopId);
-		$this->db->where('A.id !=',$cid);
-		
-		$query = $this->db->get();
-		$results = $query->result_array();	
-		
-		$coupon['shopCoupons'] = $results;
-		
-		/// otherCoupons
-//		$coupon['otherCoupons'] = array();
-		$query = $this->db->query(" SELECT A.id, A.title,  B.avatarUrl, B.discountContent
-FROM (coupon as A)
-JOIN couponcontent as B ON A.id = B.couponId
-limit 3");
-		$results = $query->result_array();
-		$coupon['otherCoupons'] = $results;
-		
-		///nearestShop
-		if(empty($longitude) || empty($latitude)){
-		
-			$query = $this->db->query("SELECT id,shopId,title,address,districtId,longitude,latitude,
-
-			openTime,phone,logoUrl FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId");
-
-		}
-		else{
-			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `distance`");
-			
+   		
+		if(empty($uid) || empty($shopbranchId) || empty($sessionToken)){
+					
+			return $this->output_error(ErrorEmptyParameter);
 		}
 	
-			$results = $query->result_array();	
+		$this->load->model('user2_m','user');
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
+			
+			return $this->output_error(ErrorInvalidSession);
+		}
+   		
 		
-			$coupon['nearestShop'] = $results[0];
+		$this->db->query("delete from favoritedShopbranch where userId = $uid");
+		
+		return $this->output_success();
+		
+	}
+	
+	public function isFavoritedShop_get(){
+	
+		$uid = $this->get('uid');
+		$shopbranchId = $this->get('shopbranchId');
+	
+		
+	
+		if(empty($uid) || empty($shopbranchId)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+	
+		$query = $this->db->query("select * from favoritedcoupon where userId = $uid and couponId = $couponId");
+		
+		$results = $query->result_array();
+
 //		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results($coupon);
-	  	
-	  	//print_r($results);exit;
-	 
-	  }
-	  
-	  
-	  public function shopDetails_get(){
-	  
-	  		$this->load->model('shop2_m','shop');
-	  		
-	  	$id = $this->get('id');
-		$longitude = $this->get('longitude');
-		$latitude =  $this->get('latitude');
-	  
-	  }
-   
-//   /** 
-//    * 返回优惠券的详情, 包括shop和shopBranches
-//    * @param id
-//    * 
-//    * @return coupon: coupon的数据
-//    * 
-//    * 
-//   */
-//   public function coupon_get(){
-//   		$id = $this->get('id');
-//
-//   		
-//   		if(!empty($id)){
-//		//优惠券id不为空
-//   			
-//   			$result = $this->coupon_m->get($id,'shop,shop.shopBranches');
-//   		
-//  			return $this->output_results($result,'获得对象失败');
-//   		}
-//   		else{
-//		//优惠券id为空
-//  			
-//   			return $this->output_results(-1,'确实优惠券id');
-//  		
-//  		}
-//
-//   }
+		if(empty($results)){
+			return $this->output_results('0');
+		}
+		else{
+			return $this->output_results('1');
+		}
+
+	
+	}
+  
    
    /**
     * 
@@ -1085,7 +1223,7 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
  	  		
-// 	  	
+	  	
 		if(empty($latitude) || empty($longitude)){
 			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId');
 		}
@@ -1203,8 +1341,191 @@ LIMIT $skip,$limit");
 	}
    
 
+
+	function couponDetails_get(){
+
+	  	
+		$this->load->model('coupon2_m','coupon');
+		$this->load->model('shop2_m','shop');
+		
+		
+		$cid = $this->get('id');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
+
 	
+		if(empty($cid)){
+		
+			return $this->output_error(ErrorEmptyCouponId);
+		}
+		
+ 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.downloadedCount,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
+ 	  	$this->db->from('coupon as A');
+		$this->db->join('couponcontent as B', 'A.id = B.couponId');
+		$this->db->where('A.id',$cid);
+
+		$query = $this->db->get();
+		
+		$results = $query->result_array();	
+	  	
+		$coupon = $results[0];
+		
+		if(empty($coupon)){
+		
+			return $this->output_error(ErrorInvalidCouponId);
+		}
+		
+		///shopCoupons
+		$shopId = $coupon['shopId'];
+		$this->db->select('A.id,A.title,B.avatarUrl,B.discountContent');
+ 	  	$this->db->from('coupon as A');
+		$this->db->join('couponcontent as B', 'A.id = B.couponId');
+		$this->db->where('A.shopId',$shopId);
+		$this->db->where('A.id !=',$cid);
+		
+		$query = $this->db->get();
+		$results = $query->result_array();	
+		
+		$coupon['shopCoupons'] = $results;
+		
+		/// otherCoupons
+
+		$query = $this->db->query(" SELECT A.id, A.title,  B.avatarUrl, B.discountContent
+FROM (coupon as A)
+JOIN couponcontent as B ON A.id = B.couponId
+limit 3");
+		$results = $query->result_array();
+		$coupon['otherCoupons'] = $results;
+
+		
+		
+		///----------------nearestShop
+		if(empty($longitude) || empty($latitude)){
+		
+			$query = $this->db->query("SELECT id,shopId,title,address,districtId,longitude,latitude,
+
+			openTime,phone,logoUrl FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId");
+
+		}
+		else{
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `distance`");
+			
+		}
 	
+		$results = $query->result_array();	
+		
+		$nearestShop =  $results[0];
+
+//		$query = $this->db->query("select description from shop where id=$shopId");
+//		$results = $query->result_array();
+//
+//		$nearestShop['description'] = $results[0]['description'];
+			
+		$coupon['nearestShop'] =$nearestShop;
+
+		$shopCount = $this->shop->countBranches($shopId);
+		
+		$coupon['shopCount'] = $shopCount;
+		//		$this->output->enable_profiler(TRUE);
+		
+	  	return $this->output_results($coupon);
+	  	
+	  	//print_r($results);exit;
+	 
+	  }
+	  
+	  
+	  public function shopbranchDetails_get(){
+	  
+//	  		$this->load->model('shop2_m','shop');
+	  		
+	  		$shopbranchId = $this->get('id');
+		
+	  		if(empty($shopbranchId)){
+	  			return $this->output_error(ErrorEmptyShopId);
+	  		}
+	  		
+	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId
+from shopbranch
+where id = $shopbranchId
+AND active = 1");
+	  
+	  		
+	  		$results = $query->result_array();
+	  		$response = $results[0];
+
+		  if(empty($response)){
+		
+			return $this->output_results(NULL);
+			
+		  }
+	  		
+	  		$shopId = $response['shopId'];
+	  		
+	  		// ----- details ------
+	  		$query = $this->db->query("select description, typeId
+from shop
+where id = $shopId
+AND active = 1");
+	  
+	  		$results = $query->result_array();
+	  		$response['description'] = $results[0]['description'];
+	  		$response['typeId'] = $results[0]['typeId'];
+	  		
+	  		
+	  		//------- shopCount
+	  		$this->load->model('shop2_m','shop');
+	  		
+	  		$shopCount = $this->shop->countBranches($shopId);
+		
+			$response['shopCount'] = $shopCount;
+			
+			
+			/// ----------shopCoupons
+			$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`
+FROM (`coupon` A) 
+JOIN `couponcontent` B
+ON `A`.`id` = `B`.`couponId`
+Where A.active = 1
+AND A.shopId = $shopId "
+);
+		
+	$response['shopCoupons'] =  $query->result_array();;
+//		$coupons = $query->result_array();
+	  		
+	  		return $this->output_results($response);
+	  
+	  }
+	
+	  
+	  public function allShopbranches_get(){
+	  
+	  	$shopId = $this->get('id');
+	  	
+	  	if(empty($shopId)){
+	  		return $this->output_error(ErrorEmptyShopId);
+	  	}
+	  	
+	  	$this->load->model('shopbranch2_m','shopbranch');
+	  	
+	  	$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl
+from shopbranch
+where shopId = $shopId
+AND active = 1");
+	  
+  		$results = $query->result_array();	
+//  		
+//  		$query = $this->db->query("select description from shop where id=$shopId");
+//  		
+//  		$description = $query->result_array();
+//  		
+  		
+  		$response['shopbranches'] = $results;
+  	
+  		
+  		return $this->output_results($response);
+	  	
+	  }
 	
 	
 	///---------- Capcha -------------
@@ -1216,23 +1537,33 @@ LIMIT $skip,$limit");
 		$mobile = $this->get('mobile');
 		
 		$captcha = random_number();
-		
-		
-		
-		$response = $this->kqsms->mock_send_register_sms($mobile,$captcha);
-//		$response = $this->kqsms->send_register_sms($mobile,$captcha);
+	
+//		$response = $this->kqsms->mock_send_register_sms($mobile,$captcha);
+		$response = $this->kqsms->send_register_sms($mobile,$captcha);
 		
 		$xml = simplexml_load_string($response);
 		
 		$code = $xml->code;
+
+		$this->db->query("insert into s_sms (type,code,mobile) values ('register',$code,$mobile)");
 		
-		if ($code == 406){
-			echo 'code is 406';
+		if ($code == 2){
+//			echo 'success';
+
+			$captchaMd5 = md5($captcha);
+		
+			return $this->output_results(array('captcha'=>$captchaMd5));
+		}
+		else{
+//			echo 'failure';
+
+			return $this->output_error(ErrorFailureSMS);
 		}
 		
-		$captchaMd5 = md5($captcha);
+	
 		
-		return $this->output_results(array('captcha'=>$captchaMd5));
+		
+	
 	}
 	
 	public function captchaforgetpwd_get(){
@@ -1240,14 +1571,32 @@ LIMIT $skip,$limit");
 		$this->load->library('kqsms');
 		
 		$mobile = $this->get('mobile');
+	
+		$captcha = random_number();
+	
+//		$response = $this->kqsms->mock_send_forgetpwd_sms($mobile,$captcha);
+		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
 		
-		$captcha = '123456';
+		$xml = simplexml_load_string($response);
 		
-		$this->kqsms->mock_send_forgetpwd_sms($mobile,$captcha);
+		$code = $xml->code;
+
+		$query = $this->db->query("insert into s_sms (type,code) values ('forget',$code)");
 		
-		$captchaMd5 = md5($captcha);
+		if ($code == 2){
+//			echo 'success';
+
+			$captchaMd5 = md5($captcha);
 		
-		return $this->output_results(array('captcha'=>$captcha));
+			return $this->output_results(array('captcha'=>$captchaMd5));
+		}
+		else{
+			
+//			echo 'failure';
+
+			return $this->output_error(ErrorFailureSMS);
+		}
+		
 	}
 	
 	

@@ -205,10 +205,56 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	}
 
 	
+	function test_bind_card(){
+	
+		$url = 'http://localhost/kq/index.php/kqapi4/mycard2';
+	
+		$post = array('uid'=>'32','card'=>'622294323');
+		
+//		$post = json_encode($post);
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
+	function test_favorietedshops(){
+	
+	
+	}
+	
+	function test_add_favoriteshop(){
+
+		$url = 'http://localhost/kq/index.php/kqapi4/myFavoritedShopbranch';
+	
+		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
+		
+//		$post = json_encode($post);
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
+	function test_delete_favoritedshop(){
+	
+		$url = 'http://localhost/kq/index.php/kqapi4/deleteMyFavoritedShopbranch';
+	
+		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
+		
+//		$post = json_encode($post);
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
 	function test(){
+		$str = '000000';
+		
+		if ($str == 0){
+			echo '=0';
+		}
 		
 		
-		echo randomNumber();
+//		echo randomNumber();
 		
 //		$url = HOST."/users?keys=phone,username";
 //		echo $this->avoslibrary->get($url);
