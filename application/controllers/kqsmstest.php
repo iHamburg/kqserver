@@ -77,8 +77,6 @@ class Kqsmstest extends CI_Controller{
 		
 		$response = $this->kqsms->send_register_sms('13166361023', '456789');
 		
-//		echo ($response);
-		
 		$xml = simplexml_load_string($response);
 		
 		$code = $xml->code;

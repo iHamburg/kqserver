@@ -44,7 +44,6 @@ if (defined('ENVIRONMENT'))
 		case 'development':
 			error_reporting(E_ALL);
 		break;
-	
 		case 'testing':
 			error_reporting(E_ALL & ~E_NOTICE);
 			break;

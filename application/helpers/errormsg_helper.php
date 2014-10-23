@@ -1,30 +1,30 @@
 <?php
 
 
-define(ErrorEmptyParameter,   400);
-define(ErrorEmptyUsernamePwd, 401);
-define(ErrorEmptyUid, 		  403);
-define(ErrorEmptyCard,	      404);
-define(ErrorEmptyCouponId,    405);
-define(ErrorEmptySession,     406);
-define(ErrorEmptyShopId,      407);
+define("ErrorEmptyParameter",   400);
+define("ErrorEmptyUsernamePwd", 401);
+define("ErrorEmptyUid", 		  403);
+define("ErrorEmptyCard",	      404);
+define("ErrorEmptyCouponId",    405);
+define("ErrorEmptySession",     406);
+define("ErrorEmptyShopId",      407);
 
-define(ErrorInvalidUsernamePwd, 601);
-define(ErrorInvalidUsername,  602);
-define(ErrorInvalidCouponId,  603);
-define(ErrorInvalidSession,   604);
-define(ErrorInvalidPassword,   605);
+define("ErrorInvalidUsernamePwd", 601);
+define("ErrorInvalidUsername",  602);
+define("ErrorInvalidCouponId",  603);
+define("ErrorInvalidSession",   604);
+define("ErrorInvalidPassword",   605);
 
-define(ErrorFailureSMS,    801);
+define("ErrorFailureSMS",    801);
 
 
-define(ErrorUsernameExists,   1001);
-define(ErrorNotRegisterUnion,   1002);
+define("ErrorUsernameExists",   1001);
+define("ErrorNotRegisterUnion",   1002);
 
-define(ErrorUnionInvalidCard, 300500);
-define(ErrorUnionExistCard, 300519);
-define(ErrorUnionLimitCardNumber, 300520);
-define(ErrorUnionUnknown, 300000);
+define("ErrorUnionInvalidCard", 300500);
+define("ErrorUnionExistCard", 300519);
+define("ErrorUnionLimitCardNumber", 300520);
+define("ErrorUnionUnknown", 300000);
 
 function msg_with_error($error){
 	
@@ -35,7 +35,7 @@ function msg_with_error($error){
 		case ErrorEmptyUsernamePwd:
 		  $msg = '用户名或密码为空';
 		break;
-		case ErrorEmptyUidCouponId:
+		case ErrorEmptyUid:
 		  $msg = '用户ID为空';
 		break;
 		case ErrorEmptyCard:

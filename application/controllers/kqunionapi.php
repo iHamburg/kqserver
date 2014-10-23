@@ -32,7 +32,7 @@ class Kqunionapi extends CI_Controller
 	 * 
 mchntId 	string 	必填 	商户代码
 couponId 	string 	必填 	票券ID
-userId 	string 	必填 	持卡人用户标识码
+cdhdUsrId 	string 	必填 	持卡人用户标识码
 chnlUsrId 	string 	必填 	票券获取时，交易发起方上送的渠道用户标识码
 cardNo 	string 	必填 	持卡人使用票券时使用的银行卡卡号（卡号不带长度位），前四位和后四位显示，其他以*代替。
 origTransAt 	string 	必填 	持卡人使用优惠券时，代表终端输入的原始交易金额（消费总金额），即实际优惠金额+实际支付金额，持卡人使用电子票时，填写默认值（全0）。 单位：分，前补0，即000000010000,代表100.00元。
@@ -46,8 +46,6 @@ transFwdInsId 	string 	可选 	交易发送机构
 	
 		$post = file_get_contents("php://input");
 
-//		$post = $this->input->post('params');
-		
 		$data['originRequest'] = $post;
 		
 //		var_dump($post);
@@ -61,7 +59,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 		
 
 			
-		$params = array('mchntId','couponId','userId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
+		$params = array('mchntId','couponId','cdhdUsrId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
 
 		foreach ($params as $key) {
 			$data[$key] = $post['data'][$key];

@@ -21,7 +21,11 @@ wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
 sp5Ykcw0iwSbUA==
 -----END PRIVATE KEY-----';
 	 
-	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+//	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+//	private $host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
+
+	
+	private $host;
 	private $appId = 'ALLPERM';
 	private $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';  	//AES加密用
 	private $infSource = 'ALLPERM';  //业务来源，接入机构需向运营方申请 
@@ -29,7 +33,23 @@ sp5Ykcw0iwSbUA==
 	
      public function __construct(){
 		
-		
+//		echo 'unionpay construct';
+
+//     	echo 'ENVIRONMENT'.ENVIRONMENT;
+     	
+//     	switch (ENVIRONMENT) {
+//     		case 'testing':
+//     		case 'rtesting':
+//     		
+//     			;
+//     		break;
+//     		
+//     		default:
+//     			;
+//     		break;
+//     	}
+     	
+		$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
 	}
 
 	
@@ -51,6 +71,7 @@ sp5Ykcw0iwSbUA==
 	public function regByMobile($mobile){
 		
 		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
+		
 		$url = $this->host.'regByMobile';
 		
 		$data = array(
@@ -322,7 +343,10 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		return $response;	
 	}
 	
-	
+	public function test(){
+		
+		return 'unionpay->test()';
+	}
 	
 	/////////////////
 	

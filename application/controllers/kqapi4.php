@@ -141,7 +141,7 @@ class Kqapi4 extends REST_Controller
    
    /**
     * 
-    * 注册新用户
+    * 注册新用户， 要保证用户是要有银联帐号的
     * 
     * @param string username
     * @param string password
@@ -192,9 +192,9 @@ class Kqapi4 extends REST_Controller
    		
    		$response = $this->unionpay->getUserByMobile($username);
    		$response = json_decode($response,true);
-   		
+ 	
    		$respCd = $response['respCd'];
-   		
+   		echo 'respCd '.$respCd;
    		if ($respCd == '000000'){
    		///手机号已经在银联注册
    			
@@ -205,11 +205,9 @@ class Kqapi4 extends REST_Controller
    			$this->db->query("update user set unionId='$union_uid' where id=$id");
    			
    		}
-
    		else if($respCd == 300200){
    			//不存在手机，需要注册
    			
-   		
    	 	  	$response = $this->unionpay->regByMobile($username);
 	   		$response = json_decode($response,true);
 			$respCd = $response['respCd'];

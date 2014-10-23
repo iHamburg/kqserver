@@ -37,119 +37,7 @@ class Kqtest extends CI_Controller{
 		echo 'kqtest ';
 		
 	}
-	
-	function user(){
-		
-	
-		$result = $this->user->get(2);
-		
-		
-		
-		if(empty($result)){
-		
-		}
-		else{
-		
-		}
-		
-		var_dump($result);
-	}
-	
-	
-	function user_post(){
-		
-//		$this->article_model->insert(array('body'=>'Woot!', 'title'=>'My thoughts'), FALSE);
-		
-		$array = array('username'=>'131111112','password'=>'111');
-
-		$count = $this->user->count_by('username',$array['username']);
-		
-		if($count>0){
-			//��ㄦ�峰��宸茬�����浜�
-			
-		}
-		else{
-			$id = $this->user->insert($array);
-			
-			$result = $this->user->get($id);
-			
-		
-		}
-		
-		
-//		$id = $this->user->insert($array);
-		
-//		var_dump($id);
-	}
-	/**
-	 * Shop���琛���扮��Coupon <br>
-	 * coupon.shop = shop;
-	 * shop.coupons add coupon 
-	 * @param $couponId
-	 * @param $shopId
-	 */
-	function addCouponToShop($couponId, $shopId){
-		
-		// coupon.shop = shop;
-		
-		$data = array('shop'=>avosPointer('Shop',$shopId));
-		$this->updateObject('Coupon',$couponId,json_encode($data));
-		
-		
-		$where = array('parent'=>avosPointer('Shop',$shopId));
-		$json = $this->retrieveObjects('Shop',json_encode($where));
-		
-		$error = checkResponseError($json);
-		if(!empty($error))
-				return $error;
-				
-		//shop.coupons add coupon 		
-		
-		$json = $this->addPointerInArray('Shop',$shopId,'coupons',avosPointer('Coupon',$couponId));
-		$error = checkResponseError($json);
-		if(!empty($error))	return $error;
-		
-	}
-	
-	/**
-	 * ������搴������诲��杩�璧锋�� <br>
-	 * shopBranch.parent = headShop
-	 * headShop.shopBranches add shopBranch
-	 * @param array $shopBranchIds: ���搴����Id��扮��
-	 * @param string $shopId
-	 * 
-	 * 
-	 */
-	function addShopBranchesToShop($shopBranchIds,$headShopId){
-	
-		//batch: shopBranch.parent = headShop
-
-          foreach ($shopBranchIds as $id) {
-               $requests[]=avosBatch('PUT',"/1/classes/Shop/$id",array('parent'=>avosPointer('Shop',$headShopId)));
-          }
-
-          $json = $this->batch($requests);
-          
-          $error = checkResponseError($json);
-	      if(!empty($error))	return $error;
-		
-	      
-		///headShop.shopBranches add shopBranch
-		
-	    $json = $this->addPointersInArray('Shop',$headShopId,'shopBranches','Shop',$shopBranchIds);
-	    
-	       $error = checkResponseError($json);
-	      if(!empty($error))	return $error;
-	}
-	
-	
-
-	function testKeys(){
-		$url = HOST."/users?keys=phone,username";
-		$json = $this->avoslibrary->get($url);
-		echobr($url);
-		echo $json;
-	}
+//	function testReg
 	
 	
 	function testresetPassword(){
@@ -249,10 +137,60 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	function test_register(){
 		$url = 'http://localhost/kq/index.php/kqapi4/user';
 	
-		$post = array('username'=>'13166361023','password'=>"111");
+//		$post = array('username'=>'13166361024','password'=>"111");
 		
 		$response = post($url,$post);
 		echo $response;
+	}
+	
+	function test_union(){
+		
+		$this->load->library('unionpay');
+		
+//		$mobile = '13166361023';
+//		$response = $this->unionpay->getUserByMobile($mobile);
+//
+//		echo $response;
+
+//		echo 'before';
+//		$response = $this->unionpay->getUserByMobile('111');
+//
+//		echo 'after';
+//		echo 'ass'.$response;
+	
+		$response = $this->unionpay->getUserByMobile('13166361023');
+   		
+   		echo 'resp'.$response;
+   		
+   		$response = json_decode($response,true);
+   		
+   		echo 'sss';
+	
+	}
+	
+	function test_direct_union(){
+	
+	
+		$url = 'https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile';
+		
+		$data = array(
+			'infSource'=>$this->infSource,
+			'mobile'=>$mobile
+		);
+	
+//		$post = $this->generate_post_json($data);
+
+		$post = json_encode($data);
+		
+		$response = post($url, $post);
+		
+		echo $response;
+	}
+	
+	function test_sms(){
+		$this->load->library('kqsms');
+		
+		echo $this->kqsms->send_register_sms('13166361023','333333');
 	}
 	
 	function test(){

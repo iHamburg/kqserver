@@ -142,10 +142,10 @@ sp5Ykcw0iwSbUA==
 	 */
 	function testGetUserByMobile(){
 	
-		header( 'Content-Type:text/html;charset=utf-8');
+//		header( 'Content-Type:text/html;charset=utf-8');
 //		$mobile = '15166412996';
 		
-			$mobile = '13166361023';
+		$mobile = '13166361023';
 		$response = $this->unionpay->getUserByMobile($mobile);
 
 		echo $response;
