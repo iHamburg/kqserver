@@ -13,16 +13,19 @@ define(ErrorInvalidUsernamePwd, 601);
 define(ErrorInvalidUsername,  602);
 define(ErrorInvalidCouponId,  603);
 define(ErrorInvalidSession,   604);
+define(ErrorInvalidPassword,   605);
 
 define(ErrorFailureSMS,    801);
 
 
 define(ErrorUsernameExists,   1001);
+define(ErrorNotRegisterUnion,   1002);
 
 define(ErrorUnionInvalidCard, 300500);
 define(ErrorUnionExistCard, 300519);
 define(ErrorUnionLimitCardNumber, 300520);
 define(ErrorUnionUnknown, 300000);
+
 function msg_with_error($error){
 	
 	switch ($error) {
@@ -60,6 +63,9 @@ function msg_with_error($error){
 		case ErrorInvalidCouponId:
 		  $msg = '无效的快券';
 		break;
+		case ErrorInvalidPassword:
+		  $msg = '密码错误';
+		break;
 	
 		case ErrorFailureSMS:
 		  $msg = '短信发送错误';
@@ -67,6 +73,9 @@ function msg_with_error($error){
 		
 		case ErrorUsernameExists:
 		  $msg = '用户名已存在';
+		break;
+		case ErrorNotRegisterUnion:
+		  $msg = '用户没有注册银联钱包';
 		break;
 		
 		case ErrorUnionInvalidCard:

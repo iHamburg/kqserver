@@ -6,7 +6,7 @@
 
 
 
-class KqTest extends CI_Controller{
+class Kqtest extends CI_Controller{
 
 	/**
 	 * 
@@ -34,7 +34,7 @@ class KqTest extends CI_Controller{
 
 	function index() {
 
-		echo 'kqtest '.ErrorEmptyUsernamePwd;
+		echo 'kqtest ';
 		
 	}
 	
@@ -181,16 +181,7 @@ class KqTest extends CI_Controller{
 	
 	}
 	
-	function testEditUserInfo(){
-		$url = 'http://localhost/kq/index.php/kqapi4/edituserinfo';
-		$password = array('oldPassword'=>'sss','newPassword'=>'aaa');
-		$post = array('uid'=>'32','sessionToken'=>'9wjGdYfi50Vr12U78vua','password'=>json_encode($password));
-		
-//		$post = json_encode($post);
-		
-		$response = post($url,$post);
-		echo $response;
-	}
+
 	
 function test_send_email(){
 		$to = "tominfrankfurt@gmail.com";
@@ -209,7 +200,7 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 		$url = 'http://localhost/kq/index.php/kqapi4/mycard2';
 	
-		$post = array('uid'=>'32','card'=>'622294323');
+		$post = array('uid'=>'32','card'=>'6222021001128509539');
 		
 //		$post = json_encode($post);
 		
@@ -240,7 +231,25 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
 		
-//		$post = json_encode($post);
+		$response = post($url,$post);
+		echo $response;
+	}
+	
+	function test_edit(){
+		$url = 'http://115.29.148.47/kq/index.php/kqapi4/editUserInfo';
+	
+//		$password = array('oldPassword'=>'444','newPassword'=>'444');
+		
+		$post = array('uid'=>'32','sessionToken'=>"ptHKUzWr17FwxVQqjube",'nickname'=>'ddd');
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
+	function test_register(){
+		$url = 'http://localhost/kq/index.php/kqapi4/user';
+	
+		$post = array('username'=>'13166361023','password'=>"111");
 		
 		$response = post($url,$post);
 		echo $response;

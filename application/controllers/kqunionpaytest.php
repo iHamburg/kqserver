@@ -233,7 +233,7 @@ sp5Ykcw0iwSbUA==
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
 		$userId = 'c00050001985';
-		$cardNo = '6222021001128509534';
+		$cardNo = '6222021001128509530';
 		
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 		echo $response;

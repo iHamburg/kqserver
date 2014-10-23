@@ -34,20 +34,16 @@ AND `expireDate` > now()");
 		
 	}
 
-	public function get_username($username){
+	public function get_union_uid($uid){
+		$query = $this->db->query("select unionId from user where id = $uid");
+		$results = $query->result_array();
 		
+		if(!empty($results)){
+			return $results[0]['unionId'];
+		}
+		return false;
 	}
 	
-	
-
-	public function user_Relanding($username,$password,$data){
-		$this->db->update('user',$data,array('username'=>$username,'password'=>$password));
-		return $this->db->affected_rows();
-	}
-	public function update_UserInfo($username,$data){
-		$this->db->update('user',$data,array('username'=>$username));
-		return $this->db->affected_rows();
-	}
 	
 	
 	/**

@@ -190,9 +190,44 @@ class Kqapi4 extends REST_Controller
    		
    		// 银联注册
    		
-//   		$response = $this->unionpay->regByMobile($mobile);
+   		$response = $this->unionpay->getUserByMobile($username);
+   		$response = json_decode($response,true);
    		
+   		$respCd = $response['respCd'];
    		
+   		if ($respCd == '000000'){
+   		///手机号已经在银联注册
+   			
+   			$data = $response['data'];
+   			
+   			$union_uid = $data['userId'];
+   				
+   			$this->db->query("update user set unionId='$union_uid' where id=$id");
+   			
+   		}
+
+   		else if($respCd == 300200){
+   			//不存在手机，需要注册
+   			
+   		
+   	 	  	$response = $this->unionpay->regByMobile($username);
+	   		$response = json_decode($response,true);
+			$respCd = $response['respCd'];
+			
+	  	 	if($respCd == 0 ){
+
+			$data = $response['data'];
+   			
+   			$union_uid = $data['userId'];
+   				
+   			$this->db->query("update user set unionId='$union_uid' where id=$id");
+	
+			}
+
+   		}
+   		
+
+		
    		
    		return $this->output_results($user);
 		
@@ -241,21 +276,13 @@ class Kqapi4 extends REST_Controller
    }
    
    public function editUserInfo_post(){
-   
-//   	$post = file_get_contents("php://input");
-//   	echo $post;
    	
    	$uid = $this->post('uid');
    	
-   	echo $uid;
    	$sessionToken = $this->post('sessionToken');
-   	 	echo $sessionToken;
+   	
    	$nickname = $this->post('nickname');
    	$pwd = $this->post('password'); //dict
-   	
-   	echo 'pwd'.$pwd;
-   	
-//   	$pwd = $this->input->post('password');
    	$avatar = $this->post('avatar');
    	
    	$this->load->model('user2_m','user');
@@ -270,29 +297,46 @@ class Kqapi4 extends REST_Controller
 		return $this->output_error(ErrorInvalidSession);
 	}
 	
-//	if (!empty($pwd)){
-//
-////		$pwd = array('oldPassword'=>'sss','newPassword'=>'ssss');
-//		var_dump($pwd);
-//		echo $pwd;
-//		
-//		$oldPassword = $pwd['oldPassword'];
-//		$newPassword = $pwd['newPassword'];
-//		
-//		echo 'old'.$oldPassword;
-//		echo 'new'.$newPassword;
-////		$query = $this->db->query("select * from user where username = '$username'");
-////		$results = $query->result_array();	
-////		$pwd = $results[0]['password'];
-////		if($oldPassword!=$pwd){
-////			$status = 777;
-////			$msg = '原来的密码错误';
-////			return $this->output_error($status,$msg);
-////		}
-//		
-//	}
+	if (!empty($pwd)){
+
+		$pwd = json_decode($pwd,true);
+		
+		$oldPassword = $pwd['oldPassword'];
+		$newPassword = $pwd['newPassword'];
+		
+		$query = $this->db->query("select * from user where id = $uid and password = '$oldPassword'");
+		$results = $query->result_array();
+
+		if(empty($results)){
+			return $this->output_error(ErrorInvalidPassword);
+		}
+		
+		$this->db->query("update user set password=$newPassword where id=$uid");
 	
+	}
+	
+	if(!empty($nickname)){
+		$this->db->query("update user set nickname='$nickname' where id=$uid");
+	}
+	
+	if(!empty($avatar)){
+
+		$img = base64_decode($avatar);
+		
+		$data = file_put_contents("public/uploads/avatar_$uid.jpg", $img);
+		
+		if(!empty($data)){
+			$avatarurl = base_url("public/uploads/avatar_$uid.jpg");
+			$this->db->query("update user set avatarUrl='$avatarurl' where id=$uid");
+		}
+		
+	}
+	
+
    	
+	$query = $this->db->query("select id,username,avatarUrl,nickname from user where id=$uid");
+	$results = $query->result_array();
+	$this->output_results($results[0]);
    }
    
    /**
@@ -373,13 +417,60 @@ class Kqapi4 extends REST_Controller
     * 
     * 用户绑定银行卡
     */
-   public function myCard_post(){
+//   public function myCard_post(){
+//   	
+//  		$uid = $this->post('uid');
+//		$card = $this->post('card');	
+//		$sessionToken = $this->post('sessionToken');
+//		
+//   		$this->load->model('user2_m','user');
+//   		
+//		if(empty($uid) || empty($card) || empty($sessionToken)){
+//		
+//			return $this->output_error(ErrorEmptyParameter);
+//		}
+//		
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//			
+//			return $this->output_error(ErrorInvalidSession);
+//		}
+//   		
+//
+//		$data['userId'] = $uid;
+//		$data['title'] = $card;
+//		
+//		$this->load->model('card2_m','card');
+//
+//		$card = $this->card->get_by($data);
+//		
+//		//如果没有卡，加上一条记录
+//		if(empty($card)){
+//			$data['bankId'] = '2';
+//			$cardId = $this->card->insert($data);
+//		
+//		
+//		}
+//		else{
+//			$cardId = $card['id'];
+//		}
+//		
+//		
+//		
+//		
+//		$result = $this->card->get_id($cardId);
+//		return $this->output_results($result);
+//
+//  		
+//   }
+   
+ 	public function myCard_post(){
    	
   		$uid = $this->post('uid');
 		$card = $this->post('card');	
 		$sessionToken = $this->post('sessionToken');
 		
    		$this->load->model('user2_m','user');
+   		$this->load->model('card2_m','card');
    		
 		if(empty($uid) || empty($card) || empty($sessionToken)){
 		
@@ -394,102 +485,69 @@ class Kqapi4 extends REST_Controller
 
 		$data['userId'] = $uid;
 		$data['title'] = $card;
-		
-		$this->load->model('card2_m','card');
+		$cardNo = $card;
+	
 
 		$card = $this->card->get_by($data);
 		
 		//如果没有卡，加上一条记录
 		if(empty($card)){
-			$data['bankId'] = '2';
-			$cardId = $this->card->insert($data);
+
+			//先从uid获得unionId
+			$unionUid = $this->user->get_union_uid($uid);
+			
+			if(!empty($unionUid)){
+				///如果用户已经有银联钱包
+				
+				$response = $this->unionpay->bindCard($unionUid, $cardNo); //13166361023				
+				$response = json_decode($response,true);
+				$respCd = $response['respCd'];
 		
+				/// 同一个账户可以多次绑定一张卡
+				if($respCd == 0 ){
+					//success
+	//				这里要获得bank
+	
+	//				echo 'success';
+					// 本地绑卡
+					 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
+					 $cardId = $this->db->insert_id();
+	
+				}
+				else if($respCd == ErrorUnionInvalidCard){
+					// 无效的卡号
+					
+					return $this->output_error(ErrorUnionInvalidCard);
+				}
+				else if($respCd == ErrorUnionExistCard){
+					
+	//				echo '重复绑卡';
+					return $this->output_error(ErrorUnionExistCard);
+				}
+				else if($respCd == ErrorUnionLimitCardNumber){
+					
+	//				echo '超过绑卡上限';
+					return $this->output_error(ErrorUnionLimitCardNumber);
+				}
+				else{
+					return $this->output_error(ErrorUnionUnknown);
+				}
+			
+			}
+			else{
+				return $this->output_error(ErrorNotRegisterUnion);
+			}
 		
+			
 		}
 		else{
+			///如果数据库里已经绑定了这张卡
 			$cardId = $card['id'];
 		}
-		
-		
 		
 		
 		$result = $this->card->get_id($cardId);
 		return $this->output_results($result);
-
-  		
-   }
-   
- 	public function myCard2_post(){
-   	
-  		$uid = $this->post('uid');
-		$card = $this->post('card');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		$this->load->model('user2_m','user');
-   		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$this->user->isSessionValid($uid,$sessionToken)){
-//			
-//			return $this->output_error(ErrorInvalidSession);
-//		}
-   		
-
-		$data['userId'] = $uid;
-		$data['title'] = $card;
-		
-		$this->load->model('card2_m','card');
-
-		$card = $this->card->get_by($data);
-		
-		//如果没有卡，加上一条记录
-		if(empty($card)){
-//			$data['bankId'] = '2';
-//			$cardId = $this->card->insert($data);
-		
-		
-			$response = $this->unionpay->bindCard('c00050001985', $cardNo); //13166361023
-			
-		
-			
-			$response = json_decode($response,true);
-			
-			$respCd = $response['respCd'];
-		
-			
-		
-			
-			if($respCd == 0 ){
-				//success
-//				echo 'success';
-			
-				return $this->output_results('success');
-			}
-			else if($respCd == ErrorUnionInvalidCard){
-				// 无效的卡号
-				
-				
-			}
-			else if($respCd == 300519){
-				// 已经注册
-				echo '重复绑卡';
-			}
-			
-			
-			
-		}
-		else{
-			$cardId = $card['id'];
-		}
-		
-		
-		
-		
-//		$result = $this->card->get_id($cardId);
-//		return $this->output_results($result);
 
   		
    }
@@ -510,16 +568,16 @@ class Kqapi4 extends REST_Controller
 		
 		$this->load->model('user2_m','user');
 		
-		if(empty($uid) || empty($card) || empty($sessionToken)){
-		
-			return $this->output_error(ErrorEmptyParameter);
-		}
-		
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-
-			return $this->output_error(ErrorInvalidSession);
-		
-		}
+//		if(empty($uid) || empty($card) || empty($sessionToken)){
+//		
+//			return $this->output_error(ErrorEmptyParameter);
+//		}
+//		
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//
+//			return $this->output_error(ErrorInvalidSession);
+//		
+//		}
    		
 
 		$data['userId'] = $uid;
@@ -527,6 +585,22 @@ class Kqapi4 extends REST_Controller
 		
 		$this->load->model('card2_m','card');
 
+		$response = $this->unionpay->unbindCard($unionUid, $cardNo); //13166361023				
+			$response = json_decode($response,true);
+			$respCd = $response['respCd'];
+	
+			/// 同一个账户可以多次绑定一张卡
+			if($respCd == 0 ){
+				//success
+//				这里要获得bank
+
+//				echo 'success';
+				// 本地绑卡
+				 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
+				 $cardId = $this->db->insert_id();
+
+			}
+		
 		$result = $this->card->delete_by($data);
 		
 		return $this->output_success();
@@ -872,16 +946,14 @@ group by A.couponId
    		
 
 		
-//		$this->load->model('favoritedshop2_m','favoritedshop');
-//
-//		$count = $this->favoritedshop->count_by($data);
-		
 		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
-		if (empty($query->result_array())){
+		$results = $query->result_array();
+		
+		///如果还没有收藏的门店
+		if (empty($results)){
 			$data['userId'] = $uid;
 			$data['shopbranchId'] = $shopId;
 			
-//			$result = $this->favoritedshop->insert($data);
 
 			$query = $this->db->query("insert into favoritedShopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
 		}
@@ -891,123 +963,123 @@ group by A.couponId
 		return $this->output_success();
 	}
 	
-	/**
-	 * 
-	 * 返回用户收藏的商户
-	 * @param string uid
-	 * 	@return array: shop
-	 */
-	public function myFavoritedShop_get(){
-		$uid = $this->get('uid');
-
-		$limit = intval($this->get('limit'));
-		$skip = intval($this->get('skip'));
-		
-		if (empty($skip))
- 	  		$skip = 0;
-	  	
- 	  	if (empty($limit))
- 	  		$limit = 30;
-		
-	
-		if(empty($uid)){
-		
-		
-			return $this->output_error(ErrorEmptyUid);
-		}
-
-		
-		$this->db->select('A.shopId,B.title,B.logoUrl');
-		$this->db->from('favoritedshop as A');
-		$this->db->where('userId',$uid);
-		$this->db->join('shop as B','A.shopId = B.id','left');
-		$this->db->limit($limit,$skip);
-		
-		$query = $this->db->get();
-		
-		$results = $query->result_array();
-	  	
-//		$this->output->enable_profiler(TRUE);
-		
-	  	return $this->output_results(array('shops'=>$results));
-	}
-	
-	
-	/**
-	 * 
-	 *  用户收藏优惠券
-	 */
-	public function myFavoritedShop_post(){
-	
-		$uid = $this->post('uid');
-		$shopId = $this->post('shopId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid) || empty($shopId) || empty($sessionToken)){
-					
-			return $this->output_error(ErrorEmptyParameter);
-		}
-
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			
-			return $this->output_error(ErrorInvalidSession);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['shopId'] = $shopId;
-		
-		$this->load->model('favoritedshop2_m','favoritedshop');
-
-		$count = $this->favoritedshop->count_by($data);
-		
-		//当没有收藏的时候才添加记录
-		if($count==0){
-			$result = $this->favoritedshop->insert($data);
-		}
-		
-		return $this->output_success();
-	}
-
-/**
-	 * 
-	 * 用户取消收藏快券
-	 * 
-	 * @return
-	 * 正常： status:1
-	 * 异常： status: -1, input 不全
-	 */
-	public function deleteMyFavoritedShop_post(){
-		$uid = $this->post('uid');
-		$shopId = $this->post('shopId');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		
-		if(empty($uid) || empty($shopId) || empty($sessionToken)){
-					
-			return $this->output_error(ErrorEmptyParameter);
-		}
-	
-		$this->load->model('user2_m','user');
-		if(!$this->user->isSessionValid($uid,$sessionToken)){
-			
-			return $this->output_error(ErrorInvalidSession);
-		}
-   		
-
-		$data['userId'] = $uid;
-		$data['shopId'] = $shopId;
-		
-		$this->load->model('favoritedshop2_m','favoritedshop');
-
-		$result = $this->favoritedshop->delete_by($data);
-		
-		return $this->output_success();
-		
-	}
+//	/**
+//	 * 
+//	 * 返回用户收藏的商户
+//	 * @param string uid
+//	 * 	@return array: shop
+//	 */
+//	public function myFavoritedShop_get(){
+//		$uid = $this->get('uid');
+//
+//		$limit = intval($this->get('limit'));
+//		$skip = intval($this->get('skip'));
+//		
+//		if (empty($skip))
+// 	  		$skip = 0;
+//	  	
+// 	  	if (empty($limit))
+// 	  		$limit = 30;
+//		
+//	
+//		if(empty($uid)){
+//		
+//		
+//			return $this->output_error(ErrorEmptyUid);
+//		}
+//
+//		
+//		$this->db->select('A.shopId,B.title,B.logoUrl');
+//		$this->db->from('favoritedshop as A');
+//		$this->db->where('userId',$uid);
+//		$this->db->join('shop as B','A.shopId = B.id','left');
+//		$this->db->limit($limit,$skip);
+//		
+//		$query = $this->db->get();
+//		
+//		$results = $query->result_array();
+//	  	
+////		$this->output->enable_profiler(TRUE);
+//		
+//	  	return $this->output_results(array('shops'=>$results));
+//	}
+//	
+//	
+//	/**
+//	 * 
+//	 *  用户收藏优惠券
+//	 */
+//	public function myFavoritedShop_post(){
+//	
+//		$uid = $this->post('uid');
+//		$shopId = $this->post('shopId');	
+//		$sessionToken = $this->post('sessionToken');
+//		
+//   		
+//		if(empty($uid) || empty($shopId) || empty($sessionToken)){
+//					
+//			return $this->output_error(ErrorEmptyParameter);
+//		}
+//
+//	
+//		$this->load->model('user2_m','user');
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//			
+//			return $this->output_error(ErrorInvalidSession);
+//		}
+//   		
+//
+//		$data['userId'] = $uid;
+//		$data['shopId'] = $shopId;
+//		
+//		$this->load->model('favoritedshop2_m','favoritedshop');
+//
+//		$count = $this->favoritedshop->count_by($data);
+//		
+//		//当没有收藏的时候才添加记录
+//		if($count==0){
+//			$result = $this->favoritedshop->insert($data);
+//		}
+//		
+//		return $this->output_success();
+//	}
+//
+///**
+//	 * 
+//	 * 用户取消收藏快券
+//	 * 
+//	 * @return
+//	 * 正常： status:1
+//	 * 异常： status: -1, input 不全
+//	 */
+//	public function deleteMyFavoritedShop_post(){
+//		$uid = $this->post('uid');
+//		$shopId = $this->post('shopId');	
+//		$sessionToken = $this->post('sessionToken');
+//		
+//   		
+//		if(empty($uid) || empty($shopId) || empty($sessionToken)){
+//					
+//			return $this->output_error(ErrorEmptyParameter);
+//		}
+//	
+//		$this->load->model('user2_m','user');
+//		if(!$this->user->isSessionValid($uid,$sessionToken)){
+//			
+//			return $this->output_error(ErrorInvalidSession);
+//		}
+//   		
+//
+//		$data['userId'] = $uid;
+//		$data['shopId'] = $shopId;
+//		
+//		$this->load->model('favoritedshop2_m','favoritedshop');
+//
+//		$result = $this->favoritedshop->delete_by($data);
+//		
+//		return $this->output_success();
+//		
+//	}
 	
 	public function deleteMyFavoritedShopbranch_post(){
 		$uid = $this->post('uid');
@@ -1033,7 +1105,7 @@ group by A.couponId
 		
 	}
 	
-	public function isFavoritedShop_get(){
+	public function isFavoritedShopbranch_get(){
 	
 		$uid = $this->get('uid');
 		$shopbranchId = $this->get('shopbranchId');
@@ -1045,7 +1117,7 @@ group by A.couponId
 			return $this->output_error(ErrorEmptyParameter);
 		}
 	
-		$query = $this->db->query("select * from favoritedcoupon where userId = $uid and couponId = $couponId");
+		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		
 		$results = $query->result_array();
 
