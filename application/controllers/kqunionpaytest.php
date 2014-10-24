@@ -316,6 +316,8 @@ sp5Ykcw0iwSbUA==
 //		echo $this->addCouponToShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287');
 
 //		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
+
+		echo $this->unionpay->test();
 	}
 	
 	

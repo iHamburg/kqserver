@@ -162,9 +162,9 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
    		
    		echo 'resp'.$response;
    		
-   		$response = json_decode($response,true);
-   		
-   		echo 'sss';
+//   		$response = json_decode($response,true);
+//   		
+//   		echo 'sss';
 	
 	}
 	
@@ -191,6 +191,18 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 		$this->load->library('kqsms');
 		
 		echo $this->kqsms->send_register_sms('13166361023','333333');
+	}
+	
+	function test_curl(){
+	
+//		$url
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	
+		$output = curl_exec($ch);
+		curl_close($ch);
 	}
 	
 	function test(){

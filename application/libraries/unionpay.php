@@ -4,7 +4,34 @@
 class Unionpay{
 	
 	  
-	private $private_key='-----BEGIN PRIVATE KEY-----
+	
+	 
+//	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+//	private $host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
+	
+	private $host;
+	private $appId;
+	private $appSecret;  	//AES加密用
+	private $infSource;  //业务来源，接入机构需向运营方申请 
+	private $version ;
+	private $private_key;
+	
+    public function __construct(){
+		
+//		echo 'unionpay construct';
+
+//     	echo 'ENVIRONMENT'.ENVIRONMENT;
+     	
+     	switch (ENVIRONMENT) {
+     		case 'testing':
+     		case 'rtesting':
+     		
+     			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+     			$this->appId = 'ALLPERM';
+     			$this->appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
+     			$this->infSource = 'ALLPERM';
+     			$this->version = '1.0';
+     			$this->private_key='-----BEGIN PRIVATE KEY-----
 MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9F1ub3EmcROVb9
 TuwbvGEwZaDeldcDtQNYvHpC5Xm+0v32pGCCJ05qK3zEpumz8bpHcBqVw94cZVia
 4iVaEWkFnWm710b7NdNeMBFhC/L9NYl0jDsoRhCL/57OxbttvMPi0YbpQc0Qfn80
@@ -20,36 +47,37 @@ wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
 +18qzzh7budS3A1kPTDx4xeT+Rtt6bhz0nfmuBuUGRa2Mt4CVNVspkAXMU7j+0mF
 sp5Ykcw0iwSbUA==
 -----END PRIVATE KEY-----';
-	 
-//	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
-//	private $host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
-
-	
-	private $host;
-	private $appId = 'ALLPERM';
-	private $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';  	//AES加密用
-	private $infSource = 'ALLPERM';  //业务来源，接入机构需向运营方申请 
-	private $version = '1.0';
-	
-     public function __construct(){
+     			;
+     		break;
+     		case 'production':
+     			$this->host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
+     			$this->appId = 'C0000048';
+     			$this->appSecret = '12345678998765432111111100000099';
+     			$this->infSource = 'C0000048';
+     			$this->version = '1.0';
+     			$this->private_key='-----BEGIN PRIVATE KEY-----
+MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAPK846+hVVxsCLyN
+Blo7wuBivFI3F4ASbgBH+pRL7kJgfS2Q/OzHeSRF/jlktUcK/dSzd6tGn6mtdtUb
+dc6zSPA+f2nKS458N+jGFyv6Fj78h1oUXDClm3rLpvnx+qJmqLyaxcm1bpKTNslq
+T/2ODdQzu58gZYejZzoAVirOGx1pAgMBAAECgYAxsMlLYtN+n/8J2jS6tBEorg2v
+JugAp8Us+Y8qXIDhxa7abRvZvNvnuQxZ42vYpz9fE34j6ck1ivUQmxZ6wejkH1IC
+LaXcn4crcba64sROG0q/15Ifep8CmSrhPgbdk/ZoG0ldZMRDCI+QaUHLs3PPxopg
+y6SShru8Hyjc0VhKIQJBAP5mxwI3MiTuyMpM66hF9bVor+4cHdr6mICJYsIiVO7U
+EJesOQLSlkwjkbY5+ox6iUrsmBUhmeDNDQUQSel3Fi8CQQD0Q1mqxPABui87Z7Oy
+dXDSoPiRrk6xn0IA+V2ehEY9SdULKZSzzIh5ZrNWUIk9uuvC6NawysG7nQWKrBSZ
+vjfnAkBIQH5i1bRLIvop4oDHcN8g35Ofx6J/D88CKoK+6is/DUGNIh+q+o4vH6cB
+nyPWg/K8McfbsIhYfUQmXQLw6J6HAkBe+GS/ocyTT1mX5k0W4NSaAF5E/hm4s+wM
+xufgfxt0LuW3blZTxf11/jlSIQQLTUbnRHJc0KickoOaFCf6UtwXAkB2xLv6jpiU
+2FqMD85MolL0uqZwsbTkNFw6/TcTlPPit8k2LVIMZNHV05SFkbrLHUnWFIegZ/6E
+NVuI+eXtaUQW
+-----END PRIVATE KEY-----';
+     		break;
+     		default:
+     			;
+     		break;
+     	}
+     	
 		
-//		echo 'unionpay construct';
-
-//     	echo 'ENVIRONMENT'.ENVIRONMENT;
-     	
-//     	switch (ENVIRONMENT) {
-//     		case 'testing':
-//     		case 'rtesting':
-//     		
-//     			;
-//     		break;
-//     		
-//     		default:
-//     			;
-//     		break;
-//     	}
-     	
-		$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
 	}
 
 	
@@ -138,7 +166,7 @@ sp5Ykcw0iwSbUA==
 	}
 
 	public function getUserByMobile2($mobile){
-
+ 
 	
 		$url = $this->host.'getUserByMobile';
 		
@@ -345,7 +373,8 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	
 	public function test(){
 		
-		return 'unionpay->test()';
+		echo 'unionpay->test()'.$this->host;
+		return 'unionpay->test()'.$this->host;
 	}
 	
 	/////////////////
