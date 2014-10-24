@@ -37,7 +37,7 @@ class Kqtest extends CI_Controller{
 		echo 'kqtest ';
 		
 	}
-//	function testReg
+
 	
 	
 	function testresetPassword(){
@@ -195,7 +195,7 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 	function test_curl(){
 	
-//		$url
+ 		$url = 'http://www.baidu.com';
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -203,6 +203,8 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 		$output = curl_exec($ch);
 		curl_close($ch);
+		
+		echo $output;
 	}
 	
 	function test(){
