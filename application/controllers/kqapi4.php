@@ -947,13 +947,14 @@ group by A.couponId
 		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		$results = $query->result_array();
 		
+		
 		///如果还没有收藏的门店
 		if (empty($results)){
 			$data['userId'] = $uid;
 			$data['shopbranchId'] = $shopId;
-			
-
+		
 			$query = $this->db->query("insert into favoritedShopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
+			
 		}
 	
 		
