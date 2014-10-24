@@ -17,41 +17,6 @@ class Kqapi4 extends REST_Controller
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var District_m
-	 */
-	var $district_m;
-	
-	/**
-	 * Enter description here ...
-	 * @var Ctype_m
-	 */
-	var $ctype_m;
-	
-	/**
-	 * Enter description here ...
-	 * @var My_m
-	 */
-	
-	var $my_m;
-
-
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var Shop2_m
-	 */
-	var $shop_m;
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var Coupon_m
-	 */
-	var $coupon_m;
-	
-	/**
-	 * 
-	 * Enter description here ...
 	 * @var User2_m;
 	 */
 	var $user;
