@@ -1088,6 +1088,7 @@ group by A.couponId
 		if(empty($uid) || empty($shopbranchId) || empty($sessionToken)){
 					
 			return $this->output_error(ErrorEmptyParameter);
+			
 		}
 	
 		$this->load->model('user2_m','user');
@@ -1478,7 +1479,7 @@ limit 3");
 
 		}
 		else{
-			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = 8 ORDER BY `distance`");
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId ORDER BY `distance`");
 			
 		}
 	

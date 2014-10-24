@@ -24,7 +24,7 @@ class Unionpay{
      	
      	switch (ENVIRONMENT) {
      		case 'testing':
-     		case 'rtesting':
+//     		case 'rtesting':
      		
      			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
      			$this->appId = 'ALLPERM';
@@ -50,6 +50,7 @@ sp5Ykcw0iwSbUA==
      			;
      		break;
      		case 'production':
+     		case 'rtesting':
      			$this->host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
      			$this->appId = 'C0000048';
      			$this->appSecret = '12345678998765432111111100000099';

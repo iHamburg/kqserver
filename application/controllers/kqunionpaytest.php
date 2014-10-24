@@ -202,6 +202,8 @@ sp5Ykcw0iwSbUA==
 		$mobile = '13166361026';
 		
 		$response = $this->unionpay->regByMobile2($mobile);
+
+		echo $response;
 		
 		$response = json_decode($response,true);
 		
