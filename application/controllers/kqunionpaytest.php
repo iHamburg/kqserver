@@ -239,6 +239,7 @@ sp5Ykcw0iwSbUA==
 		
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 		echo $response;
+	
 	}
 	
 	
@@ -248,7 +249,9 @@ sp5Ykcw0iwSbUA==
 	 */
 	function testUnbindCard(){
 	
+		
 		header( 'Content-Type:text/html;charset=utf-8 ');
+		
 		
 		$userId = 'c00050001985';
 		$cardNo = '6222021001128509534';
