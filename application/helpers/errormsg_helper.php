@@ -26,6 +26,8 @@ define("ErrorUnionExistCard", 300519);
 define("ErrorUnionLimitCardNumber", 300520);
 define("ErrorUnionUnknown", 300000);
 
+//define("Error")
+
 function msg_with_error($error){
 	
 	switch ($error) {

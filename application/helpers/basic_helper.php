@@ -1,5 +1,8 @@
 <?php
 
+define('aliHost', 'http://115.29.148.47');
+define('ucloudHost',  'http://61.153.100.241');
+
 
 function randomCharacter($number){
 		$m = '0123456789abcdefghijkpqrstuvwxyzABCDEFGHIJKPQRSTUVWXYZ';
@@ -17,6 +20,19 @@ function random_number(){
 		$s = str_shuffle($m);
 		$str = substr($s,1,6);
 		return $str;
+}
+
+
+ function get_host($servername){
+		$host = 'http://localhost';
+		if($servername == 'ali'){
+			$host = aliHost;
+		}
+		else if($servername == 'ucloud'){
+			$host = ucloudHost;
+		}
+		
+		return $host;
 }
 
 /**

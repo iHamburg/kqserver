@@ -96,8 +96,6 @@ class Kqapi4 extends REST_Controller
 		
 		
 		$results['sessionToken'] = $sessionToken;
-
-		unset($results['password']);
 		
 		return $this->output_results($results);
 		
@@ -202,7 +200,8 @@ class Kqapi4 extends REST_Controller
    public function userInfo_get(){
    
      	$uid = $this->get('uid');
-     	$sessionToken = $this->get('sessionToken');
+   	
+     	$sessionToken = $this->post('sessionToken');
 		
    		$this->load->model('user2_m','user');
 		
@@ -210,8 +209,7 @@ class Kqapi4 extends REST_Controller
    		if(empty($uid)){
    			return $this->output_error(ErrorEmptyUid);
    		}
-
-   		if(!$this->user->isSessionValid($uid,$sessionToken)){
+  	 	if(!$this->user->isSessionValid($uid,$sessionToken)){
 			
 			return $this->output_error(ErrorInvalidSession);
 		}	
@@ -232,7 +230,7 @@ class Kqapi4 extends REST_Controller
 		
 		$response['fCouponNum'] = $results[0]['num'];
 		
-		$query = $this->db->query("select count(*) as num from `favoritedshopbranch` where userId = $uid");
+		$query = $this->db->query("select count(*) as num from `favoritedshop` where userId = $uid");
 		$results = $query->result_array();	
 		
 		$response['fShopNum'] = $results[0]['num'];
@@ -241,8 +239,6 @@ class Kqapi4 extends REST_Controller
    }
    
    public function editUserInfo_post(){
-   	
-//   	$this->output->enable_profiler(TRUE);
    	
    	$uid = $this->post('uid');
    	
@@ -278,7 +274,7 @@ class Kqapi4 extends REST_Controller
 			return $this->output_error(ErrorInvalidPassword);
 		}
 		
-		$this->db->query("update user set password= '$newPassword' where id=$uid");
+		$this->db->query("update user set password=$newPassword where id=$uid");
 	
 	}
 	
@@ -304,7 +300,6 @@ class Kqapi4 extends REST_Controller
 	$query = $this->db->query("select id,username,avatarUrl,nickname from user where id=$uid");
 	$results = $query->result_array();
 	$this->output_results($results[0]);
-	
    }
    
    /**
@@ -846,10 +841,10 @@ group by A.couponId
 
 //		$this->output->enable_profiler(TRUE);
 		if(empty($results)){
-			return $this->output_results(array('result'=>'0'));
+			return $this->output_results('0');
 		}
 		else{
-			return $this->output_results(array('result'=>'0'));
+			return $this->output_results('1');
 		}
 	
 	}
@@ -881,7 +876,7 @@ group by A.couponId
 //		
 //		$query = $this->db->get();
 		
-		$query = $this->db->query("select B.* from favoritedshopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
+		$query = $this->db->query("select B.* from favoritedShopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
 		
 		
 		
@@ -914,7 +909,7 @@ group by A.couponId
    		
 
 		
-		$query = $this->db->query("select * from favoritedshopbranch where userId = $uid and shopbranchId = $shopbranchId");
+		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		$results = $query->result_array();
 		
 		
@@ -923,7 +918,7 @@ group by A.couponId
 			$data['userId'] = $uid;
 			$data['shopbranchId'] = $shopId;
 		
-			$query = $this->db->query("insert into favoritedshopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
+			$query = $this->db->query("insert into favoritedShopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
 			
 		}
 	
@@ -1069,7 +1064,7 @@ group by A.couponId
 		}
    		
 		
-		$this->db->query("delete from favoritedshopbranch where userId = $uid");
+		$this->db->query("delete from favoritedShopbranch where userId = $uid");
 		
 		return $this->output_success();
 		
@@ -1087,17 +1082,16 @@ group by A.couponId
 			return $this->output_error(ErrorEmptyParameter);
 		}
 	
-		$query = $this->db->query("select * from favoritedshopbranch where userId = $uid and shopbranchId = $shopbranchId");
+		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		
 		$results = $query->result_array();
 
 //		$this->output->enable_profiler(TRUE);
-
 		if(empty($results)){
-			return $this->output_results(array('result'=>'0'));
+			return $this->output_results('0');
 		}
 		else{
-			return $this->output_results(array('result'=>'0'));
+			return $this->output_results('1');
 		}
 
 	
@@ -1624,7 +1618,7 @@ AND active = 1");
 		
 		$code = $xml->code;
 
-		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$code,$mobile)");
+		$query = $this->db->query("insert into s_sms (type,code) values ('forget',$code)");
 		
 		if ($code == 2){
 //			echo 'success';

@@ -42,8 +42,11 @@ if(isset($css)) {
  for ($i = 0; $i < count($titles); $i++) {
  	$title = $titles[$i];
  	$link = $links[$i];
- 	
- 	echo anchor($link,$title,'target="_blank"');
+ 
+// 	echo anchor($link,$title,'target="_blank"');
+	?>
+	<a href="<?php echo $link;?>" target="_blank"><?php echo $title.'        #         '.$link;?></a>
+	<?php 
  	echo br();
  }
  ?>

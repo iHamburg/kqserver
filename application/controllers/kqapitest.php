@@ -6,7 +6,7 @@
 
 
 
-class Kqtest extends CI_Controller{
+class Kqapitest extends CI_Controller{
 
 	/**
 	 * 
@@ -23,6 +23,8 @@ class Kqtest extends CI_Controller{
 	 */
 	var $user;
 	
+	
+//	var $host = 'http://localhost';
 	//
 	//
 	function __construct(){
@@ -38,8 +40,63 @@ class Kqtest extends CI_Controller{
 		
 	}
 
+	function testSuit($servername='localhost'){
+		
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		
+		
+		$this->load->helper('html');
+		
+		$host = get_host($servername);
+		
+		$linkPrepend = $host.'/kq/index.php/kqapitest/';
+		
+//		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
+		$apiLink = array('test_userinfo','test_edit','testGetUserByMobile','testBindCard','testUnbindCard');
+		$apiTitle = $apiLink;
+		
+		foreach ($apiLink as $link) {
+			$newApiLink[] = $linkPrepend.$link.'/'.$servername;
+		}
+		
+		
+		$data['title'] = '客户端接口测试套装';
+		
+		$data['titles'] = $apiTitle;
+		$data['links'] = $newApiLink;
+		
+		$this->load->view('vtestsuit', $data);
+		
+	}
 	
+	function test_userinfo($servername='localhost'){
+		
+		$host = get_host($servername);
+		
+		$url = $host.'/kq/index.php/kqapi4/userinfo/uid/32/sessionToken/ptHKUzWr17FwxVQqjube';
+//		echo $url;
+		$response = get($url);
+		echo $response;
+		
+//		echo $this->host;
+	}
 	
+	function test_edit(){
+		
+		$host = get_host($servername);
+		
+		$url = $host.'/kq/index.php/kqapi4/editUserInfo';
+	
+		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
+		
+//		$post = array('uid'=>'32','sessionToken'=>"ptHKUzWr17FwxVQqjube",'nickname'=>'ddd');
+		$post = array('uid'=>'32','sessionToken'=>"ptHKUzWr17FwxVQqjube",'password'=>json_encode($password));
+		
+		$response = post($url,$post);
+		echo $response;
+	}
+	
+
 	function testresetPassword(){
 	
 		$url = 'http://localhost/kq/index.php/kqapi4/resetPassword';
@@ -50,15 +107,7 @@ class Kqtest extends CI_Controller{
 	
 	}
 	
-	function testSession(){
-	
-		echo $this->user->isSessionValid('32', 'ptHKUzWr17FwxVQqjube');
-		
-		$this->output->enable_profiler(TRUE);
-		
-//		echo 'aaa';
-	}
-	
+
 	function testCaptcha(){
 		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
 //		$post = array('username'=>'1111','password'=>'2222');
@@ -123,16 +172,6 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 		echo $response;
 	}
 	
-	function test_edit(){
-		$url = 'http://115.29.148.47/kq/index.php/kqapi4/editUserInfo';
-	
-//		$password = array('oldPassword'=>'444','newPassword'=>'444');
-		
-		$post = array('uid'=>'32','sessionToken'=>"ptHKUzWr17FwxVQqjube",'nickname'=>'ddd');
-		
-		$response = post($url,$post);
-		echo $response;
-	}
 	
 	function test_register(){
 		$url = 'http://localhost/kq/index.php/kqapi4/user';
@@ -232,5 +271,16 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 //		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
 	}
 	
+//	private function get_host($servername){
+//		$host = 'http://localhost';
+//		if($servername == 'ali'){
+//			$host = aliHost;
+//		}
+//		else if($servername == 'ucloud'){
+//			$host = ucloudHost;
+//		}
+//		
+//		return $host;
+//	}
 
 }
