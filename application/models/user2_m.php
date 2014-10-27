@@ -10,7 +10,6 @@ class User2_m extends MY_Model{
 	
 	public function __construct(){
 		parent::__construct();
-	
 	}
 
 	public function isSessionValid($uid,$sessionToken){
@@ -34,6 +33,11 @@ AND `expireDate` > now()");
 		
 	}
 
+	/**
+	 * 
+	 * 如果有注册返回unionUid，如果没注册过，返回false
+	 * @param unknown_type $uid
+	 */
 	public function get_union_uid($uid){
 		$query = $this->db->query("select unionId from user where id = $uid");
 		$results = $query->result_array();
@@ -44,92 +48,39 @@ AND `expireDate` > now()");
 		return false;
 	}
 	
-	
-	
-	/**
-	 * 获取用户收藏的优惠券的数量
-	 */
-	
-	
-	public function count_my_all($uid){
-		$query = $this->db->query("select count(*) as cardNum,(select count(*) from downloadedcoupon where uid = ".$uid.") as dCouponNum,(select count(*) from favoritedshop where userId = ".$uid.") as fShopNum,(select count(*) from favoritedcoupon where userId = ".$uid.") as fCouponNum from card where userId = ".$uid);
-		return $query->result_array();
-	}
-	public function count_fcoupon($id){
-		$this->db->select('count(*) as fCouponNum')->from('favoritedcoupon');
-		$this->db->where(array('userId'=>$id ));
-		return $this->db->get()->row_array();
-	}
-	/**
-	 * 获取用户收藏的商户的数量
-	 */
-	public function count_fshop($id){
-		$this->db->select('count(*) as fShopNum')->from('favoritedshop');
-		$this->db->where(array('userId'=>$id ));
-		return $this->db->get()->row_array();
-	}
-	/**
-	 * 获取用户绑定银行卡的数量
-	 */
-	public function count_card($id){
-		$this->db->select('count(*) as cardNum')->from('card');
-		$this->db->where(array('userId'=>$id ));
-		return $this->db->get()->row_array();
-	}
-	/**
-	 * 获取用户下载的优惠券的数量
-	 */
-	public function count_downloadedcoupon($id){
-		$this->db->select('count(*) as dCouponNum')->from('downloadedcoupon');
-		$this->db->where(array('uid'=>$id ));
-		return $this->db->get()->row_array();
-	}
-	/**
-	 * Enter description here ...
-	 * @param unknown_type $uid
-	 * @return array 包括
-	 *  title
-	 */
-	public function get_user_cards($uid){
-		$this->db->select('id,title,peopleid')->from('card');
-		$this->db->where(array('peopleid'=>$uid));
-		return $this->db->get()->result_array();
+	public function update_unionid_by_uid($uid,$unionId){
 		
-			
-			/*$where = json_encode(array('people'=>avosPointer('_User',$uid)));
-
-			$json = $this->avoslibrary->retrieveObjects('Card',$where,'','','title');
+		$this->db->query("update user set unionId='$union_uid' where id=$uid");
 		
-   			$results = json_decode($json,true);
-   			
-   			
-   			if (empty($results['error'])){
-   				return $results['results'];
-   			}
-   			else{
-   				return Error_Retrieve_Object;
-   			}*/
-
-   			
 	}
 	
-	
-	public function get_user_downloaded_coupons($uid){
-		$query = $this->db->query('select couponid,downloadedcoupon.id,coupon.title,status from downloadedcoupon left join coupon on downloadedcoupon.couponid = coupon.id && downloadedcoupon.user = '.$uid);
-		return  $query->result_array();
-
+	public function get_dcoupons($uid,$mode='unused',$limit=30,$skip=0){
+		
+		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->from('downloadedcoupon as A');
+		$this->db->where('uid',$uid);
+		if($mode == 'unused'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate <','now()');
+		}
+		else if($mode == 'used'){
+			$this->db->where('status','used');
+		}
+		else if($mode == 'expired'){
+			$this->db->where('status','unused');
+			$this->db->where('B.endDate >','now()');
+		}
+		$this->db->join('coupon as B','A.couponId = B.id','left');
+		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->group_by('A.couponId');
+		$this->db->limit($limit,$skip);
+		
+		$query = $this->db->get();
+		
+		$results = $query->result_array();
+		
+		return $results;
 	}
-	function get_user_favorited_coupons($uid){
-		$query = $this->db->query('select couponid,favoritedcoupon.id,coupon.title from favoritedcoupon left join coupon on favoritedcoupon.couponid = coupon.id && favoritedcoupon.user = '.$uid);
-		return  $query->result_array();
-	}
-
-	function get_user_favorited_shop($uid){
-		$query = $this->db->query('select shopid,favoritedshop.id,shop.title from favoritedshop left join shop on favoritedshop.shopid = shop.id && favoritedshop.userid = '.$uid);
-		return  $query->result_array();
-	}
-	
-	
 	
 	
 	function login($username,$password){

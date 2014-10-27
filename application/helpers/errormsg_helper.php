@@ -26,7 +26,12 @@ define("ErrorUnionExistCard", 300519);
 define("ErrorUnionLimitCardNumber", 300520);
 define("ErrorUnionUnknown", 300000);
 
-//define("Error")
+define("ErrorUnionGetUser", 900);
+define("ErrorUnionRegister", 901);
+define("ErrorUnionBindCard", 902);
+define("ErrorUnionUnbindCard", 903);
+define("ErrorUnionDownloadCoupon", 904);
+
 
 function msg_with_error($error){
 	
@@ -92,9 +97,24 @@ function msg_with_error($error){
 		case ErrorUnionUnknown:
 		  $msg = '未知银联错误';
 		break;
+		case ErrorUnionGetUser:
+			$msg = '银联查询用户错误';
+		break;
+		case ErrorUnionRegister:
+			$msg = '银联注册用户错误';
+		break;
+		case ErrorUnionBindCard:
+			$msg = '银联绑卡错误';
+		break;
+		case ErrorUnionUnbindCard:
+			$msg = '银联解卡错误';
+		break;
+		case ErrorUnionDownloadCoupon:
+			$msg = '银联下载快券错误';
+		break;
 		
 		default:
-		 $msg = '未知错误';
+		 $msg = '服务器未知错误';
 		break;
 	}
 	

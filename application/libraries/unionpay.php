@@ -7,7 +7,7 @@ class Unionpay{
 	
 	 
 //	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
-//	private $host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
+//	private $host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/getUserByMobile';
 	
 	private $host;
 	private $appId;
@@ -24,8 +24,8 @@ class Unionpay{
      	
      	switch (ENVIRONMENT) {
      		case 'testing':   	// localhost
-     		case 'rtesting':  	// aliyun 测试服务器
-//     		case 'production':	// ucloud 生产服务器
+	  		case 'rtesting':  	// aliyun 测试服务器
+  //   		case 'production':	// ucloud 生产服务器
      			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
      			$this->appId = 'ALLPERM';
      			$this->appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
@@ -47,7 +47,7 @@ wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
 +18qzzh7budS3A1kPTDx4xeT+Rtt6bhz0nfmuBuUGRa2Mt4CVNVspkAXMU7j+0mF
 sp5Ykcw0iwSbUA==
 -----END PRIVATE KEY-----';
-     			;
+     			
      		break;
      		case 'production':
 //     		case 'testing':
@@ -75,12 +75,15 @@ xufgfxt0LuW3blZTxf11/jlSIQQLTUbnRHJc0KickoOaFCf6UtwXAkB2xLv6jpiU
 NVuI+eXtaUQW
 -----END PRIVATE KEY-----';
      		break;
+     		
      		default:
      			;
      		break;
      	}
      	
 		
+     	
+//     	echo $this->host;
 	}
 
 	
@@ -148,6 +151,7 @@ NVuI+eXtaUQW
 	
 
 	
+	
 	/**
 	 * 
 	 * 用户信息查询-手机号码方式
@@ -166,6 +170,7 @@ NVuI+eXtaUQW
 		$response = $this->post($url, $post);
 
 		return $response;
+		
 	}
 
 	public function getUserByMobile2($mobile){

@@ -205,7 +205,7 @@ sp5Ykcw0iwSbUA==
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$mobile = '13166361026';
+		$mobile = '13166361023';
 		
 		$response = $this->unionpay->regByMobile($mobile);
 
@@ -220,11 +220,11 @@ sp5Ykcw0iwSbUA==
 			echo 'success';
 		
 		}
-		else if($resCd == 300102){
+		else if($respCd == 300102){
 			// 无效的手机
 			echo '无效的手机';
 		}
-		else if($resCd == 300304){
+		else if($respCd == 300304){
 			// 已经注册
 			echo '已经注册';
 		}

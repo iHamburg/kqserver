@@ -9,12 +9,11 @@ require(APPPATH.'libraries/REST_Controller.php');
  * 从测试服务器中获取数据
  * @author Forest
  *
- *应该没有银联相关的东西
  */
 class Kqapi5 extends REST_Controller
 {
 
-
+	
 	/**
 	 * 
 	 * Enter description here ...
@@ -44,11 +43,13 @@ class Kqapi5 extends REST_Controller
 		
 		header("Content-type: text/html; charset=utf-8");
 		
-		$this->load->library('unionpay');
+
 	}
 	
 	function index(){
 	
+		
+
 	}
 	
 	
@@ -97,6 +98,8 @@ class Kqapi5 extends REST_Controller
 		
 		
 		$results['sessionToken'] = $sessionToken;
+
+		unset($results['password']);
 		
 		return $this->output_results($results);
 		
@@ -154,42 +157,8 @@ class Kqapi5 extends REST_Controller
    		
    		$user = $this->user->get($id);
    		
-   		// 银联注册
-   		
-   		$response = $this->unionpay->getUserByMobile($username);
-   		$response = json_decode($response,true);
- 	
-   		$respCd = $response['respCd'];
-   		echo 'respCd '.$respCd;
-   		if ($respCd == '000000'){
-   		///手机号已经在银联注册
-   			
-   			$data = $response['data'];
-   			
-   			$union_uid = $data['userId'];
-   				
-   			$this->db->query("update user set unionId='$union_uid' where id=$id");
-   			
-   		}
-   		else if($respCd == 300200){
-   			//不存在手机，需要注册
-   			
-   	 	  	$response = $this->unionpay->regByMobile($username);
-	   		$response = json_decode($response,true);
-			$respCd = $response['respCd'];
-			
-	  	 	if($respCd == 0 ){
-
-			$data = $response['data'];
-   			
-   			$union_uid = $data['userId'];
-   				
-   			$this->db->query("update user set unionId='$union_uid' where id=$id");
-	
-			}
-
-   		}
-   		
+   		//----- 银联注册
+   	
 
 		
    		
@@ -201,8 +170,7 @@ class Kqapi5 extends REST_Controller
    public function userInfo_get(){
    
      	$uid = $this->get('uid');
-   	
-     	$sessionToken = $this->post('sessionToken');
+     	$sessionToken = $this->get('sessionToken');
 		
    		$this->load->model('user2_m','user');
 		
@@ -210,7 +178,8 @@ class Kqapi5 extends REST_Controller
    		if(empty($uid)){
    			return $this->output_error(ErrorEmptyUid);
    		}
-  	 	if(!$this->user->isSessionValid($uid,$sessionToken)){
+
+   		if(!$this->user->isSessionValid($uid,$sessionToken)){
 			
 			return $this->output_error(ErrorInvalidSession);
 		}	
@@ -231,7 +200,7 @@ class Kqapi5 extends REST_Controller
 		
 		$response['fCouponNum'] = $results[0]['num'];
 		
-		$query = $this->db->query("select count(*) as num from `favoritedshop` where userId = $uid");
+		$query = $this->db->query("select count(*) as num from `favoritedshopbranch` where userId = $uid");
 		$results = $query->result_array();	
 		
 		$response['fShopNum'] = $results[0]['num'];
@@ -239,15 +208,27 @@ class Kqapi5 extends REST_Controller
 		return $this->output_results($response);
    }
    
+    public function abc_post(){
+
+    	return $this->output_results('12345');
+    
+    }
+   
    public function editUserInfo_post(){
    	
+//   	$this->output->enable_profiler(TRUE);
+ 	
    	$uid = $this->post('uid');
-   	
    	$sessionToken = $this->post('sessionToken');
-   	
    	$nickname = $this->post('nickname');
-   	$pwd = $this->post('password'); //dict
+   	$pwd = $this->post('password'); //
+     	
+//   	 $this->output_results('12345');
+   	 
    	$avatar = $this->post('avatar');
+//   	  $this->output_results('66666');
+   	  
+//   	  $this->output_results($avatar);
    	
    	$this->load->model('user2_m','user');
    		
@@ -275,32 +256,40 @@ class Kqapi5 extends REST_Controller
 			return $this->output_error(ErrorInvalidPassword);
 		}
 		
-		$this->db->query("update user set password=$newPassword where id=$uid");
+		$this->db->query("update user set password= '$newPassword' where id=$uid");
 	
 	}
 	
 	if(!empty($nickname)){
+
 		$this->db->query("update user set nickname='$nickname' where id=$uid");
+	
 	}
 	
 	if(!empty($avatar)){
 
+//		return $this->output_results($avatar);
+		
 		$img = base64_decode($avatar);
 		
 		$data = file_put_contents("public/uploads/avatar_$uid.jpg", $img);
 		
 		if(!empty($data)){
+
 			$avatarurl = base_url("public/uploads/avatar_$uid.jpg");
 			$this->db->query("update user set avatarUrl='$avatarurl' where id=$uid");
+			
+
 		}
 		
 	}
-	
 
-   	
+	
+	
 	$query = $this->db->query("select id,username,avatarUrl,nickname from user where id=$uid");
 	$results = $query->result_array();
 	$this->output_results($results[0]);
+	
    }
    
    /**
@@ -454,60 +443,18 @@ class Kqapi5 extends REST_Controller
 
 		$card = $this->card->get_by($data);
 		
-		//如果没有卡，加上一条记录
-		if(empty($card)){
-
-			//先从uid获得unionId
-			$unionUid = $this->user->get_union_uid($uid);
-			
-			if(!empty($unionUid)){
-				///如果用户已经有银联钱包
-				
-				$response = $this->unionpay->bindCard($unionUid, $cardNo); //13166361023				
-				$response = json_decode($response,true);
-				$respCd = $response['respCd'];
 		
-				/// 同一个账户可以多次绑定一张卡
-				if($respCd == 0 ){
-					//success
-	//				这里要获得bank
-	
-	//				echo 'success';
-					// 本地绑卡
-					 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
-					 $cardId = $this->db->insert_id();
-	
-				}
-				else if($respCd == ErrorUnionInvalidCard){
-					// 无效的卡号
-					
-					return $this->output_error(ErrorUnionInvalidCard);
-				}
-				else if($respCd == ErrorUnionExistCard){
-					
-	//				echo '重复绑卡';
-					return $this->output_error(ErrorUnionExistCard);
-				}
-				else if($respCd == ErrorUnionLimitCardNumber){
-					
-	//				echo '超过绑卡上限';
-					return $this->output_error(ErrorUnionLimitCardNumber);
-				}
-				else{
-					return $this->output_error(ErrorUnionUnknown);
-				}
-			
-			}
-			else{
-				return $this->output_error(ErrorNotRegisterUnion);
-			}
-		
-			
-		}
-		else{
-			///如果数据库里已经绑定了这张卡
+		if(!empty($card)){
+			///如果数据库里已经绑定了这张卡, 获得卡号ID
 			$cardId = $card['id'];
 		}
+		else{
+			//如果本地数据库没有卡号记录
+			//先从uid获得unionId
+			$cardId = $this->card->insert($data);
+			
+		}
+
 		
 		
 		$result = $this->card->get_id($cardId);
@@ -549,21 +496,7 @@ class Kqapi5 extends REST_Controller
 		
 		$this->load->model('card2_m','card');
 
-		$response = $this->unionpay->unbindCard($unionUid, $cardNo); //13166361023				
-			$response = json_decode($response,true);
-			$respCd = $response['respCd'];
 	
-			/// 同一个账户可以多次绑定一张卡
-			if($respCd == 0 ){
-				//success
-//				这里要获得bank
-
-//				echo 'success';
-				// 本地绑卡
-				 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
-				 $cardId = $this->db->insert_id();
-
-			}
 		
 		$result = $this->card->delete_by($data);
 		
@@ -842,10 +775,10 @@ group by A.couponId
 
 //		$this->output->enable_profiler(TRUE);
 		if(empty($results)){
-			return $this->output_results('0');
+			return $this->output_results(array('result'=>'0'));
 		}
 		else{
-			return $this->output_results('1');
+			return $this->output_results(array('result'=>'1'));
 		}
 	
 	}
@@ -877,7 +810,7 @@ group by A.couponId
 //		
 //		$query = $this->db->get();
 		
-		$query = $this->db->query("select B.* from favoritedShopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
+		$query = $this->db->query("select B.* from favoritedshopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
 		
 		
 		
@@ -910,7 +843,7 @@ group by A.couponId
    		
 
 		
-		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
+		$query = $this->db->query("select * from favoritedshopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		$results = $query->result_array();
 		
 		
@@ -919,7 +852,7 @@ group by A.couponId
 			$data['userId'] = $uid;
 			$data['shopbranchId'] = $shopId;
 		
-			$query = $this->db->query("insert into favoritedShopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
+			$query = $this->db->query("insert into favoritedshopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
 			
 		}
 	
@@ -1065,7 +998,7 @@ group by A.couponId
 		}
    		
 		
-		$this->db->query("delete from favoritedShopbranch where userId = $uid");
+		$this->db->query("delete from favoritedshopbranch where userId = $uid");
 		
 		return $this->output_success();
 		
@@ -1083,16 +1016,18 @@ group by A.couponId
 			return $this->output_error(ErrorEmptyParameter);
 		}
 	
-		$query = $this->db->query("select * from favoritedShopbranch where userId = $uid and shopbranchId = $shopbranchId");
+		$query = $this->db->query("select * from favoritedshopbranch where userId = $uid and shopbranchId = $shopbranchId");
 		
 		$results = $query->result_array();
 
 //		$this->output->enable_profiler(TRUE);
+
+		
 		if(empty($results)){
-			return $this->output_results('0');
+			return $this->output_results(array('result'=>'0'));
 		}
 		else{
-			return $this->output_results('1');
+			return $this->output_results(array('result'=>'1'));
 		}
 
 	
@@ -1619,7 +1554,7 @@ AND active = 1");
 		
 		$code = $xml->code;
 
-		$query = $this->db->query("insert into s_sms (type,code) values ('forget',$code)");
+		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$code,$mobile)");
 		
 		if ($code == 2){
 //			echo 'success';
