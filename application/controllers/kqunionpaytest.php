@@ -117,36 +117,51 @@ sp5Ykcw0iwSbUA==
 		
 	}
 
-	function testsuit2($servername='localhost'){
-		
-		header( 'Content-Type:text/html;charset=utf-8 ');
-		
-		$linkPrepend = 'kqunionpaytest/';
-		
-		$apiTitle = array('用户注册','用户信息查询','银行卡开通服务','银行卡关闭服务');
-		$apiLink = array('testRegByMobile','testGetUserByMobile','testBindCard','testUnbindCard');
-		foreach ($apiLink as $link) {
-			$newApiLink[] = $linkPrepend.$link;
-		}
-		
-		
-		$data['title'] = '银联接口测试套装';
-		
-		$data['titles'] = $apiTitle;
-		$data['links'] = $newApiLink;
-		
-		$this->load->view('vUnionPayTest', $data);
-		
-	}
+//	function testsuit2($servername='localhost'){
+//		
+//		header( 'Content-Type:text/html;charset=utf-8 ');
+//		
+//		$linkPrepend = 'kqunionpaytest/';
+//		
+//		$apiTitle = array('用户注册','用户信息查询','银行卡开通服务','银行卡关闭服务');
+//		$apiLink = array('testRegByMobile','testGetUserByMobile','testBindCard','testUnbindCard');
+//		foreach ($apiLink as $link) {
+//			$newApiLink[] = $linkPrepend.$link;
+//		}
+//		
+//		
+//		$data['title'] = '银联接口测试套装';
+//		
+//		$data['titles'] = $apiTitle;
+//		$data['links'] = $newApiLink;
+//		
+//		$this->load->view('vUnionPayTest', $data);
+//		
+//	}
 	
 	
 	/**
 	 * 
+	 * 测试服务器
+	 * https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile
+	 * {"appId":"ALLPERM","version":"1.0","data":{"mobile":"13166361023"},"signToken":"48cb3a35ca9bf9338a0058ff46673b082dd1f47e9ed10b157da293f2a1425646a824e8a0c9513c4eb4dab178ab5a8f240c354579016f3ff6a034dbeb956e3553ff5ce7cc0f41db0e2b6fe1eeeb0e8f82aba8e84417d404cb202c7087b591b85b256a3c13b59ebf030b43beb16ff01298d2c62d421ae4b1f46c7bd66a3bd55386"}
+	 * 
+	 * curl -X POST -H 'Content-Type: application/json' -k -d '{"appId":"ALLPERM","version":"1.0","data":{"mobile":"13166361023"},"signToken":"48cb3a35ca9bf9338a0058ff46673b082dd1f47e9ed10b157da293f2a1425646a824e8a0c9513c4eb4dab178ab5a8f240c354579016f3ff6a034dbeb956e3553ff5ce7cc0f41db0e2b6fe1eeeb0e8f82aba8e84417d404cb202c7087b591b85b256a3c13b59ebf030b43beb16ff01298d2c62d421ae4b1f46c7bd66a3bd55386"}' https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile
+	 * ====
+	 * 正式服务器
+	 * 
+	 * 
+	 * https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/getUserByMobile
+	 * {"appId":"C0000048","version":"1.0","data":{"mobile":"13166361023"},"signToken":"b76448431d852df32afdad028cdfc1036c1a3bb0f16af78f10c535ebe83874373ff44b80110796b98ee772b9dae730bc65be66d4bc60c7d4b26847a540b5bb5c1494ba17e00d8108cc7baa3b16a5711cbf2f6ca8ac41073bfc3c9e801c5500ba39047138158b684e932febfdd152deec34c7a010645bdd1577a35cefb3db1517"}
+	 *
+	 *curl -v -X POST -H 'Content-Type: application/json' -k -d '{"appId":"C0000048","version":"1.0","data":{"mobile":"13166361023"},"signToken":"b76448431d852df32afdad028cdfc1036c1a3bb0f16af78f10c535ebe83874373ff44b80110796b98ee772b9dae730bc65be66d4bc60c7d4b26847a540b5bb5c1494ba17e00d8108cc7baa3b16a5711cbf2f6ca8ac41073bfc3c9e801c5500ba39047138158b684e932febfdd152deec34c7a010645bdd1577a35cefb3db1517"}' https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/getUserByMobile
 	 * 用户信息查询-手机号码方式
 	 */
 	function testGetUserByMobile(){
 	
-//		header( 'Content-Type:text/html;charset=utf-8');
+		header( 'Content-Type:text/html;charset=utf-8');
+//		header( 'Content-Type:application/json;charset=utf-8');
+		
 //		$mobile = '15166412996';
 		
 		if (empty($mobile)){
@@ -161,29 +176,29 @@ sp5Ykcw0iwSbUA==
 	
 
 //	// 原始命令
-//	function testGetUserByMobile2(){
-////		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
-//		$url = $this->host.'getUserByMobile';
-//		
-//		$data = array('mobile'=>'15166412999');
-//		
-//		$data = json_encode($data);
-//		
-//		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
-//		
-//		$signToken = bin2hex($signToken);
-//		
-//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-//
-//		$post = json_encode($post);
-//		
-////		var_dump($url);
-////		var_dump($post);
-//		
-//		$response = $this->post($url, $post);
-//		
-//		echo $response;
-//		}
+	function testGetUserByMobile2(){
+//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile'=>'15166412999');
+		
+		$data = json_encode($data);
+		
+		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+		
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post = json_encode($post);
+		
+//		var_dump($url);
+//		var_dump($post);
+		
+		$response = $this->post($url, $post);
+		
+		echo $response;
+		}
 
 	
 //	function testGetUserByMobile3(){
@@ -328,6 +343,19 @@ sp5Ykcw0iwSbUA==
 
 //		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
 
+			header( 'Content-Type:text/html;charset=utf-8');
+//		header( 'Content-Type:application/json;charset=utf-8');
+		
+//		$mobile = '15166412996';
+		
+		if (empty($mobile)){
+			$mobile = '13166361023';
+//			$mobile = '15166412996';
+		}
+		$response = $this->unionpay->getUserByMobile2($mobile);
+
+		echo $response;
+		
 		echo $this->unionpay->test();
 	}
 	

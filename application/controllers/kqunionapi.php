@@ -4,7 +4,7 @@ require(APPPATH.'libraries/REST_Controller.php');
 
 /**
  * 
- * 从测试服务器中获取数据
+ * 接受银联的调用
  * @author Forest
  *
  */

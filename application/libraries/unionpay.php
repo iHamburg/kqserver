@@ -86,6 +86,60 @@ NVuI+eXtaUQW
 //     	echo $this->host;
 	}
 
+
+	
+	
+	/**
+	 * 
+	 * 用户信息查询-手机号码方式
+	 * 正确： {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":null},"respCd":"000000","msg":""}
+	 * {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"中国工商银行"}]},"respCd":"000000","msg":""}
+	 * 用户不存在： {"data":null,"respCd":"300200","msg":""}
+	 */
+	public function getUserByMobile($mobile){
+
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile' => $mobile);
+		
+		$post = $this->generate_post_json($data);
+		
+//		echo $post;
+		
+		
+		
+		$response = $this->post($url, $post);
+
+		return $response;
+		
+	}
+
+	public function getUserByMobile2($mobile){
+ 
+	
+		$url = $this->host.'getUserByMobile';
+		
+		$data = array('mobile' => $mobile);
+		
+		$dataJson = json_encode($data);
+
+//		echo 'data '.$data;
+		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+		
+		$signToken = bin2hex($signToken);
+
+		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+
+		$post2 = json_encode($post);
+
+		echo 'url '.$url;
+		echo $post2;
+		
+//		echo 'ssss';
+//		$response = $this->post($url, $post);
+
+//		return $response;
+	}
 	
 	/**
 	 * 
@@ -150,54 +204,6 @@ NVuI+eXtaUQW
 	}
 	
 
-	
-	
-	/**
-	 * 
-	 * 用户信息查询-手机号码方式
-	 * 正确： {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":null},"respCd":"000000","msg":""}
-	 * {"data":{"userId":"c00050001985","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"中国工商银行"}]},"respCd":"000000","msg":""}
-	 * 用户不存在： {"data":null,"respCd":"300200","msg":""}
-	 */
-	public function getUserByMobile($mobile){
-
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile' => $mobile);
-		
-		$post = $this->generate_post_json($data);
-		
-		$response = $this->post($url, $post);
-
-		return $response;
-		
-	}
-
-	public function getUserByMobile2($mobile){
- 
-	
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile' => $mobile);
-		
-		$dataJson = json_encode($data);
-
-//		echo 'data '.$data;
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-		
-//		echo 'post '.$post;
-		
-		$response = $this->post($url, $post);
-
-		
-		return $response;
-	}
 	
 	/**
 	 * 
@@ -391,16 +397,22 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	private function post($url='',$objJson=''){
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_SSLVERSION, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array(  
-            'Content-Type: application/json; charset=utf-8')  
-        );  // 要求用json格式传递参数	
-	
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8') );  // 要求用json格式传递参数	
+//		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json') );  // 要求用json格式传递参数
+		
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
 		$output = curl_exec($ch);
+		
+		if(!$output){
+//		    echo "cURL error number:" .curl_errno($ch);
+//   			echo " and url is $url and cURL error:" . curl_error($ch);
+			
+		}
 		curl_close($ch);
 		
 		return $output;
