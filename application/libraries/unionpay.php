@@ -23,9 +23,9 @@ class Unionpay{
 //     	echo 'ENVIRONMENT'.ENVIRONMENT;
      	
      	switch (ENVIRONMENT) {
-     		case 'testing':
-//     		case 'rtesting':
-     		
+     		case 'testing':   	// localhost
+     		case 'rtesting':  	// aliyun 测试服务器
+//     		case 'production':	// ucloud 生产服务器
      			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
      			$this->appId = 'ALLPERM';
      			$this->appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
@@ -50,7 +50,9 @@ sp5Ykcw0iwSbUA==
      			;
      		break;
      		case 'production':
-     		case 'rtesting':
+//     		case 'testing':
+//     		case 'rtesting':
+//     		case 'xxx':
      			$this->host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
      			$this->appId = 'C0000048';
      			$this->appSecret = '12345678998765432111111100000099';
@@ -123,7 +125,7 @@ NVuI+eXtaUQW
 		$data = array(
 			'infSource'=>$this->infSource,
 			'mobile'=>$mobile
-					);
+		);
 		
 		$dataJson = json_encode($data);
 		
@@ -380,25 +382,6 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	
 	/////////////////
 	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $url
-	 */
-	private function get($url){
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-	
-	
-		$output = curl_exec($ch);
-		curl_close($ch);
-		
-		return $output;
-	}
 
 	private function post($url='',$objJson=''){
 		$ch = curl_init();
@@ -409,9 +392,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(  
             'Content-Type: application/json; charset=utf-8')  
-        );  // 要求用json格式传递参数
-		
-	
+        );  // 要求用json格式传递参数	
 	
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
 		$output = curl_exec($ch);

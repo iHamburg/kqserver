@@ -1,5 +1,6 @@
 <?php
 /*
+ * 这里对外界来说应该就是api
  * @author qing
  *
  */
@@ -87,34 +88,36 @@ sp5Ykcw0iwSbUA==
 		}      
 	}
 	
-	function aes() {
-
+	
+	function testsuit($servername='localhost'){
+		
 		header( 'Content-Type:text/html;charset=utf-8 ');
-		echo 'union pay test<br>';
+	
+		$host = get_host($servername);
 		
-//		$plain = '1aabac6d068eef6a7bad3fdf50a05cc8';
+		$linkPrepend = $host.'/kq/index.php/kqunionpaytest/';
 		
-		$plain = '12';
-		
-		$content = '6288888888888888';
-		$key = 'lvANHSNZCYTZRNmX';
-		
-		$content = $this->pad2Length($content, 16);
-		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
-		$iv_size = mcrypt_enc_get_iv_size($cipher);      
-		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
+//		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
 
+		$apiLink = array('testGetUserByMobile','testRegByMobile','testBindCard','testUnbindCard');
+		$apiTitle = $apiLink;
 		
-		echo '自动生成iv的长度:'.strlen($iv).'位:'.bin2hex($iv).'<br>';
 		
-		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv);
-		 
+		foreach ($apiLink as $link) {
+			$newApiLink[] = $linkPrepend.$link.'/'.$servername;
+		}
 		
-		echo base64_encode($cipherText);
+		
+		$data['title'] = '银联接口测试套装';
+		
+		$data['titles'] = $apiTitle;
+		$data['links'] = $newApiLink;
+		
+		$this->load->view('vtestsuit', $data);
 		
 	}
-	
-	function testSuit(){
+
+	function testsuit2($servername='localhost'){
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
@@ -135,7 +138,8 @@ sp5Ykcw0iwSbUA==
 		$this->load->view('vUnionPayTest', $data);
 		
 	}
-
+	
+	
 	/**
 	 * 
 	 * 用户信息查询-手机号码方式
@@ -145,50 +149,52 @@ sp5Ykcw0iwSbUA==
 //		header( 'Content-Type:text/html;charset=utf-8');
 //		$mobile = '15166412996';
 		
-		$mobile = '13166361023';
+		if (empty($mobile)){
+			$mobile = '13166361023';
+//			$mobile = '15166412996';
+		}
 		$response = $this->unionpay->getUserByMobile($mobile);
 
 		echo $response;
-		
 
 	}
 	
 
-	// 原始命令
-	function testGetUserByMobile2(){
-//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile'=>'15166412999');
-		
-		$data = json_encode($data);
-		
-		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-		
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-		
-//		var_dump($url);
-//		var_dump($post);
-		
-		$response = $this->post($url, $post);
-		
-		echo $response;
-		}
+//	// 原始命令
+//	function testGetUserByMobile2(){
+////		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
+//		$url = $this->host.'getUserByMobile';
+//		
+//		$data = array('mobile'=>'15166412999');
+//		
+//		$data = json_encode($data);
+//		
+//		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
+//		
+//		$signToken = bin2hex($signToken);
+//		
+//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+//
+//		$post = json_encode($post);
+//		
+////		var_dump($url);
+////		var_dump($post);
+//		
+//		$response = $this->post($url, $post);
+//		
+//		echo $response;
+//		}
 
 	
-	function testGetUserByMobile3(){
-	
-		header( 'Content-Type:text/html;charset=utf-8');
-		$mobile = '13166361023';
-		$response = $this->unionpay->getUserByMobile2($mobile);
-
-		echo $response;
-		
-	}
+//	function testGetUserByMobile3(){
+//	
+//		header( 'Content-Type:text/html;charset=utf-8');
+//		$mobile = '13166361023';
+//		$response = $this->unionpay->getUserByMobile2($mobile);
+//
+//		echo $response;
+//		
+//	}
 		
 	
 	/**
@@ -201,7 +207,7 @@ sp5Ykcw0iwSbUA==
 		
 		$mobile = '13166361026';
 		
-		$response = $this->unionpay->regByMobile2($mobile);
+		$response = $this->unionpay->regByMobile($mobile);
 
 		echo $response;
 		
@@ -209,7 +215,7 @@ sp5Ykcw0iwSbUA==
 		
 		$respCd = $response['respCd'];
 		
-		if($respCd == 0){
+		if($respCd == '000000'){
 			//success
 			echo 'success';
 		

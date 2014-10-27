@@ -35,7 +35,7 @@ if(isset($css)) {
 <body>
 <div class="container">
  
- <h><?php echo $title;?></h><br>
+ <h1><?php echo $title;?></h1><br>
  <?php 
  
  

@@ -179,16 +179,22 @@ class Kqapi4 extends REST_Controller
 	   		$response = json_decode($response,true);
 			$respCd = $response['respCd'];
 			
-	  	 	if($respCd == 0 ){
+	  	 	if($respCd == '000000' ){
 
-			$data = $response['data'];
-   			
-   			$union_uid = $data['userId'];
-   				
-   			$this->db->query("update user set unionId='$union_uid' where id=$id");
+				$data = $response['data'];
+	   			
+	   			$union_uid = $data['userId'];
+	   				
+	   			$this->db->query("update user set unionId='$union_uid' where id=$id");
 	
 			}
+			else{
+				//@todo error
+			}
 
+   		}
+   		else{
+   			//TODO:
    		}
    		
 
@@ -458,44 +464,39 @@ class Kqapi4 extends REST_Controller
 
 		$card = $this->card->get_by($data);
 		
-		//如果没有卡，加上一条记录
-		if(empty($card)){
-
+		
+		if(!empty($card)){
+			///如果数据库里已经绑定了这张卡, 获得卡号ID
+			$cardId = $card['id'];
+		}
+		else{
+			//如果本地数据库没有卡号记录
 			//先从uid获得unionId
 			$unionUid = $this->user->get_union_uid($uid);
 			
 			if(!empty($unionUid)){
-				///如果用户已经有银联钱包
+				///如果用户已经有银联钱包ID
 				
 				$response = $this->unionpay->bindCard($unionUid, $cardNo); //13166361023				
 				$response = json_decode($response,true);
 				$respCd = $response['respCd'];
 		
 				/// 同一个账户可以多次绑定一张卡
-				if($respCd == 0 ){
+				if($respCd == '000000' ){
 					//success
 	//				这里要获得bank
-	
+					$data = $resonse['data'];
+					
 	//				echo 'success';
 					// 本地绑卡
 					 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
 					 $cardId = $this->db->insert_id();
 	
 				}
-				else if($respCd == ErrorUnionInvalidCard){
-					// 无效的卡号
+				else if($respCd == ErrorUnionInvalidCard ||$respCd == ErrorUnionExistCard || $respCd == ErrorUnionLimitCardNumber){
+					// 对于绑卡的错误判定
 					
-					return $this->output_error(ErrorUnionInvalidCard);
-				}
-				else if($respCd == ErrorUnionExistCard){
-					
-	//				echo '重复绑卡';
-					return $this->output_error(ErrorUnionExistCard);
-				}
-				else if($respCd == ErrorUnionLimitCardNumber){
-					
-	//				echo '超过绑卡上限';
-					return $this->output_error(ErrorUnionLimitCardNumber);
+					return $this->output_error($respCd);
 				}
 				else{
 					return $this->output_error(ErrorUnionUnknown);
@@ -503,15 +504,17 @@ class Kqapi4 extends REST_Controller
 			
 			}
 			else{
+				//如果用户没有unionId
+				
+				//TODO 先注册银联用户再绑卡
+				
+				
 				return $this->output_error(ErrorNotRegisterUnion);
 			}
 		
 			
 		}
-		else{
-			///如果数据库里已经绑定了这张卡
-			$cardId = $card['id'];
-		}
+
 		
 		
 		$result = $this->card->get_id($cardId);
@@ -558,7 +561,7 @@ class Kqapi4 extends REST_Controller
 			$respCd = $response['respCd'];
 	
 			/// 同一个账户可以多次绑定一张卡
-			if($respCd == 0 ){
+			if($respCd == '000000' ){
 				//success
 //				这里要获得bank
 
@@ -567,6 +570,9 @@ class Kqapi4 extends REST_Controller
 				 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
 				 $cardId = $this->db->insert_id();
 
+			}
+			else{
+				//TODO
 			}
 		
 		$result = $this->card->delete_by($data);

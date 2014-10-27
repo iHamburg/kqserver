@@ -9,11 +9,12 @@ require(APPPATH.'libraries/REST_Controller.php');
  * 从测试服务器中获取数据
  * @author Forest
  *
+ *应该没有银联相关的东西
  */
-class Kqapi4 extends REST_Controller
+class Kqapi5 extends REST_Controller
 {
 
-	
+
 	/**
 	 * 
 	 * Enter description here ...

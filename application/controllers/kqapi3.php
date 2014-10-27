@@ -505,7 +505,7 @@ class Kqapi3 extends REST_Controller
 	public function requestCaptchaForgetPassword_get(){
 	
 		$username = $this->get('username');
-		//TODO: 
+	
 		
 		$captcha = $username;
 		return $this->output_results($captcha);
