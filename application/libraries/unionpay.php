@@ -150,6 +150,9 @@ NVuI+eXtaUQW
 	 * 		 {"data":{"mobile":"15166412996","userId":"c00050001984"},"respCd":"000000","msg":""}
 	 * 		 {"data":{"mobile":"13166361023","userId":"c00050001985"},"respCd":"000000","msg":""}
 	 * 
+	 * 
+	 * {"data":{"mobile":"13917368904","userId":"c00058863074"},"respCd":"000000","msg":""}
+	 * 
 	 * 已经注册
 	 * {"data":null,"respCd":"300304","msg":""}
 	 * 
@@ -314,6 +317,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	 * {"data":{"transSeq":"123456789900","couponNum":1.0},"respCd":"000000","msg":""}
 	 * 
 	 * 500048： 票券下载张数超过单用户下载限制
+	 * 500046	票券不存在
 
 
 		$data['chnlUsrId'] = '111';
@@ -331,8 +335,8 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		
 		$post = $this->generate_post_json($data);
 
-		
 		$response = $this->post($url, $post);
+
 		return $response;
 		
 	}

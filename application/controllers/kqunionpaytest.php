@@ -99,7 +99,7 @@ sp5Ykcw0iwSbUA==
 		
 //		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
 
-		$apiLink = array('testGetUserByMobile','testRegByMobile','testBindCard','testUnbindCard');
+		$apiLink = array('testGetUserByMobile','testRegByMobile','testBindCard','testUnbindCard','testCouponDwnById');
 		$apiTitle = $apiLink;
 		
 		
@@ -220,7 +220,7 @@ sp5Ykcw0iwSbUA==
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$mobile = '13166361023';
+		$mobile = '13917368904';
 		
 		$response = $this->unionpay->regByMobile($mobile);
 
@@ -294,17 +294,15 @@ sp5Ykcw0iwSbUA==
 //		$chnlUsrMobile = '13166361023';
 //		$couponSceneId = '000';
 		
-		$data['chnlUsrId'] = '111';
-		$data['chnlUsrMobile'] = '131663610235555';
-		$data['couponId'] = 'Z00000000010074';
 		
-//		$data['couponId'] = 'D00000000008029';
+		$data['chnlUsrId'] = '57';
+		$data['chnlUsrMobile'] = '13166361023';
+		$data['couponId'] = 'D00000000008039';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
-		$data['transSeq'] = '123456789900';
-		$data['userId'] = 'c00050001986';
+		$data['transSeq'] = 'C57D36T1414479969';
+		$data['userId'] = 'c00055685346';
 	
-		
 		$response = $this->unionpay->couponDwnById($data);
 //		
 //		

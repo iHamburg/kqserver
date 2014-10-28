@@ -83,6 +83,71 @@ AND `expireDate` > now()");
 	}
 	
 	
+	/**
+	 * 
+	 * 如果coupon是event，并且用户已经下载过了返回no，
+	 * coupon已经sellOut= 》no
+	 * 否则返回true
+	 * @param unknown_type $uid
+	 * @param unknown_type $couponId
+	 */
+	public function can_user_dcoupon($uid,$couponId){
+		
+		return true;
+	}
+	
+	
+	/**
+	 * 
+	 * 如果成功返回新插入的id
+	 * @param unknown_type $uid
+	 * @param unknown_type $couponId
+	 * @param unknown_type $transSeq
+	 */
+	public function download_coupon($uid,$couponId){
+		
+		
+		if (!$this->can_user_dcoupon($uid,$couponId)){
+				// 如果用户不能下载该快券
+			return ErrorLimitDCoupon;
+
+		}
+		else{
+			// 如果用户可以继续下载
+		
+				$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
+		
+				$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
+
+				
+				if ($this->db->affected_rows() == 0){
+				/// 如果下载失败
+				
+					return ErrorFailureDCoupon;
+
+				}
+				else{
+					return true;
+				}
+		}
+		
+	}
+	
+	public function download_coupon2($uid,$couponId){
+		
+		$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
+		
+		$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
+
+		if ($this->db->affected_rows()>0){
+			return $this->db->insert_id();
+		}
+		else{
+			return false;
+		}
+	}
+	
+	
 	function login($username,$password){
 
 		$this->db->select('id,username,nickname,avatarUrl,sessionToken')->from('user');

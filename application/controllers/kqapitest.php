@@ -56,7 +56,7 @@ class Kqapitest extends CI_Controller{
 		
 //		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
 
-		$apiLink = array('test_userinfo','test_edit','testGetUserByMobile','testBindCard','testUnbindCard');
+		$apiLink = array('test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon');
 		$apiTitle = $apiLink;
 		
 		
@@ -74,7 +74,7 @@ class Kqapitest extends CI_Controller{
 		
 	}
 	
-	function test_userinfo($servername='localhost'){
+	function test_userinfo($servername){
 		
 		$host = get_host($servername);
 		
@@ -85,14 +85,14 @@ class Kqapitest extends CI_Controller{
 		
 	}
 	
-	function test_edit($servername='localhost'){
+	function test_edit($servername){
 		
 		$host = get_host($servername);
 		
 		$url = $host.'/kq/index.php/kqapi5/editUserInfo';
 	
 		
-		echo $url;
+//		echo $url;
 //		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
 		
 //		$post = array('uid'=>'32','sessionToken'=>"ptHKUzWr17FwxVQqjube",'nickname'=>'ddd');
@@ -117,16 +117,58 @@ class Kqapitest extends CI_Controller{
 		echo $response;
 	}
 	
+	/**
+	 * 
+	 * 成功绑卡
+	 * {"status":1,"data":{"cardId":"52","title":"6222021001128509533","logoUrl":null,"bankTitle":null}}
+	 * @param unknown_type $servername
+	 */
+	function test_bind_card($servername){
 	
-	function testCount(){
-		echo $this->user->isSessionValid('24','ZVvW9HygCAsa4RTBQG6t');
+		$host = get_host($servername);
+		
+		$url = $host.'/kq/index.php/kqapi4/mycard';
+	
+		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
+		
+//		$post = json_encode($post);
+		
+		$response = post($url,$post);
+		echo $response;
 	}
-
-	function testDownloadCoupon(){
-		$url = 'localhost/kq/index.php/kqapi4/myDownloadedCoupon';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+	
+	
+	function test_unbind_card($servername){
+		
+		$host = get_host($servername);
+		
+		
+		$url = $host.'/kq/index.php/kqapi4/deleteMyCard';
+		
+		$data = array('uid'=>'57','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ','card'=>'6222021001128509533');
 		
 		$response = post($url,$data);
+		
+		echo $response;
+	}
+	
+
+	function test_get_download_coupon($servername){
+		$host = get_host($servername);
+		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57';
+		
+		$response = get($url);
+		echo $response;
+	}
+	
+	function test_download_coupon($servername){
+		$host = get_host($servername);
+		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/';
+		
+		$data = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','couponId'=>'36');
+		
+		$response = post($url,$data);
+
 		echo $response;
 	}
 	
@@ -185,15 +227,7 @@ class Kqapitest extends CI_Controller{
 		
 		echo $response;
 	}
-	
-	function testDeleteCard(){
-		$url = 'localhost/kq/index.php/kqapi4/deleteMyCard';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
+
 	
 	function testResetPassword(){
 		$url = 'localhost/kq/index.php/kqapi4/resetPassword';
@@ -300,17 +334,7 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	}
 
 	
-	function test_bind_card(){
-	
-		$url = 'http://localhost/kq/index.php/kqapi4/mycard2';
-	
-		$post = array('uid'=>'32','card'=>'6222021001128509539');
-		
-//		$post = json_encode($post);
-		
-		$response = post($url,$post);
-		echo $response;
-	}
+
 	
 	function test_favorietedshops(){
 	
@@ -415,11 +439,19 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	}
 	
 	function test(){
-		$str = '000000';
+			
+//		$query = $this->db->query('select * from user where id>10');
+//		var_dump($query);
+//		
+//		echo '<br>';
+//		
+//		$query->free_result();
+//		var_dump($query);
+	
+		echo now();
+	}
 		
-		if ($str == 0){
-			echo '=0';
-		}
+//		$query = $this->
 		
 		
 //		echo randomNumber();
@@ -436,18 +468,7 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 //		echo $this->addCouponToShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287');
 
 //		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
-	}
 	
-//	private function get_host($servername){
-//		$host = 'http://localhost';
-//		if($servername == 'ali'){
-//			$host = aliHost;
-//		}
-//		else if($servername == 'ucloud'){
-//			$host = ucloudHost;
-//		}
-//		
-//		return $host;
-//	}
+
 
 }

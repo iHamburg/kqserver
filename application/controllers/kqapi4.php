@@ -22,12 +22,14 @@ class Kqapi4 extends REST_Controller
 	var $user;
 	
 	
+	
 	/**
 	 * 
 	 * Enter description here ...
 	 * @var Kqsms
 	 */
 	var $kqsms;
+	
 	
 	
 	/**
@@ -109,7 +111,6 @@ class Kqapi4 extends REST_Controller
 		
 		return $this->output_results($results);
 		
-
 		
 	}
 
@@ -146,7 +147,9 @@ class Kqapi4 extends REST_Controller
    		$count = $this->user->count_by('username',$username);
 
    		if($count>0){
+
    			return $this->output_error(ErrorUsernameExists);
+   		
    		}
    		
    		
@@ -162,12 +165,7 @@ class Kqapi4 extends REST_Controller
    		$this->db->select('id,username,nickname,avatarUrl,sessionToken');
    		
    		$user = $this->user->get($id);
-   		
-
-   		
-
-		
-   		
+  		
    		return $this->output_results($user);
 		
    }
@@ -329,15 +327,11 @@ class Kqapi4 extends REST_Controller
 	
 		if(empty($uid)){
 		
-	
 			return $this->output_error(ErrorEmptyUid);
+		
 		}
 	
-//		if(!$this->user->isSessionValid($uid,$sessionToken)){
-//
-//			return $this->output_error(ErrorInvalidSession);
-//		}
-		 	// 
+
 		
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
 		$this->db->from('card as A');
@@ -403,6 +397,8 @@ class Kqapi4 extends REST_Controller
 //  		
 //   }
    
+   
+   
  	public function myCard_post(){
    	
   		$uid = $this->post('uid');
@@ -443,10 +439,11 @@ class Kqapi4 extends REST_Controller
 			if(empty($unionUid)){
 			
 				//如果用户没有unionId
-				
 				//----- 银联注册， 按理说应该先注册，如果已经注册过了，再查询的
    		
 		   		$response = $this->unionpay->getUserByMobile($username);
+		   		
+//		   		echo 'response'.$response;
 		   		$response = json_decode($response,true);
 		   		$respCd = $response['respCd'];
 		//   		echo 'respCd '.$respCd;
@@ -490,27 +487,29 @@ class Kqapi4 extends REST_Controller
 		   			return $this->output_error(ErrorUnionGetUser);
 		   			
 		   		}
-
-		 
-		   		
-				
+			
 			}
 		
 			//--------绑卡----------
 			// 确保有unionUid
 			$response = $this->unionpay->bindCard($unionUid, $cardNo); //13166361023				
+			
 			$response = json_decode($response,true);
+				
 			$respCd = $response['respCd'];
 	
+			
 			/// 同一个账户可以多次绑定一张卡
 			if($respCd == '000000' ){
 				//success
 //				这里要获得bank
-				$data = $resonse['data'];
-				
-//				echo 'success';
 
-				 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
+				$data = $response['data'];				
+				$issuerName = $data['issuerName'];  // 银行名称
+				
+				//TODO: 要存到bank里去
+				
+				 $this->db->query("insert into card (userId, title, bankTitle) values ($uid,'$cardNo','$issuerName')"); // return 1
 				 $cardId = $this->db->insert_id();
 
 			}
@@ -526,19 +525,22 @@ class Kqapi4 extends REST_Controller
 
 			}
 			
-			
 			//------ 绑卡成功 ----- 
-			// 用户如果有已经下载的优惠券，需要批量从银联下载
-			
+			//TODO 用户如果有已经下载的优惠券，需要批量从银联下载
 			
 			
 		}
-
+	
 		
-		
-		$result = $this->card->get_id($cardId);
-		return $this->output_results($result);
+		$query = $this->db->query("select * from card where id = $cardId");
+		$results = $query->result_array();
+//		$result = $this->card->get_id($cardId);
+		$response = $results[0];
+		$response['logoUrl'] = '';
+		return $this->output_results($response);
 
+//		return $this->output_results($response);
+		
   		
    }
    
@@ -558,45 +560,56 @@ class Kqapi4 extends REST_Controller
 		
 		$this->load->model('user2_m','user');
 		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$this->user->isSessionValid($uid,$sessionToken)){
-//
-//			return $this->output_error(ErrorInvalidSession);
-//		
-//		}
-   		
+		if(empty($uid) || empty($card) || empty($sessionToken)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+		}
+		
+		if(!$this->user->isSessionValid($uid,$sessionToken)){
 
+			return $this->output_error(ErrorInvalidSession);
+		
+		}
+   		
 		$data['userId'] = $uid;
 		$data['title'] = $card;
 		
 		$this->load->model('card2_m','card');
 
-		$response = $this->unionpay->unbindCard($unionUid, $cardNo); //13166361023				
+		$unionUid = $this->user->get_union_uid($uid);
+		
+		if (!empty($unionUid)){
+			// 用户应该在银联注册过，能找到银联id
+			$response = $this->unionpay->unbindCard($unionUid, $card); //13166361023				
+		
 			$response = json_decode($response,true);
 			$respCd = $response['respCd'];
-	
-			/// 同一个账户可以多次绑定一张卡
+		
+				/// 同一个账户可以多次绑定一张卡
 			if($respCd == '000000' ){
 				//success
-//				这里要获得bank
-
-//				echo 'success';
-				// 本地绑卡
-				 $this->db->query("insert into card (userId,title) values ($uid,$cardNo)"); // return 1
-				 $cardId = $this->db->insert_id();
-
+				$result = $this->card->delete_by($data);
+			
+				return $this->output_success();
+	
 			}
 			else{
 				//TODO
+	//			return $this->output_results($response);
+				return $this->output_error(ErrorUnionUnbindCard);
+	
 			}
+		}
+		else{
+			// 如果没有银联uid， 报出错
+			
+			return $this->output_error(ErrorUnionEmptyUID);
+			
+		}
 		
-		$result = $this->card->delete_by($data);
+
 		
-		return $this->output_success();
+	
 		
 	}
 	
@@ -642,41 +655,18 @@ group by A.couponId
 			return $this->output_error(ErrorEmptyUid);
 		}
 	
+		$this->load->model('user2_m','user');
 		
-//		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
-//		$this->db->from('downloadedcoupon as A');
-//		$this->db->where('uid',$uid);
-//		if($mode=='unused'){
-//			$this->db->where('status','unused');
-//			$this->db->where('B.endDate <','now()');
-//		}
-//		else if($mode == 'used'){
-//			$this->db->where('status','used');
-//		}
-//		else if($mode == 'expired'){
-//			$this->db->where('status','unused');
-//			$this->db->where('B.endDate >','now()');
-//		}
-//		$this->db->join('coupon as B','A.couponId = B.id','left');
-//		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
-//		$this->db->group_by('A.couponId');
-//		$this->db->limit($limit,$skip);
-//		
-//		$query = $this->db->get();
-//		
-//		$results = $query->result_array();
-//	
-//	  	
-//
-//		
-//	  	return $this->output_results(array('coupons'=>$results));
+		$results = $this->user->get_dcoupons($uid);
+		
+	  	return $this->output_results(array('coupons'=>$results));
 	
 //		$this->output->enable_profiler(TRUE);
 			
-		$this->load->model('user2_m','user');
-//		$results = $this->user->ge
 	
 	}
+	
+	
 	
 	
 	/**
@@ -692,6 +682,7 @@ group by A.couponId
 	
 		
 		$this->load->model('user2_m','user');
+		$this->load->model('coupon2_m','coupon');
 
 		if(empty($uid) || empty($couponId) || empty($sessionToken)){
 		
@@ -702,28 +693,58 @@ group by A.couponId
 			
 			return $this->output_error(ErrorInvalidSession);
 		}
-   		
+
+
 
 		$data['uid'] = $uid;
 		$data['couponId'] = $couponId;
 		
-		$this->load->model('downloadedcoupon2_m');
+		
+		/**
+		 * 如果unionUid不存在，只要存在本地数据库就行
+		 * 如果unionUid存在，那么必须要先存在银联数据库，再存在本地。
+		 */
+		
+		$unionUid = $this->user->get_union_uid($uid);
+		
+	
+		if (empty($unionUid)){
+			// 如果还没有银联uid，直接存在数据库中
+			
+			$result = $this->user->download_coupon($uid,$couponId);
 
-//		$data['chnlUsrId'] = $uid;
-//		$data['chnlUsrMobile'] = '131663610235555';
-//		$data['couponId'] = 'Z00000000010074';
-//		$data['couponNum'] = '1';
-//		$data['couponSceneId'] = '000';
-//		$data['transSeq'] = '123456789900';
-//		$data['userId'] = 'c00050001986';
-//		
-//		$response = $this->unionpay->couponDwnById($data);
+			if ($result === true){
+				return $this->output_success();
+			}
+			else{
+				return $this->output_error($result);
+			}
+		}
+		else{
+			
+			//如果有银联uid，需要先从银联下载, 银联下载成功了再下载到服务器
+			
+			$data['chnlUsrId'] = $uid;
+			$data['chnlUsrMobile'] = '131663610235555';
+			$data['couponId'] = 'Z00000000010074';
+			$data['couponNum'] = '1';
+			$data['couponSceneId'] = '000';
+			$data['transSeq'] = '123456789900';
+			$data['userId'] = 'c00050001986';
+			
+			$response = $this->unionpay->couponDwnById($data);
+			
+			
+			
+			
+			return $this->output_results('有银联id');
+			
+		}
+
 		
-		$result = $this->downloadedcoupon2_m->insert($data);
+		return $this->output_results('回到最后');
+//		return $this->output_success();
 		
-		
-		
-		return $this->output_success();
 	}
 	
 	
@@ -1498,7 +1519,7 @@ limit 3");
 		$shopCount = $this->shop->countBranches($shopId);
 		
 		$coupon['shopCount'] = $shopCount;
-		//		$this->output->enable_profiler(TRUE);
+//		$this->output->enable_profiler(TRUE);
 		
 	  	return $this->output_results($coupon);
 	  	

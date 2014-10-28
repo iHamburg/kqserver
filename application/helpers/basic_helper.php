@@ -25,6 +25,7 @@ function random_number(){
 
  function get_host($servername){
 		$host = 'http://localhost';
+		
 		if($servername == 'ali'){
 			$host = aliHost;
 		}

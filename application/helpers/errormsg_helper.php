@@ -16,6 +16,9 @@ define("ErrorInvalidSession",   604);
 define("ErrorInvalidPassword",   605);
 
 define("ErrorFailureSMS",    801);
+define("ErrorLimitDCoupon",  802);
+define("ErrorFailureDCoupon", 803);
+
 
 
 define("ErrorUsernameExists",   1001);
@@ -31,7 +34,7 @@ define("ErrorUnionRegister", 901);
 define("ErrorUnionBindCard", 902);
 define("ErrorUnionUnbindCard", 903);
 define("ErrorUnionDownloadCoupon", 904);
-
+define("ErrorUnionEmptyUID", 905);
 
 function msg_with_error($error){
 	
@@ -77,6 +80,12 @@ function msg_with_error($error){
 		case ErrorFailureSMS:
 		  $msg = '短信发送错误';
 		break;
+		case ErrorLimitDCoupon:
+		  $msg = '用户不能下载该快券';
+		break;
+		case ErrorFailureDCoupon:
+		  $msg = '用户下载快券失败';
+		break;
 		
 		case ErrorUsernameExists:
 		  $msg = '用户名已存在';
@@ -111,6 +120,9 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionDownloadCoupon:
 			$msg = '银联下载快券错误';
+		break;
+		case ErrorUnionEmptyUID:
+			$msg = '没有银联用户id';
 		break;
 		
 		default:

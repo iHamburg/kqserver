@@ -278,7 +278,6 @@ class Kqapi5 extends REST_Controller
 
 			$avatarurl = base_url("public/uploads/avatar_$uid.jpg");
 			$this->db->query("update user set avatarUrl='$avatarurl' where id=$uid");
-			
 
 		}
 		
@@ -1410,7 +1409,8 @@ limit 3");
 	  
 	  public function shopbranchDetails_get(){
 	  
-//	  		$this->load->model('shop2_m','shop');
+	  	
+	  	
 	  		
 	  		$shopbranchId = $this->get('id');
 		
@@ -1426,6 +1426,9 @@ AND active = 1");
 	  		
 	  		$results = $query->result_array();
 	  		$response = $results[0];
+	  		
+	  		
+	  		
 
 		  if(empty($response)){
 		
@@ -1463,7 +1466,7 @@ Where A.active = 1
 AND A.shopId = $shopId "
 );
 		
-	$response['shopCoupons'] =  $query->result_array();;
+		$response['shopCoupons'] =  $query->result_array();;
 //		$coupons = $query->result_array();
 	  		
 	  		return $this->output_results($response);
