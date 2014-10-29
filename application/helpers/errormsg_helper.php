@@ -8,12 +8,17 @@ define("ErrorEmptyCard",	      404);
 define("ErrorEmptyCouponId",    405);
 define("ErrorEmptySession",     406);
 define("ErrorEmptyShopId",      407);
+define("ErrorEmptyUnionCouponId",      408);
+define("ErrorEmptyUnionUid", 409);
 
 define("ErrorInvalidUsernamePwd", 601);
 define("ErrorInvalidUsername",  602);
 define("ErrorInvalidCouponId",  603);
 define("ErrorInvalidSession",   604);
 define("ErrorInvalidPassword",   605);
+
+define("ErrorDBUpdate", 701);
+define("ErrorDBDelete", 702);
 
 define("ErrorFailureSMS",    801);
 define("ErrorLimitDCoupon",  802);
@@ -22,19 +27,25 @@ define("ErrorFailureDCoupon", 803);
 
 
 define("ErrorUsernameExists",   1001);
-define("ErrorNotRegisterUnion",   1002);
+define("ErrorCardExists",   1003);
 
 define("ErrorUnionInvalidCard", 300500);
 define("ErrorUnionExistCard", 300519);
 define("ErrorUnionLimitCardNumber", 300520);
 define("ErrorUnionUnknown", 300000);
+define("ErrorUnionInvalidCoupon", 500046);
+define("ErrorUnionInvalidParameter", 300002);
+define("ErrorUnionEmptyUser", 300200);  // 查询结果
+
 
 define("ErrorUnionGetUser", 900);
 define("ErrorUnionRegister", 901);
 define("ErrorUnionBindCard", 902);
 define("ErrorUnionUnbindCard", 903);
 define("ErrorUnionDownloadCoupon", 904);
-define("ErrorUnionEmptyUID", 905);
+
+
+
 
 function msg_with_error($error){
 	
@@ -59,6 +70,12 @@ function msg_with_error($error){
 		break;
 		case ErrorEmptyShopId:
 		  $msg = 'ShopId为空';
+		break;
+		case ErrorEmptyUnionCouponId:
+		  $msg = '优惠券的银联编号为空';
+		break;
+		case ErrorEmptyUnionUid:
+		  $msg = '用户的银联编号为空';
 		break;
 		
 		case ErrorInvalidUsernamePwd:
@@ -87,11 +104,18 @@ function msg_with_error($error){
 		  $msg = '用户下载快券失败';
 		break;
 		
+		case ErrorDBUpdate:
+		  $msg = '数据库更新错误';
+		break;
+		case ErrorDBDelete:
+		  $msg = '数据库删除错误';
+		break;
+		
 		case ErrorUsernameExists:
 		  $msg = '用户名已存在';
 		break;
-		case ErrorNotRegisterUnion:
-		  $msg = '用户没有注册银联钱包';
+		case ErrorCardExists:
+		  $msg = '用户已经绑定该银行卡';
 		break;
 		
 		case ErrorUnionInvalidCard:
@@ -123,6 +147,15 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionEmptyUID:
 			$msg = '没有银联用户id';
+		break;
+		case ErrorUnionInvalidCoupon:
+			$msg = '银联优惠券无效';
+		break;
+		case ErrorUnionInvalidParameter:
+			$msg = '银联参数值无效';
+		break;
+		case ErrorUnionEmptyUser:
+			$msg = '银联用户不存在';
 		break;
 		
 		default:

@@ -8,7 +8,7 @@
 
 
 
-class Kqunionpaytest extends CI_Controller{
+class Kqunionpaytools extends CI_Controller{
 
 	
 	/**
@@ -18,27 +18,7 @@ class Kqunionpaytest extends CI_Controller{
 	 */
 	var $unionpay;
 	
-	var $private_key =  '-----BEGIN PRIVATE KEY-----
-MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAO9F1ub3EmcROVb9
-TuwbvGEwZaDeldcDtQNYvHpC5Xm+0v32pGCCJ05qK3zEpumz8bpHcBqVw94cZVia
-4iVaEWkFnWm710b7NdNeMBFhC/L9NYl0jDsoRhCL/57OxbttvMPi0YbpQc0Qfn80
-QnYZYcwic640UVUz5DzJ/sVOrleFAgMBAAECgYBUSTfQmIxE/k5ClGyuw35yhgfm
-yUHjQg0LpsCOGO6ZGl1c1PtGe9K4zrGO+/8IKDkos22MD+G1Zi9VLQooujeTJtps
-fHsp9DhGgglfhOwH8kkCtgVaH6sovgzIj5plln6la/GDAcRe5kGn1xoTDusnVqw9
-OqC27gybn/hM3lFOaQJBAP14rXdpap1EKbigSSEGP0PwiA0c2yu1EknxQ8fRJWS7
-DyIRn9K1vsxCbxfLY2PYlPWFz8fCPMRJhqO3BP4OxacCQQDxqOavBS0UT4iqJ1+W
-zz7dV6sTd/p3gbVBy5It7wGWnDiBa9Z2beLm1k84oc7mb56Mf6VDCuAeILEs3jJ1
-PLbzAkBvVzc7oP7IHk0FYMM+0nOv8FSTDf3ocR2bhXN0rpZybQj0ujEuac9qAjSy
-ixEZpuWoBCOFZ/kxb+rIt3hl8S85AkEA6TZEmTb3kBhJHVwuBY4vbtBCCuHIVzhX
-wg1BHw7+i2hrp4p4R4Y4aOj9Pvv4fa3OZmxxAkgmjSyjj1dHfph/PQJAbmRVNakH
-+18qzzh7budS3A1kPTDx4xeT+Rtt6bhz0nfmuBuUGRa2Mt4CVNVspkAXMU7j+0mF
-sp5Ykcw0iwSbUA==
------END PRIVATE KEY-----';
-	
-	var $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
-	var $appId = 'ALLPERM';
-	var $version = '1.0';
-	var $appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
+
 	
 	function __construct(){
 		parent::__construct();
@@ -55,48 +35,17 @@ sp5Ykcw0iwSbUA==
 
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		echo 'union pay test<br>';
-		
-//		$key = '1aabac6d068eef6a7bad3fdf50a05cc8';
-		
-		$plain = '12';
-		
-		$content = '6288888888888888';
-		$key = 'lvANHSNZCYTZRNmX';
-		
-		
-		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
-		$iv_size = mcrypt_enc_get_iv_size($cipher);      
-		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
-
-		
-		echo '自动生成iv的长度:'.strlen($iv).'位:'.bin2hex($iv).'<br>';
-		
-		if (mcrypt_generic_init($cipher, $key, $iv) != -1)      
-		{      
-		    // PHP pads with NULL bytes if $content is not a multiple of the block size..      
-		    $cipherText = mcrypt_generic($cipher,$content);      
-		    mcrypt_generic_deinit($cipher);      
-		    mcrypt_module_close($cipher);      
-		         
-		    // Display the result in hex.      
-//		    printf("128-bit encrypted result:\n%s\n\n",bin2hex($cipherText));
-//  			 printf("128-bit encrypted result:\n%s\n\n",base64_encode($cipherText));
-
-		    echo base64_encode($cipherText);
-		    print("<br />");      
-		         
-		}      
+	
 	}
 	
 	
-	function testsuit($servername='localhost'){
+	function toolsuit($servername='localhost'){
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 	
 		$host = get_host($servername);
 		
-		//因为不是api的调用，所以host是要远程的
-		$linkPrepend = $host.'/kq/index.php/kqunionpaytest/';
+		$linkPrepend = $host.'/kq/index.php/kqunionpaytools/';
 		
 //		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
 
@@ -109,7 +58,7 @@ sp5Ykcw0iwSbUA==
 		}
 		
 		
-		$data['title'] = '银联接口测试套装';
+		$data['title'] = '银联接口工具套装';
 		
 		$data['titles'] = $apiTitle;
 		$data['links'] = $newApiLink;
@@ -118,28 +67,8 @@ sp5Ykcw0iwSbUA==
 		
 	}
 
-//	function testsuit2($servername='localhost'){
-//		
-//		header( 'Content-Type:text/html;charset=utf-8 ');
-//		
-//		$linkPrepend = 'kqunionpaytest/';
-//		
-//		$apiTitle = array('用户注册','用户信息查询','银行卡开通服务','银行卡关闭服务');
-//		$apiLink = array('testRegByMobile','testGetUserByMobile','testBindCard','testUnbindCard');
-//		foreach ($apiLink as $link) {
-//			$newApiLink[] = $linkPrepend.$link;
-//		}
-//		
-//		
-//		$data['title'] = '银联接口测试套装';
-//		
-//		$data['titles'] = $apiTitle;
-//		$data['links'] = $newApiLink;
-//		
-//		$this->load->view('vUnionPayTest', $data);
-//		
-//	}
 	
+//	function 
 	
 	/**
 	 * 
@@ -161,7 +90,6 @@ sp5Ykcw0iwSbUA==
 	function testGetUserByMobile(){
 	
 		header( 'Content-Type:text/html;charset=utf-8');
-		
 //		header( 'Content-Type:application/json;charset=utf-8');
 		
 //		$mobile = '15166412996';
@@ -202,7 +130,16 @@ sp5Ykcw0iwSbUA==
 		echo $response;
 		}
 
-
+	
+//	function testGetUserByMobile3(){
+//	
+//		header( 'Content-Type:text/html;charset=utf-8');
+//		$mobile = '13166361023';
+//		$response = $this->unionpay->getUserByMobile2($mobile);
+//
+//		echo $response;
+//		
+//	}
 		
 	
 	/**
@@ -314,6 +251,9 @@ sp5Ykcw0iwSbUA==
 		var_dump( $this->unionpay->is_server_alive());
 	
 		
+//		var_dump($this->unionpay->is_server_alive());
+	
+//		var_dump($this->unionpay->isserveralive());
 		
 	}
 	

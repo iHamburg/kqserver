@@ -12,46 +12,65 @@ class User2_m extends MY_Model{
 		parent::__construct();
 	}
 
+	/**
+	 * 
+	 * 如果成功返回user， 否则返回NULL
+	 * @param unknown_type $uid
+	 * @param unknown_type $sessionToken
+	 */
 	public function isSessionValid($uid,$sessionToken){
 
 
-		$query = $this->db->query(" SELECT COUNT(*) AS `numrows`FROM (`user`)
+		$query = $this->db->query(" SELECT * FROM (`user`)
 WHERE `id` =  $uid
 AND sessionToken = '$sessionToken'
 AND `expireDate` > now()");
 		$results = $query->result_array();
 		
-		$result = $results[0];
-		$count = $result['numrows'];
+		$result = $results[0];  // array or NULL
 		
-		if ($count == 0){
-			return false;
-		}
-		else{
-			return true;
-		}
+
+		return $result;
+
 		
 	}
+	
+//	public function isSessionValid2($uid,$sessionToken){
+//
+//
+//		$query = $this->db->query(" SELECT COUNT(*) AS `numrows`FROM (`user`)
+//WHERE `id` =  $uid
+//AND sessionToken = '$sessionToken'
+//AND `expireDate` > now()");
+//		$results = $query->result_array();
+//		
+//		$result = $results[0];
+//		$count = $result['numrows'];
+//		
+//		if ($count == 0){
+//			return false;
+//		}
+//		else{
+//			return true;
+//		}
+//		
+//	}
 
 	/**
 	 * 
-	 * 如果有注册返回unionUid，如果没注册过，返回false
+	 * 
 	 * @param unknown_type $uid
+	 * @param unknown_type $unionId
 	 */
-	public function get_union_uid($uid){
-		$query = $this->db->query("select unionId from user where id = $uid");
-		$results = $query->result_array();
-		
-		if(!empty($results)){
-			return $results[0]['unionId'];
-		}
-		return false;
-	}
-	
 	public function update_unionid_by_uid($uid,$unionId){
 		
-		$this->db->query("update user set unionId='$union_uid' where id=$uid");
+		$this->db->query("update user set unionId='$unionId' where id=$uid");
 		
+		if($this->db->affected_rows()>0){
+			return true;
+		}
+		else 
+			return false;
 	}
 	
 	public function get_dcoupons($uid,$mode='unused',$limit=30,$skip=0){
@@ -97,6 +116,9 @@ AND `expireDate` > now()");
 	}
 	
 	
+//	public function register_union($)
+	
+	
 	/**
 	 * 
 	 * 如果成功返回新插入的id
@@ -106,47 +128,136 @@ AND `expireDate` > now()");
 	 */
 	public function download_coupon($uid,$couponId){
 		
-		
-		if (!$this->can_user_dcoupon($uid,$couponId)){
-				// 如果用户不能下载该快券
-			return ErrorLimitDCoupon;
-
-		}
-		else{
+	
 			// 如果用户可以继续下载
 		
-				$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
-		
-				$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
-
-				
-				if ($this->db->affected_rows() == 0){
-				/// 如果下载失败
-				
-					return ErrorFailureDCoupon;
-
-				}
-				else{
-					return true;
-				}
-		}
-		
-	}
+			$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 	
-	public function download_coupon2($uid,$couponId){
+			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
+
+			
+			if ($this->db->affected_rows() == 0){
+			/// 如果下载失败
+			
+				return ErrorFailureDCoupon;
+
+			}
+			else{
+				return true;
+			}
+
+	}
+
+
+
+	public function download_union_coupon($uid,$mobile,$unionUid,$couponId,$unionCouponId){
 		
 		$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 		
-		$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
-
-		if ($this->db->affected_rows()>0){
-			return $this->db->insert_id();
+		$data['chnlUsrId'] = $uid;
+		$data['chnlUsrMobile'] = $mobile;
+		$data['couponId'] = $unionCouponId;
+		$data['couponNum'] = '1';
+		$data['couponSceneId'] = '000';
+		$data['transSeq'] = $transSeq;
+		$data['userId'] = $unionUid;
+		
+//		print_r($data);
+		
+		$response = $this->unionpay->couponDwnById($data);
+	
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
 		}
-		else{
-			return false;
+		else {
+			return $respCd;
+		}
+		
+	}
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @param unknown_type $uid
+	 */
+	public function download_batch_coupons($uid){
+		
+	}
+	
+	/**
+	 * 
+	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
+	 * @param unknown_type $mobile
+	 */
+	public function get_union_user($mobile){
+		
+		$response = $this->unionpay->getUserByMobile($mobile);
+		
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
 		}
 	}
 	
+	public function register_union($mobile){
+		$response = $this->unionpay->regByMobile($mobile);
+		
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
+		}
+	}
+	
+	public function bind_union_card($unionUid, $cardNo){
+		$response = $this->unionpay->bindCard($unionUid,$cardNo);
+		
+		$response = json_decode($response,true);
+		
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
+		}
+	}
+	
+
+	
+	/**
+	 * 
+	 * 返回true，表示成功
+	 * @param unknown_type $unionUid
+	 * @param unknown_type $cardNo
+	 */
+	public function unbind_union_card($unionUid, $cardNo){
+		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
+		
+		$response = json_decode($response,true);
+		
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return true;
+		}
+		else {
+			return $respCd;
+		}
+	}
 	
 	function login($username,$password){
 

@@ -38,11 +38,10 @@ class Kqapitest extends CI_Controller{
 
 		echo 'kqtest ';
 		
-
-		
 	}
 
-	
+	// 其实不用连remote的test函数
+		
 	function testsuit($servername='localhost'){
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
@@ -52,10 +51,9 @@ class Kqapitest extends CI_Controller{
 		
 		$host = get_host($servername);
 		
-		$linkPrepend = $host.'/kq/index.php/kqapitest/';
+		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
+//		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
-//		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
-
 		$apiLink = array('test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon');
 		$apiTitle = $apiLink;
 		
@@ -130,8 +128,8 @@ class Kqapitest extends CI_Controller{
 		$url = $host.'/kq/index.php/kqapi4/mycard';
 	
 		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
+//		$post = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','card'=>'6222021001128509533');
 		
-//		$post = json_encode($post);
 		
 		$response = post($url,$post);
 		echo $response;
@@ -165,7 +163,8 @@ class Kqapitest extends CI_Controller{
 		$host = get_host($servername);
 		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/';
 		
-		$data = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','couponId'=>'36');
+//		$data = array('uid'=>'57','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ','couponId'=>'38');
+		$data = array('uid'=>'61','sessionToken'=>'f3TubJFYWiewIZ1PkhDx','couponId'=>'38');
 		
 		$response = post($url,$data);
 
@@ -447,28 +446,15 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 //		
 //		$query->free_result();
 //		var_dump($query);
+
+		$query = $this->db->query("insert into bank (title) values ('浦发银行')");
 	
-		echo now();
+		var_dump($query);
+		
+		echo 'aaa';
 	}
 		
-//		$query = $this->
-		
-		
-//		echo randomNumber();
-		
-//		$url = HOST."/users?keys=phone,username";
-//		echo $this->avoslibrary->get($url);
-		
-//	$data = array('shop'=>avosPointer('Shop', '53bbece4e4b0dea5ac1c8907'));
-//		
-//		echo $this->updateObject('Coupon','539e8dfce4b023daacbd6fa3',json_encode($data));
-	
-//		echo $this->addShopBranchesToShop(array('539e8c51e4b0c92f1847dc23','539e8c52e4b0c92f1847dc24'), '539e8c52e4b0c92f1847dc25');
 
-//		echo $this->addCouponToShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287');
-
-//		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'))	;
-	
 
 
 }
