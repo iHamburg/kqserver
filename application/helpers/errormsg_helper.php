@@ -26,7 +26,6 @@ define("ErrorLimitDCoupon",  802);
 define("ErrorFailureDCoupon", 803);
 
 
-
 define("ErrorUsernameExists",   1001);
 define("ErrorCardExists",   1003);
 

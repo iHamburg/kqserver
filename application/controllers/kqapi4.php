@@ -12,7 +12,6 @@ require(APPPATH.'libraries/REST_Controller.php');
  */
 class Kqapi4 extends REST_Controller
 {
-
 	
 	/**
 	 * 
@@ -255,7 +254,9 @@ class Kqapi4 extends REST_Controller
 	}
 	
 	if(!empty($nickname)){
+
 		$this->db->query("update user set nickname='$nickname' where id=$uid");
+	
 	}
 	
 	if(!empty($avatar)){
@@ -311,6 +312,36 @@ class Kqapi4 extends REST_Controller
 	 * *************        My     ****************
 	 */
 	
+   
+   public function myNews_get(){
+   	
+   		$uid = $this->get('uid');
+   		$lastNewsId = $this->get('lastNewsId');
+   		if (empty($lastNewsId))
+   			$lastNewsId = 0;
+   
+		$limit = intval($this->get('limit'));
+		$skip = intval($this->get('skip'));
+		
+		if (empty($skip))
+ 	  		$skip = 0;
+	  	
+ 	  	if (empty($limit))
+ 	  		$limit = 30;
+   		
+ 	  		
+
+   		// 返回
+   		if (empty($uid))
+   			return $this->output_error(ErrorEmptyUid);
+   			
+   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') and id>$lastNewsId limit $skip,$limit");
+   		
+   		$results = $query->result_array();
+   		
+   		return $this->output_results(array('news'=>$results));
+   }
+   
    
    /**
     * 
@@ -434,6 +465,7 @@ class Kqapi4 extends REST_Controller
 			///如果数据库里已经绑定了这张卡,报错
 			
 			return $this->output_error(ErrorCardExists);
+		
 		}
 	
 		//如果本地数据库没有卡号记录，先判断用户是否已经银联注册
@@ -448,6 +480,9 @@ class Kqapi4 extends REST_Controller
 			//如果用户没有unionId，先查询再注册, 获得unionUid
 					
 			$unionUser = $this->user->get_union_user($username);
+			
+			
+//			var_dump($unionUser);
 		
 		 	if($unionUser == ErrorUnionEmptyUser ){
 			//如果银联没有该用户，说明需要注册 
@@ -469,25 +504,27 @@ class Kqapi4 extends REST_Controller
 			else{
 			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
 	
+				
+				
 				$unionUid = $unionUser['userId'];	
 				
 			}
 			
-			//TODO 用户如果有已经下载的优惠券，需要批量从银联下载
-	 		$query = $this->db->query("select * from downloadedcoupon  
-where uid = $uid
-AND status = 'unused'");
-		
-			$results = $query->result_array();
- 			
-			if(!empty($results)){
-				//如果用户已经下载了coupon， 需要去银联登记
-				
-				$unionUid = $response['userId'];
-				// 这里没有unionCouponId！！！
-//					$response = $this->user->download_batch_coupons($uid, $username, $unionUid, $results);
-				
-			}
+			//TODO 用户如果有已经下载的优惠券，需要批量从银联下载, 这一块会从后台操作
+//	 		$query = $this->db->query("select * from downloadedcoupon  
+//where uid = $uid
+//AND status = 'unused'");
+//		
+//			$results = $query->result_array();
+// 			
+//			if(!empty($results)){
+//				//如果用户已经下载了coupon， 需要去银联登记
+//				
+//				$unionUid = $response['userId'];
+//				// 这里没有unionCouponId！！！
+////					$response = $this->user->download_batch_coupons($uid, $username, $unionUid, $results);
+//				
+//			}
 			
 			//把银联的Uid更新到服务器中
 
@@ -530,21 +567,25 @@ AND status = 'unused'");
 		if (!empty($bank)){
 			//如果发卡行已经在bank中了  
 			$logoUrl = $bank['logoUrl'];
-			
+			$bankId = $bank['id'];
 		}
 		else{
+			// 如果发卡行不在bank中，bank新增一个record
+			
 			$this->bank->insert(array('title'=>$issuerName));
-				
+			$bankId = $this->db->insert_id();
+			
 		}
 		
 		if (empty($logoUrl)){
 			$logoUrl  = 'http://www.quickquan.com/images/banks/unknownbank.jpg';
 		}
 		
-		
 		// -- 服务器绑卡 -- 
 		
-		 $this->db->query("insert into card (userId, title, bankTitle) values ($uid,'$cardNo','$issuerName')"); // return 1
+//		var_dump($bankId);
+		
+		 $this->db->query("insert into card (userId, title, bankTitle, bankId) values ($uid,'$cardNo','$issuerName',$bankId)"); // return 1
 	
 
 		// 返回银行卡的信息
@@ -748,6 +789,8 @@ AND status = 'unused'");
 		$data['title'] = $card;
 	
 		$this->load->model('card2_m','card');
+		
+		$cardNo = $card;
 		$card = $this->card->get_by($data);	
 		
 		
@@ -755,10 +798,14 @@ AND status = 'unused'");
 			///如果数据库里已经绑定了这张卡,报错
 			
 			return $this->output_error(ErrorEmptyCard);
+		
+			
 		}
 
 		
 		$unionUid = $user['unionId'];
+		
+//		return $this->output_results($user);
 		
 		if (empty($unionUid)){
 			// 如果用户没有银联帐号
@@ -766,7 +813,11 @@ AND status = 'unused'");
 		}
 		
 		// 银联解绑
-		$response = $this->user->unbind_union_card($unionUid,$card);
+		$response = $this->user->unbind_union_card($unionUid, $cardNo);
+		
+//		echo 'unionId'.$unionUid;
+//		echo 'card'.$cardNo;
+//		return $this->output_results($response);
 		
 		if($response === true){
 			// 银联解绑成功
@@ -889,6 +940,7 @@ group by A.couponId
  	  		$limit = 30;
 		
 		$mode = $this->get('mode');
+		
 		if(empty($mode)){
 			$mode = 'unused';
 		}
@@ -900,12 +952,14 @@ group by A.couponId
 	
 		$this->load->model('user2_m','user');
 		
-		$results = $this->user->get_dcoupons($uid);
+		$results = $this->user->get_dcoupons($uid,$mode,$limit,$skip);
+		
+//		$this->output->enable_profiler(TRUE);
 		
 	  	return $this->output_results(array('coupons'=>$results));
 	
 	  	
-//		$this->output->enable_profiler(TRUE);
+//		
 			
 	
 	}
@@ -1285,18 +1339,9 @@ group by A.couponId
 			return $this->output_error(ErrorEmptyUid);
 		}
 		
-//		$this->db->select('A.shopId,B.title,B.logoUrl');
-//		$this->db->from('favoritedshop as A');
-//		$this->db->where('userId',$uid);
-//		$this->db->join('shop as B','A.shopId = B.id','left');
-//		$this->db->limit($limit,$skip);
-//		
-//		$query = $this->db->get();
 		
 		$query = $this->db->query("select B.* from favoritedshopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid");
-		
-		
-		
+	
 		$results = $query->result_array();
 	  	
 //		$this->output->enable_profiler(TRUE);
@@ -1715,22 +1760,85 @@ LIMIT $skip,$limit");
 		
 	}
 
-	 
-   /**
-    * 返回快券: dictionary: location -> array of coupons 
-    * 先搜子商户
-    * 返回的快券是有重复的，（因为不同的子商户会有同样的主商户，因此会返回重复的快券，需要客户端处理）
-    * @param districtId
-    * @param subDistrictId
-    * @param couponTypeId
-    * @param subTypeId
-    * @param districtKeyword
-    * @param couponTypeKeyword
-    * @param latitude
-    * @param longitude
-    * @param skip
-    * @param limit
-    */
+//	 
+//   /**
+//    * 返回快券: dictionary: location -> array of coupons 
+//    * 先搜子商户
+//    * 返回的快券是有重复的，（因为不同的子商户会有同样的主商户，因此会返回重复的快券，需要客户端处理）
+//    * @param districtId
+//    * @param subDistrictId
+//    * @param couponTypeId
+//    * @param subTypeId
+//    * @param districtKeyword
+//    * @param couponTypeKeyword
+//    * @param latitude
+//    * @param longitude
+//    * @param skip
+//    * @param limit
+//    */
+//	public function searchCoupons_get(){
+//	
+//  	 	$shopTypeId = $this->get('shopTypeId');
+//		$districtId = $this->get('districtId');
+//		$longitude = $this->get('longitude');
+//		$latitude =  $this->get('latitude');
+//		$order =  $this->get('order');
+//		$keyword = $this->get('keyword');
+//		
+//		if(empty($order)){
+//			$order = 'distance';
+//		}
+//		
+//		$skip = intval($this->get('skip'));
+//	  	$limit = intval($this->get('limit'));
+//	  	
+//	  	if (empty($skip))
+// 	  		$skip = 0;
+//	  	
+// 	  	if (empty($limit))
+// 	  		$limit = 30;
+//   	
+//		if(empty($latitude) || empty($longitude)){
+//			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address');
+//		}
+//		else{
+//			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+//		}
+//		
+//		
+// 	  	$this->db->from('coupon as A');
+//		$this->db->join('shop as B', 'A.shopId = B.id','left');
+//		$this->db->join('shopbranch as C', 'A.shopId = C.shopId','left');
+//		$this->db->join('couponcontent as D', 'A.id = D.couponId','left');
+//		
+//		if(!empty($keyword)){
+//			$this->db->like('A.title',$keyword);
+//		}	
+//		if (!empty($districtId)){
+//			$this->db->where('districtId',$districtId);
+//		}
+//		if(!empty($shopTypeId)){
+//			$this->db->where('typeId',$shopTypeId);
+//		}
+//		
+//		$this->db->where('A.active','1');
+//		$this->db->where('B.active','1');
+//
+//		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
+//			
+//			$this->db->order_by('distance');
+//		}
+// 	  	$this->db->limit($limit,$skip);
+// 	  	
+// 	  	$query = $this->db->get();
+//		
+//		$results = $query->result_array();	
+//		
+////		$this->output->enable_profiler(TRUE);
+//		
+//		return $this->output_results(array('coupons'=>$results));
+//	}
+   
 	public function searchCoupons_get(){
 	
   	 	$shopTypeId = $this->get('shopTypeId');
@@ -1754,10 +1862,19 @@ LIMIT $skip,$limit");
  	  		$limit = 30;
    	
 		if(empty($latitude) || empty($longitude)){
+
 			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address');
+		
 		}
 		else{
-			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+
+			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+			
+			
+//			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,(ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN((latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS((latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - (longitude * 3.1415) / 180 ) ) * 6380) as distance,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+
+//			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($latitude -`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($longitude-`longitude`)/360),2)))) as distance");
+		
 		}
 		
 		
@@ -1793,7 +1910,6 @@ LIMIT $skip,$limit");
 		
 		return $this->output_results(array('coupons'=>$results));
 	}
-   
 
 
 	function couponDetails_get(){
@@ -1862,18 +1978,13 @@ limit 3");
 
 		}
 		else{
-			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($longitude-`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($latitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId ORDER BY `distance`");
 			
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($latitude -`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($longitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId ORDER BY `distance`");
 		}
 	
 		$results = $query->result_array();	
 		
 		$nearestShop =  $results[0];
-
-//		$query = $this->db->query("select description from shop where id=$shopId");
-//		$results = $query->result_array();
-//
-//		$nearestShop['description'] = $results[0]['description'];
 			
 		$coupon['nearestShop'] =$nearestShop;
 
@@ -2027,7 +2138,7 @@ AND active = 1");
 		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
 		
 		if ($response === true){
-//			echo 'success';
+
 
 			$captchaMd5 = md5($captcha);
 		

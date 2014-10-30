@@ -248,10 +248,13 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
-		$userId = 'c00050001985';
-		$cardNo = '6222021001128509530';
+//		$userId = 'c00050001985';
+//		$cardNo = '6222021001128509530';
+		$userId = 'c00055685346';
+		$cardNo = '6222021001128509533';
 		
 		$response = $this->unionpay->bindCard($userId, $cardNo);
+
 		echo $response;
 	
 	}
@@ -287,29 +290,24 @@ sp5Ykcw0iwSbUA==
 //		$chnlUsrMobile = '13166361023';
 //		$couponSceneId = '000';
 		
-		
 		$data['chnlUsrId'] = '57';
 		$data['chnlUsrMobile'] = '13166361023';
-		$data['couponId'] = 'Z00000000008039';
+		$data['couponId'] = 'D00000000008334';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
-		$data['transSeq'] = 'C57D36T1414479969';
+		$data['transSeq'] = 'C57D36T1424473970';
 		$data['userId'] = 'c00055685346';
 	
-		$response = $this->unionpay->couponDwnById($data);
-//		
+		
+		print_r($data);
+		
+		$response = $this->unionpay->couponDwnById($data);		
 //		
 		echo $response;
 	}
 	
 	function test_verify(){
-		
-//		if ($this->unionpay->verify_service()){
-//			echo '服务器正常运行';
-//		}
-//		else{
-//			echo '服务器出状况了';
-//		}
+
 	
 		var_dump( $this->unionpay->is_server_alive());
 	

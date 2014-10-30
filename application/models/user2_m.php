@@ -12,6 +12,7 @@ class User2_m extends MY_Model{
 		parent::__construct();
 	}
 
+	
 	/**
 	 * 
 	 * 如果成功返回user， 否则返回NULL
@@ -20,7 +21,7 @@ class User2_m extends MY_Model{
 	 */
 	public function isSessionValid($uid,$sessionToken){
 
-
+		
 		$query = $this->db->query(" SELECT * FROM (`user`)
 WHERE `id` =  $uid
 AND sessionToken = '$sessionToken'
@@ -31,9 +32,9 @@ AND `expireDate` > now()");
 		
 
 		return $result;
-
-		
+	
 	}
+	
 	
 //	public function isSessionValid2($uid,$sessionToken){
 //

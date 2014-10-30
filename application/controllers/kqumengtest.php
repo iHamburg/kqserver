@@ -6,22 +6,19 @@
 
 
 
-class Kqapitest extends CI_Controller{
+class Kqumengtest extends CI_Controller{
 
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var Coupon_m
-	 */
-	var $coupon_m;
-  
 	
+	private $host = 'http://msg.umeng.com/api/send';
+	private $appkey = '5445cf0bfd98c5d70001d213';
+//	private $appMasterSecret = 'bqalj5hvoltwhiy9gtmnthurulr8woxf';  
+	private $appMasterSecret = '64e78a65df3cc2da9b2402a6f9979a3a'; 
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var User2_m
+	 * @var Kqumeng
 	 */
-	var $user;
+	var $umeng;
 	
 	
 //	var $host = 'http://localhost';
@@ -30,13 +27,49 @@ class Kqapitest extends CI_Controller{
 	function __construct(){
 		parent::__construct();
 		
-		$this->load->model('user2_m','user');
+//		$this->load->model('user2_m','user');
+
+		$this->load->library('kqumeng','umeng');
+		
 	}
 	
 
 	function index() {
 
-		echo 'kqtest ';
+//		echo 'kqumengtest ';
+		
+//		echo now();
+//		
+//		$appkey = "50e26c315270156df0000031";
+//        $appMasterSecret = "b3a09842d2c86177aa8268ee64f14f7e";
+//        $timestamp = "1385321933302";
+//        
+//        $md5= md5($appkey.$appMasterSecret.$timestamp);
+        
+//        echo $md5;
+		
+		$timestamp = now();
+		
+		$validationToken = $this->appkey.$this->appMasterSecret.$timestamp;
+		
+		$validationToken = md5($validationToken);
+		
+		$data['appkey'] = $this->appkey;
+		$data['timestamp'] = $timestamp;
+		$data['validationToken'] = $validationToken;
+		$data['type'] = 'broadcast';
+		
+		$payload['display_type'] = 'notification';
+		$payload['body'] = array('ticker'=>'通知栏提示文字', 'title'=>'通知标题','text'=>'通知文字描述','play_sound'=>'false','after_open'=>'go_app');
+		
+		$data['payload'] = $payload;
+		
+		print_r($data);
+		
+		$data = json_encode($data);
+		$response = post($this->host, $data);
+		
+		var_dump($response);
 		
 	}
 

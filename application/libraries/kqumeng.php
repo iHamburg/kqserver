@@ -1,11 +1,13 @@
 <?php
 
 
-class Kqsms{
+class Kqumeng{
 	 
 //	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
-	private $account = 'cf_yuece';
-	private $password = '1234567';
+	private $host = 'http://msg.umeng.com/api/send';
+	private $appkey = '5445cf0bfd98c5d70001d213';
+	private $appMasterSecret = 'bqalj5hvoltwhiy9gtmnthurulr8woxf';
+	
 	
 	
      public function __construct(){
@@ -16,6 +18,29 @@ class Kqsms{
 	public function test(){
 		
 		return 'kqsms'; 
+	}
+	
+	public function send_test_notification(){
+		
+		$timestamp = now();
+		$validationToken = $this->appkey.$this->appMasterSecret.$timestamp;
+		
+		$validationToken = md5($validationToken);
+		
+		$data['appkey'] = $this->appkey;
+		$data['timestamp'] = $timestamp;
+		$data['validationToken'] = $validationToken;
+		$data['type'] = 'broadcast';
+		
+		$payload['display_type'] = 'notification';
+		$payload['body'] = array('ticker'=>'通知栏提示文字', 'title'=>'通知标题','text'=>'通知文字描述','play_sound'=>'false','after_open'=>'go_app');
+		
+		$data['payload'] = $payload;
+		
+		
+		
+		
+		return $validationToken;
 	}
 	
 	/**
