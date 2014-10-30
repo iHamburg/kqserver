@@ -298,6 +298,7 @@ class Kqapi4 extends REST_Controller
 			
 	   		return $this->output_error(ErrorInvalidUsername);
 		}
+
 		$updateId = $this->user->update_by(array('username'=>$username),array('password'=>$password));
 
 		return $this->output_success();
@@ -442,12 +443,12 @@ class Kqapi4 extends REST_Controller
 		$username = $user['username'];
 					
 		
+		//凡事数据库没有unionUid，说明没有获得银联的信息，如果成功注册或是登录，需要把之前下载的快券登记到银联中去
 		if(empty($unionUid)){
-			
 			//如果用户没有unionId，先查询再注册, 获得unionUid
 					
 			$unionUser = $this->user->get_union_user($username);
-			
+		
 		 	if($unionUser == ErrorUnionEmptyUser ){
 			//如果银联没有该用户，说明需要注册 
 			
@@ -457,16 +458,7 @@ class Kqapi4 extends REST_Controller
 		 			// 如果注册没有成功，报错
 		 			return $this->output_error(ErrorUnionRegister);
 		 		}
-		 		else{
-		 			
-		 			// 注册成功 
-		 			//TODO 用户如果有已经下载的优惠券，需要批量从银联下载
-		 			$unionUid = $response['userId'];
-					
-		 			// 先获得用户下载的快券
-		 			
-		 		}
-	
+		
 			}
 			else if(!is_array($unionUser)){
 				// 其他union查询的错误
@@ -475,16 +467,30 @@ class Kqapi4 extends REST_Controller
 			
 			}
 			else{
-			// 返回data，说明手机已经银联注册可以获得unionUid
-			
-//				var_dump($unionUser);
-				
+			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
+	
 				$unionUid = $unionUser['userId'];	
 				
 			}
 			
+			//TODO 用户如果有已经下载的优惠券，需要批量从银联下载
+	 		$query = $this->db->query("select * from downloadedcoupon  
+where uid = $uid
+AND status = 'unused'");
+		
+			$results = $query->result_array();
+ 			
+			if(!empty($results)){
+				//如果用户已经下载了coupon， 需要去银联登记
+				
+				$unionUid = $response['userId'];
+				// 这里没有unionCouponId！！！
+//					$response = $this->user->download_batch_coupons($uid, $username, $unionUid, $results);
+				
+			}
+			
 			//把银联的Uid更新到服务器中
-//			echo 'uid '.$uid.'unionUid'.$unionUid;
+
 			if(!$this->user->update_unionid_by_uid($uid,$unionUid)){
 				
 				return $this->output_error(ErrorDBUpdate);
@@ -932,9 +938,6 @@ group by A.couponId
 			return $this->output_error(ErrorInvalidSession);
 		}
 
-		
-
-
 		$data['uid'] = $uid;
 		$data['couponId'] = $couponId;
 		
@@ -966,30 +969,31 @@ group by A.couponId
 				return $this->output_error(ErrorEmptyUnionCouponId);
 			}
 			
-			// 500046 ,票券不存在
-			// 300002, unionUid不对
+		
 			// 从银联下载优惠券
-			$result = $this->user->download_union_coupon($uid,$user['username'],$unionUid,$couponId, $unionCouponId);
+			$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
+			
+			$result = $this->user->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
 			//处理无效的uionUid和unionCouponId错误
 			 if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter){
 				return $this->output_error($result);
 			}
 			else if(!is_array($result)){
-				// 处理其他union下载的错误
+				// 其他union下载的错误
 				return $this->output_error(ErrorUnionDownloadCoupon);
 			}
 			
 		}
 	
 		// 服务器下载快券
-		$result2 = $this->user->download_coupon($uid,$couponId);
+		$result2 = $this->user->download_coupon($uid,$couponId, $transSeq);
 
 		if ($result2 === true){
 			return $this->output_success();
 		}
 		else{
-			return $this->output_error($result2);
+			return $this->output_error(ErrorDBInsert);
 		}
 		
 	
@@ -1987,18 +1991,12 @@ AND active = 1");
 		$mobile = $this->get('mobile');
 		
 		$captcha = random_number();
-	
-//		$response = $this->kqsms->mock_send_register_sms($mobile,$captcha);
+
 		$response = $this->kqsms->send_register_sms($mobile,$captcha);
 		
-		$xml = simplexml_load_string($response);
+		$this->db->query("insert into s_sms (type,code,mobile) values ('register',$response,$mobile)");
 		
-		$code = $xml->code;
-
-		$this->db->query("insert into s_sms (type,code,mobile) values ('register',$code,$mobile)");
-		
-		if ($code == 2){
-//			echo 'success';
+		if ($response === true){
 
 			$captchaMd5 = md5($captcha);
 		
@@ -2024,16 +2022,11 @@ AND active = 1");
 	
 		$captcha = random_number();
 	
-//		$response = $this->kqsms->mock_send_forgetpwd_sms($mobile,$captcha);
 		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
-		
-		$xml = simplexml_load_string($response);
-		
-		$code = $xml->code;
 
-		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$code,$mobile)");
+		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
 		
-		if ($code == 2){
+		if ($response === true){
 //			echo 'success';
 
 			$captchaMd5 = md5($captcha);

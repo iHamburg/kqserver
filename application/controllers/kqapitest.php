@@ -54,7 +54,8 @@ class Kqapitest extends CI_Controller{
 		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
-		$apiLink = array('test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon');
+		$apiLink = array('test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
+			'test_captcha_register');
 		$apiTitle = $apiLink;
 		
 		
@@ -168,6 +169,13 @@ class Kqapitest extends CI_Controller{
 		
 		$response = post($url,$data);
 
+		echo $response;
+	}
+	
+	function test_captcha_register($servername){
+		$host = get_host($servername);
+		$url = $host.'/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
+		$response = get($url);
 		echo $response;
 	}
 	

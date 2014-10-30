@@ -19,6 +19,7 @@ define("ErrorInvalidPassword",   605);
 
 define("ErrorDBUpdate", 701);
 define("ErrorDBDelete", 702);
+define("ErrorDBInsert", 703);
 
 define("ErrorFailureSMS",    801);
 define("ErrorLimitDCoupon",  802);
@@ -109,6 +110,9 @@ function msg_with_error($error){
 		break;
 		case ErrorDBDelete:
 		  $msg = '数据库删除错误';
+		break;
+		case ErrorDBInsert:
+		  $msg = '数据库插入错误';
 		break;
 		
 		case ErrorUsernameExists:

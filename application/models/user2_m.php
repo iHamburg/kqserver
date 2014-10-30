@@ -126,20 +126,17 @@ AND `expireDate` > now()");
 	 * @param unknown_type $couponId
 	 * @param unknown_type $transSeq
 	 */
-	public function download_coupon($uid,$couponId){
+	public function download_coupon($uid,$couponId, $transSeq){
 		
 	
 			// 如果用户可以继续下载
-		
-			$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 	
 			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
 
 			
 			if ($this->db->affected_rows() == 0){
 			/// 如果下载失败
-			
-				return ErrorFailureDCoupon;
+				return false;
 
 			}
 			else{
@@ -150,9 +147,8 @@ AND `expireDate` > now()");
 
 
 
-	public function download_union_coupon($uid,$mobile,$unionUid,$couponId,$unionCouponId){
+	public function download_union_coupon($uid,$mobile,$unionUid,$unionCouponId, $transSeq){
 		
-		$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 		
 		$data['chnlUsrId'] = $uid;
 		$data['chnlUsrMobile'] = $mobile;
@@ -183,8 +179,20 @@ AND `expireDate` > now()");
 	 * Enter description here ...
 	 * @param unknown_type $uid
 	 */
-	public function download_batch_coupons($uid){
+	public function download_batch_coupons($uid, $mobile, $unionUid, $coupons){
 		
+		foreach ($coupons as $coupon) {
+			$couponId = $coupon['id'];
+			$unionCouponId = $coupon['unionCouponId'];
+//			$transSeq = $coupon['transSeq'];
+	// transSeq 要从
+			
+			// 如果没有unioncouponid， 跳出
+			if (empty($unionCouponId) )
+				continue;
+			
+			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
+		}
 	}
 	
 	/**

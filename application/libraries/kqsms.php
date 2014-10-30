@@ -29,9 +29,16 @@ class Kqsms{
 		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
-		return $this->get($url);
-//		return $url;
+		$response = $this->get($url);
+
+		$xml = simplexml_load_string($response);
 		
+		$code = $xml->code;
+		
+		if ($code == 2)
+			return true;
+		else 
+			return $code;
 	}
 	
 	public function mock_send_register_sms($mobile, $captcha){
@@ -49,8 +56,16 @@ class Kqsms{
 		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
-		return $this->get($url);
-
+		$response = $this->get($url);
+		
+		$xml = simplexml_load_string($response);
+		
+		$code = $xml->code;
+		
+		if ($code == 2)
+			return true;
+		else 
+			return $code;
 		
 	}
 	
@@ -80,6 +95,12 @@ class Kqsms{
 		
 		return $url;
 	}
+	
+//	public function insert_db(){
+//	
+//		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$code,$mobile)");
+//	}
+	
 	/////////////////
 	
 	/**
