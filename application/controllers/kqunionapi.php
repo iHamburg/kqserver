@@ -56,14 +56,13 @@ transFwdInsId 	string 	可选 	交易发送机构
 		}
 		
 		$post = json_decode($post,true);
-		
-
 			
 		$params = array('mchntId','couponId','cdhdUsrId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
-
+//	{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"D00000000000002","cdhdUsrId":"c00000000000","chnlUsrId":"qq382677505","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}
 		foreach ($params as $key) {
 			$data[$key] = $post['data'][$key];
 		}
+		
 		
 		if(empty($data['mchntId']) ||empty($data['couponId'])){
 			$response = array('respCd'=>'300000','msg'=>'参数不可为空');
@@ -74,7 +73,27 @@ transFwdInsId 	string 	可选 	交易发送机构
 		
 		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
 		
+		
+		// 把数据存入数据库中
 		$this->uCouponAccepted->insert($data);
+		
+		
+		if($this->db->affected_row() == 0){
+			//如果数据库没有登记成功，登记在logo中
+			
+			log_message('error', 'Union CouponAccepted DBInsert #'.$post);
+		
+		}
+		
+		// 如果是要异步调用的话，一定要是api，否则也可以在这里做 
+		// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
+		// 如果能获得uid，就不用join user了
+//		
+		
+		// 先把downloadedcoupon的status改成used，
+		
+		
+		// 然后把user-》increment
 		
 		$response = array('respCd'=>'000000','msg'=>'');
 		echo json_encode($response);

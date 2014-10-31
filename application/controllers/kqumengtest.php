@@ -216,7 +216,7 @@ class Kqumengtest extends CI_Controller{
 	
 	function test_mynews($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi4/myNews/uid/35/lastNewsId/10';
+		$url = $host.'/kq/index.php/kqapi4/myNews/uid/84/lastNewsId/0';
 		$response = get($url);
 		echo $response;
 	}

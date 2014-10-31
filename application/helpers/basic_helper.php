@@ -289,18 +289,56 @@ function show_custom_error($message, $status_code = 500, $heading = 'An Error Wa
 
 
 function get($url){
+	
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	
 	//curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
 
 	$output = curl_exec($ch);
+	
+	$curl_errno = curl_errno($ch);  
+    $curl_error = curl_error($ch);
+	
+ 	if($curl_errno >0){  
+//          echo "cURL Error ($curl_errno): $curl_error\n";  
+    }
+	
 	curl_close($ch);
 
 	return $output;
+	
+}
+
+function asyn_get($url){
+	
+	$ch = curl_init();
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+	curl_setopt($ch, CURLOPT_NOSIGNAL,1);    //注意，毫秒超时一定要设置这个  
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS,200);  //超时毫秒，cURL 7.16.2中被加入。从PHP 5.2.3起可使用  
+	
+    //curl_setopt($ch, CURLOPT_HTTPHEADER, $this->header);
+
+	$output = curl_exec($ch);
+	
+	$curl_errno = curl_errno($ch);  
+    $curl_error = curl_error($ch);
+	
+ 	if($curl_errno >0){  
+          echo "cURL Error ($curl_errno): $curl_error\n";  
+    }
+    
+	curl_close($ch);
+
+//	return $output;
 }
 
 function post($url='',$data=''){
@@ -315,6 +353,14 @@ function post($url='',$data=''){
 
 	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 	$output = curl_exec($ch);
+	
+	$curl_errno = curl_errno($ch);  
+    $curl_error = curl_error($ch);
+	
+ 	if($curl_errno >0){  
+//          echo "cURL Error ($curl_errno): $curl_error\n";  
+    }
+	
 	curl_close($ch);
 
 	return $output;

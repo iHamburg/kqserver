@@ -52,6 +52,9 @@ class Kqapi4 extends REST_Controller
 		header("Content-type: text/html; charset=utf-8");
 		
 		$this->load->library('unionpay');
+		$this->load->model('user2_m','user');
+		$this->load->model('card2_m','card');
+		$this->load->model('coupon2_m','coupon');
 	}
 	
 	function index(){
@@ -102,7 +105,6 @@ class Kqapi4 extends REST_Controller
 		$expireDate = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
 	
 		$this->user->update($id,array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate));
-		
 		
 		$results['sessionToken'] = $sessionToken;
 
@@ -329,17 +331,24 @@ class Kqapi4 extends REST_Controller
  	  	if (empty($limit))
  	  		$limit = 30;
    		
- 	  		
 
    		// 返回
    		if (empty($uid))
    			return $this->output_error(ErrorEmptyUid);
    			
-   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') and id>$lastNewsId limit $skip,$limit");
+   			
+   		$query = $this->db->query("select count(*) as num from news 
+where  (uid=$uid or uid is null or uid ='')
+and id>$lastNewsId");	
+   		
+   		$results = $query->result_array();
+   		$count = $results[0]['num'];
+   		
+   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by id desc limit $skip,$limit");
    		
    		$results = $query->result_array();
    		
-   		return $this->output_results(array('news'=>$results));
+   		return $this->output_results(array('news'=>$results, 'count'=>$count));
    }
    
    
@@ -958,9 +967,6 @@ group by A.couponId
 		
 	  	return $this->output_results(array('coupons'=>$results));
 	
-	  	
-//		
-			
 	
 	}
 	
@@ -1011,6 +1017,7 @@ group by A.couponId
 		
 		
 		$unionUid = $user['unionId'];
+		$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 		
 		if(!empty($unionUid)){
 			// 如果用户已经银联注册，需要先从银联下载
@@ -1025,7 +1032,7 @@ group by A.couponId
 			
 		
 			// 从银联下载优惠券
-			$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
+	
 			
 			$result = $this->user->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
@@ -1041,14 +1048,28 @@ group by A.couponId
 		}
 	
 		// 服务器下载快券
-		$result2 = $this->user->download_coupon($uid,$couponId, $transSeq);
+		$couponId = $this->user->download_coupon($uid,$couponId, $transSeq);
 
-		if ($result2 === true){
-			return $this->output_success();
-		}
-		else{
+		// 是否应该在这里做download的increment工作？
+		
+		if($couponId === false){
+			
+			log_message('error','Insert DownloadedCoupon: uid# '.$uid.', couponId #'.$couponId);
+			
 			return $this->output_error(ErrorDBInsert);
 		}
+		else{
+			
+			if($this->coupon->dcount_increment($couponId) != true){
+				//如果自增没有完成，log
+				
+				log_message('error','DCount Increment: uid # '.$uid,', couponId #',$couponId,',downloadedCouponId #'.$id);
+			}
+			
+			return $this->output_success();
+		}
+		
+	
 		
 	
 	}
@@ -1952,6 +1973,7 @@ LIMIT $skip,$limit");
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
 		$this->db->where('A.shopId',$shopId);
 		$this->db->where('A.id !=',$cid);
+		$this->db->where('A.active',1);
 		
 		$query = $this->db->get();
 		$results = $query->result_array();	
@@ -1960,9 +1982,10 @@ LIMIT $skip,$limit");
 		
 		/// otherCoupons
 
-		$query = $this->db->query(" SELECT A.id, A.title,  B.avatarUrl, B.discountContent
+		$query = $this->db->query("SELECT A.id, A.title,  B.avatarUrl, B.discountContent
 FROM (coupon as A)
 JOIN couponcontent as B ON A.id = B.couponId
+where A.active = 1
 limit 3");
 		$results = $query->result_array();
 		$coupon['otherCoupons'] = $results;
@@ -1974,12 +1997,12 @@ limit 3");
 		
 			$query = $this->db->query("SELECT id,shopId,title,address,districtId,longitude,latitude,
 
-			openTime,phone,logoUrl FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId");
+			openTime,phone,logoUrl FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId and A.active=1");
 
 		}
 		else{
 			
-			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($latitude -`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($longitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId ORDER BY `distance`");
+			$query = $this->db->query("SELECT *,(2 * 6378.137* ASIN(SQRT(POW(SIN(PI()*($latitude -`latitude`)/360),2)+COS(PI()*$latitude/180)* COS(`latitude` * PI()/180)*POW(SIN(PI()*($longitude-`longitude`)/360),2)))) as distance FROM (`shopbranch` as A) WHERE `A`.`shopId` = $shopId and A.active=1 ORDER BY `distance`");
 		}
 	
 		$results = $query->result_array();	
@@ -1995,7 +2018,6 @@ limit 3");
 		
 	  	return $this->output_results($coupon);
 	  	
-	  	//print_r($results);exit;
 	 
 	  }
 	  
@@ -2105,17 +2127,20 @@ AND active = 1");
 
 		$response = $this->kqsms->send_register_sms($mobile,$captcha);
 		
-		$this->db->query("insert into s_sms (type,code,mobile) values ('register',$response,$mobile)");
-		
 		if ($response === true){
 
+			$this->db->query("insert into s_sms (type,code,mobile) values ('register',$response,$mobile)");
+			
 			$captchaMd5 = md5($captcha);
 		
 			return $this->output_results(array('captcha'=>$captchaMd5));
+			
 		}
 		else{
 //			echo 'failure';
-
+			
+			log_message('error','SMS Register error #'.$response.', mobiel # '.$mobile);
+			
 			return $this->output_error(ErrorFailureSMS);
 		}
 		
@@ -2135,10 +2160,10 @@ AND active = 1");
 	
 		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
 
-		$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
+		
 		
 		if ($response === true){
-
+			$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
 
 			$captchaMd5 = md5($captcha);
 		
@@ -2148,10 +2173,25 @@ AND active = 1");
 			
 //			echo 'failure';
 
+			log_message('error','SMS Forget error #'.$response.', mobiel # '.$mobile);
+			
 			return $this->output_error(ErrorFailureSMS);
 		}
 		
 	}
+	
+	
+//	public function 
+	
+	public function sleep_dcoupon_get(){
+		
+		sleep(5);
+		
+		$this->coupon->dcount_increment(36);
+		
+		return $this->output_results('10s后的返回');
+	}
+	
 	
 	
 	//----------------------Private----------------------

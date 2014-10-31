@@ -1,11 +1,8 @@
 <?php
 
 
-class Kqsms{
-	 
-//	private $host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
-	private $account = 'cf_yuece';
-	private $password = '1234567';
+class Kqlibrary{
+	
 	
 	
      public function __construct(){
@@ -15,8 +12,11 @@ class Kqsms{
 
 	public function test(){
 		
-		return 'kqsms'; 
+		return 'kqlibrary'; 
 	}
+	
+	
+	
 	
 	/**
 	 * 
@@ -41,15 +41,15 @@ class Kqsms{
 			return $code;
 	}
 	
-//	public function mock_send_register_sms($mobile, $captcha){
-//		
-//		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
-//		
-//		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
-//		
-//		return $url;
-//		
-//	}
+	public function mock_send_register_sms($mobile, $captcha){
+		
+		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+		
+		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+		
+		return $url;
+		
+	}
 	
 	public function send_forgetpwd_sms($mobile, $captcha){
 		
@@ -70,14 +70,14 @@ class Kqsms{
 		
 	}
 	
-//	public function mock_send_forgetpwd_sms($mobile, $captcha){
-//		
-//		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
-//		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
-//		
-//		return $url;
-//		
-//	}
+	public function mock_send_forgetpwd_sms($mobile, $captcha){
+		
+		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+		
+		return $url;
+		
+	}
 	
 	public function send_coupon_accepted_sms($mobile,$coupon){
 	
@@ -88,14 +88,14 @@ class Kqsms{
 		return $this->get($url);
 	}
 	
-//	public function mock_send_coupon_accepted_sms($mobile,$coupon){
-//	
-//		$content = "您的优惠券刚刚被承兑";
-//		
-//		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
-//		
-//		return $url;
-//	}
+	public function mock_send_coupon_accepted_sms($mobile,$coupon){
+	
+		$content = "您的优惠券刚刚被承兑";
+		
+		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+		
+		return $url;
+	}
 	
 //	public function insert_db(){
 //	

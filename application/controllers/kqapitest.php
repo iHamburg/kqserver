@@ -162,6 +162,7 @@ class Kqapitest extends CI_Controller{
 		echo $response;
 	}
 	
+	// 回去银联接口下载
 	function test_download_coupon($servername){
 		$host = get_host($servername);
 		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/';
@@ -176,14 +177,14 @@ class Kqapitest extends CI_Controller{
 	
 	function test_captcha_register($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
+		$url = $host.'/kq/index.php/kqapi4/captcharegister/mobile/1316636102333';
 		$response = get($url);
 		echo $response;
 	}
 	
 	function test_mynews($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi4/myNews/uid/35/lastNewsId/10';
+		$url = $host.'/kq/index.php/kqapi4/myNews/uid/84/lastNewsId/0';
 		$response = get($url);
 		echo $response;
 	}
@@ -462,19 +463,33 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 	function test(){
 			
-//		$query = $this->db->query('select * from user where id>10');
-//		var_dump($query);
-//		
-//		echo '<br>';
-//		
-//		$query->free_result();
-//		var_dump($query);
-
-		$query = $this->db->query("insert into bank (title) values ('浦发银行')");
-	
-		var_dump($query);
+		echo 'begin';
 		
-		echo 'aaa';
+		$url = 'http://61.153.100.241/kq/index.php/kqapi4/sleep_dcoupon';
+		
+//		$url = 'localhost/kq/index.php/kqapi4/sleep_dcoupon';
+		
+//		$response = get($url);
+		
+//		echo $response;
+		
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt ($ch,  CURLOPT_NOSIGNAL,true);
+	//	curl_setopt($ch, CURLOPT_TIMEOUT, 1);
+	
+		curl_setopt($ch, CURLOPT_TIMEOUT_MS, 100);
+	
+		$output = curl_exec($ch);
+		curl_close($ch);
+		
+		
+		
+		echo 'end';
 	}
 		
 

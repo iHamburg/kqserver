@@ -35,30 +35,10 @@ AND `expireDate` > now()");
 	
 	}
 	
-	
-//	public function isSessionValid2($uid,$sessionToken){
-//
-//
-//		$query = $this->db->query(" SELECT COUNT(*) AS `numrows`FROM (`user`)
-//WHERE `id` =  $uid
-//AND sessionToken = '$sessionToken'
-//AND `expireDate` > now()");
-//		$results = $query->result_array();
-//		
-//		$result = $results[0];
-//		$count = $result['numrows'];
-//		
-//		if ($count == 0){
-//			return false;
-//		}
-//		else{
-//			return true;
-//		}
-//		
-//	}
+
 
 	/**
-	 * 
+	 * 返回true 或 false 
 	 * 
 	 * @param unknown_type $uid
 	 * @param unknown_type $unionId
@@ -73,6 +53,20 @@ AND `expireDate` > now()");
 		else 
 			return false;
 	}
+	
+	/**
+	 * 当银联通知票券承兑，修改数据库， 把downloadedcoupon的
+	 * 
+	 * @param unknown_type $uid
+	 * @param unknown_type $unionUid
+	 * @param unknown_type $unionCouponId
+	 */
+	public function accept_coupon($uid, $unionCouponId){
+		
+		$this->db->query("");
+		
+	}
+	
 	
 	public function get_dcoupons($uid,$mode='unused',$limit=30,$skip=0){
 		
@@ -117,12 +111,9 @@ AND `expireDate` > now()");
 	}
 	
 	
-//	public function register_union($)
-	
-	
 	/**
 	 * 
-	 * 如果成功返回新插入的id
+	 * 服务器写入下载快券， 如果成功返回新插入的id
 	 * @param unknown_type $uid
 	 * @param unknown_type $couponId
 	 * @param unknown_type $transSeq
@@ -132,16 +123,22 @@ AND `expireDate` > now()");
 	
 			// 如果用户可以继续下载
 	
-			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
+//			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
 
-			
+			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ($uid,$couponId,'$transSeq',null)");
+		
 			if ($this->db->affected_rows() == 0){
 			/// 如果下载失败
 				return false;
 
 			}
 			else{
-				return true;
+//				
+				//调用内部服务器的数据库更新
+				
+				$id =  $this->db->insert_id();
+
+				return $id;
 			}
 
 	}
