@@ -36,6 +36,7 @@ define("ErrorUnionUnknown", 300000);
 define("ErrorUnionInvalidCoupon", 500046);
 define("ErrorUnionInvalidParameter", 300002);
 define("ErrorUnionEmptyUser", 300200);  // 查询结果
+define("ErrorUnionNoCardBunden", 500058);
 
 
 define("ErrorUnionGetUser", 900);
@@ -129,6 +130,9 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionLimitCardNumber:
 		  $msg = '超过最大开通钱包服务的卡的数量';
+		break;
+		case ErrorUnionNoCardBunden:
+			$msg = '没有绑卡的用户不能下载';
 		break;
 		case ErrorUnionUnknown:
 		  $msg = '未知银联错误';

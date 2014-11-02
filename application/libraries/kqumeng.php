@@ -8,13 +8,19 @@ class Kqumeng{
 	private $appkey = '5445cf0bfd98c5d70001d213';
 	private $appMasterSecret = 'bqalj5hvoltwhiy9gtmnthurulr8woxf';
 	
-	
+	public $name = '';
 	
      public function __construct(){
 		
-//		echo 'kqsms init';
+		echo 'kqumeng init';
 	}
 
+	public function display($haha){
+		
+		$name = $this->name;
+		echo "display $name # $haha";
+	}
+	
 	public function test(){
 		
 		return 'kqsms';

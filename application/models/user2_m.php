@@ -112,11 +112,11 @@ AND `expireDate` > now()");
 	
 	
 	/**
-	 * 
-	 * 服务器写入下载快券， 如果成功返回新插入的id
+	 * 服务器插入下载快券
 	 * @param unknown_type $uid
 	 * @param unknown_type $couponId
 	 * @param unknown_type $transSeq
+	 * @return 如果成功返回新插入的id, 失败返回false
 	 */
 	public function download_coupon($uid,$couponId, $transSeq){
 		
@@ -144,7 +144,15 @@ AND `expireDate` > now()");
 	}
 
 
-
+	/**
+	 * 从银联下载优惠券
+	 * @param  $uid
+	 * @param  $mobile
+	 * @param  $unionUid
+	 * @param unknown_type $unionCouponId
+	 * @param unknown_type $transSeq
+	 * @return 成功返回data数组， 失败返回respCd
+	 */
 	public function download_union_coupon($uid,$mobile,$unionUid,$unionCouponId, $transSeq){
 		
 		
@@ -245,12 +253,14 @@ AND `expireDate` > now()");
 
 	
 	/**
-	 * 
-	 * 返回true，表示成功
+	 * 银联解绑卡
+	 * 成功返回true
+	 * 失败反悔respCd
 	 * @param unknown_type $unionUid
 	 * @param unknown_type $cardNo
 	 */
 	public function unbind_union_card($unionUid, $cardNo){
+		
 		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
 		
 		$response = json_decode($response,true);

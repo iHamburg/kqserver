@@ -13,22 +13,22 @@ require(APPPATH.'libraries/REST_Controller.php');
 class Kqapi4 extends REST_Controller
 {
 	
+	
 	/**
 	 * 
 	 * Enter description here ...
-	 * @var User2_m;
+	 * @var User2_m
 	 */
 	var $user;
 	
-	
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @var Kqsms
-	 */
-	var $kqsms;
-	
+//	
+//	/**
+//	 * 
+//	 * Enter description here ...
+//	 * @var Kqsms
+//	 */
+//	var $kqsms;
+//	
 	
 	
 	/**
@@ -55,6 +55,9 @@ class Kqapi4 extends REST_Controller
 		$this->load->model('user2_m','user');
 		$this->load->model('card2_m','card');
 		$this->load->model('coupon2_m','coupon');
+		
+		
+		
 	}
 	
 	function index(){
@@ -544,7 +547,6 @@ and id>$lastNewsId");
 			}
 		}
 
-//		echo 'UnionId'.$unionUid;
 		//如果用户已经有了银联帐号，直接绑卡--------绑卡----------
 		$response = $this->user->bind_union_card($unionUid,$cardNo);
 		
@@ -800,18 +802,17 @@ and id>$lastNewsId");
 		$this->load->model('card2_m','card');
 		
 		$cardNo = $card;
+		
 		$card = $this->card->get_by($data);	
 		
 		
 		if(empty($card)){
 			///如果数据库里已经绑定了这张卡,报错
-			
 			return $this->output_error(ErrorEmptyCard);
-		
 			
 		}
 
-		
+	
 		$unionUid = $user['unionId'];
 		
 //		return $this->output_results($user);
@@ -824,26 +825,32 @@ and id>$lastNewsId");
 		// 银联解绑
 		$response = $this->user->unbind_union_card($unionUid, $cardNo);
 		
+		
 //		echo 'unionId'.$unionUid;
 //		echo 'card'.$cardNo;
 //		return $this->output_results($response);
 		
-		if($response === true){
-			// 银联解绑成功
 		
-			$this->card->delete_by($data);
-			
-			if ($this->db->affected_rows() < 1){
-				return $this->output_error(ErrorDBDelete);
-			}
-			
-			return $this->output_success();
+		if($response == ErrorUnionInvalidParameter){
+			// 如果参数不对错误
+			return $this->output_error($response);
 		}
-		else{
-			// 银联解绑失败
+		else if($response !== true){
+			// 如果其他未知错误
 			return $this->output->error(ErrorUnionUnbindCard);
 		}
-	
+		
+		// 银联解绑成功
+		
+		// 服务器删除银行卡
+		$this->card->delete_by($data);
+			
+		if ($this->db->affected_rows() < 1){
+			return $this->output_error(ErrorDBDelete);
+		}
+		else{
+			return $this->output_success();
+		}
 		
 	}
 	
@@ -1019,25 +1026,26 @@ group by A.couponId
 		$unionUid = $user['unionId'];
 		$transSeq = "C$uid"."D$couponId"."T".now();  //C+uid+ unionCouponId + datetime
 		
+		// 如果用户绑定银联钱包，先从银联下载优惠券
 		if(!empty($unionUid)){
-			// 如果用户已经银联注册，需要先从银联下载
 			
 			$coupon = $this->coupon->get($couponId);
-			
+
 			$unionCouponId = $coupon['unionCouponId'];
 		
 			if(empty($unionCouponId)){
 				return $this->output_error(ErrorEmptyUnionCouponId);
 			}
-			
 		
 			// 从银联下载优惠券
 	
 			
 			$result = $this->user->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
-			//处理无效的uionUid和unionCouponId错误
-			 if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter){
+			
+			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
+
+				//处理无效的uionUid和unionCouponId, 用户没有绑卡错误
 				return $this->output_error($result);
 			}
 			else if(!is_array($result)){
@@ -1045,8 +1053,12 @@ group by A.couponId
 				return $this->output_error(ErrorUnionDownloadCoupon);
 			}
 			
+			//成功从银联下载了优惠券
+			
 		}
 	
+		//
+		
 		// 服务器下载快券
 		$couponId = $this->user->download_coupon($uid,$couponId, $transSeq);
 
@@ -1289,8 +1301,6 @@ group by A.couponId
 		$couponId = $this->post('couponId');	
 		$sessionToken = $this->post('sessionToken');
 		
-   		
-	
 	
 		$this->load->model('user2_m','user');
 

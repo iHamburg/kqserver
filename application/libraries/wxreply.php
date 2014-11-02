@@ -19,6 +19,8 @@ class Wxreply{
 		$CI->load->helper('array');
 		$arr2 = random_element(array());
 		print_r($arr2);
+		
+		echo 'blabla';
 	}
 
   public function replyText($text){

@@ -3,7 +3,7 @@
  * @author qing
  *
  */
-
+require(APPPATH.'libraries/phpmailer/PHPMailerAutoload.php'); 
 
 
 class Kqtest extends CI_Controller{
@@ -136,11 +136,52 @@ class Kqtest extends CI_Controller{
 		
 	
 	 public function message($to = 'World')
-	  {
+	 {
 	    echo "Hello {$to}!".PHP_EOL;
 	  }
 
+	public function testmail(){
 	
+	
+		$mail = new PHPMailer;
+	
+		//$mail->SMTPDebug = 3;                               // Enable verbose debug output
+		
+		$mail->isSMTP();                                      // Set mailer to use SMTP
+		$mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+		$mail->SMTPAuth = true;                               // Enable SMTP authentication
+		$mail->Username = 'tominfrankfurt@gmail.com';                 // SMTP username
+		$mail->Password = 'Qingxin805328';                           // SMTP password
+		$mail->SMTPSecure = 'ssl';                            // Enable TLS encryption, `ssl` also accepted
+		$mail->Port = 465;                                    // TCP port to connect to
+		
+		$mail->From = 'tominfrankfurt@gmail.com';
+		$mail->FromName = 'tom';
+		$mail->addAddress('tominfrankfurt@gmail.com', 'Joe User');     // Add a recipient
+		//$mail->addAddress('ellen@example.com');               // Name is optional
+		//$mail->addReplyTo('info@example.com', 'Information');
+		//$mail->addCC('cc@example.com');
+		//$mail->addBCC('bcc@example.com');
+		
+		$mail->WordWrap = 50;                                 // Set word wrap to 50 characters
+		//$mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
+		//$mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
+		$mail->isHTML(true);                                  // Set email format to HTML
+		
+		$mail->Subject = 'Here is the subject';
+		$mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+		$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+		
+		if(!$mail->send()) {
+		    echo 'Message could not be sent.';
+		    echo 'Mailer Error: ' . $mail->ErrorInfo;
+		} else {
+		    echo 'Message has been sent';
+		}
+		
+	}
+	  
+	  
 	public function test(){
 //	
 //		$this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ('sdfsdf',1,1,null) ");
