@@ -333,7 +333,7 @@ function asyn_get($url){
     $curl_error = curl_error($ch);
 	
  	if($curl_errno >0){  
-          echo "cURL Error ($curl_errno): $curl_error\n";  
+//          echo "cURL Error ($curl_errno): $curl_error\n";  
     }
     
 	curl_close($ch);

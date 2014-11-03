@@ -1,7 +1,7 @@
 <?php
 
 
-class Shop2_m extends MY_Model{
+class News2_m extends MY_Model{
 	
 	
 	public $_table = 'shop';

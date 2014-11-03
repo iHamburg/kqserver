@@ -11,13 +11,19 @@ require(APPPATH.'libraries/REST_Controller.php');
 class Kqunionapi extends CI_Controller
 {
 
-	
-	//
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Kqlibrary
+	 */
+	var $kqlibrary;
 	
 	function __construct(){
 		parent::__construct();
 		
 		header("Content-type: application/json; charset=utf-8");
+		
+		$this->load->library('kqlibrary');
 		
 	}
 	
@@ -87,13 +93,12 @@ transFwdInsId 	string 	可选 	交易发送机构
 		
 		// 如果是要异步调用的话，一定要是api，否则也可以在这里做 
 		// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
+//		$this->kqlibrary->accept_coupon($uid, $unionCouponId)
+		
+		
 		// 如果能获得uid，就不用join user了
-//		
+
 		
-		// 先把downloadedcoupon的status改成used，
-		
-		
-		// 然后把user-》increment
 		
 		$response = array('respCd'=>'000000','msg'=>'');
 		echo json_encode($response);

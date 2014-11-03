@@ -54,7 +54,7 @@ class Kqapitest extends CI_Controller{
 		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
-		$apiLink = array('test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
+		$apiLink = array('test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
 			'test_captcha_register','test_mynews','test_search');
 		$apiTitle = $apiLink;
 		
@@ -72,6 +72,24 @@ class Kqapitest extends CI_Controller{
 		$this->load->view('vtestsuit', $data);
 		
 	}
+	
+	function test_register($servername){
+		
+		$host = get_host($servername);
+		
+		$url = $host.'/kq/index.php/kqapi4/user';
+	
+		
+//		echo $url;
+//		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
+		
+		$post = array('username'=>'3222222','password'=>'ddd');
+		
+		$response = post($url,$post);
+		
+		echo $response;
+	}
+	
 	
 	function test_userinfo($servername){
 		
@@ -156,7 +174,8 @@ class Kqapitest extends CI_Controller{
 
 	function test_get_download_coupon($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57';
+//		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57';
+		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/mode/expired';
 		
 		$response = get($url);
 		echo $response;
@@ -192,7 +211,7 @@ class Kqapitest extends CI_Controller{
 	function test_search($servername){
 		
 		$host = get_host($servername);
-		$url =  $host.'/kq/index.php/kqapi4/searchCoupons2';
+		$url =  $host.'/kq/index.php/kqapi4/searchCoupons';
 		
 //		$url.='/districtId/13';
 //		$url.='/shopTypeId/1';
@@ -208,6 +227,24 @@ class Kqapitest extends CI_Controller{
 		
 	}
 	
+	function test_async_get($servername){
+		
+		$host = get_host($servername);
+		$url =  $host.'/kq/index.php/kqapi4/batchDownloadUnionCoupon/uid/22';
+		
+//		$url.='/districtId/13';
+//		$url.='/shopTypeId/1';
+
+		$url.='/longitude/121.4/latitude/31.2';
+		$url.='/keyword/0';
+		$url.='/limit/20';
+		
+		$response = get($url);
+		
+		echo $response;
+	
+		
+	}
 	
 	function testFavoriteCoupon(){
 		$url = 'localhost/kq/index.php/kqapi4/myFavoritedCoupon';
@@ -386,15 +423,7 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 		echo $response;
 	}
 	
-	
-	function test_register(){
-		$url = 'http://localhost/kq/index.php/kqapi4/user';
-	
-//		$post = array('username'=>'13166361024','password'=>"111");
-		
-		$response = post($url,$post);
-		echo $response;
-	}
+
 	
 	function test_union(){
 		

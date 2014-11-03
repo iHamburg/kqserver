@@ -24,14 +24,27 @@ class Kqtest extends CI_Controller{
 	var $user;
 	
 	
-//	var $host = 'http://localhost';
-	//
-	//
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Kqlibrary
+	 */
+	var $kqlibrary;
+	
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Kqsms
+	 */
+	var $kqsms;
+	
 	function __construct(){
 		parent::__construct();
 		
 		$this->load->model('user2_m','user');
 		$this->load->model('coupon2_m', 'coupon');
+		$this->load->library('kqlibrary');
+//		$this->load->library('kqsms');
 	}
 	
 
@@ -55,7 +68,7 @@ class Kqtest extends CI_Controller{
 		$linkPrepend = 'http://localhost/kq/index.php/kqtest/';
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
-		$apiLink = array('test_dcoupon','test_error_log','test_coupon_dincrement','test_acoupon_increment');
+		$apiLink = array('test_dcoupon','test_error_log','test_coupon_dincrement','test_acoupon_increment','test_accept_coupon','test_bind_card_sms');
 		$apiTitle = $apiLink;
 		
 		
@@ -100,7 +113,7 @@ class Kqtest extends CI_Controller{
 		echo $this->coupon->increment_acount(36);
 	}
 	
-	function test_coupon_accepted(){
+	function test_remote_coupon_accepted(){
 			
 //		$query = $this->db->query('select * from user where id>10');
 //		var_dump($query);
@@ -134,6 +147,16 @@ class Kqtest extends CI_Controller{
 		$this->uCouponAccepted->insert($data);
 	}
 		
+	function test_accept_coupon(){
+		
+		echo $this->kqlibrary->accept_coupon(33, 'D00000000008029');
+	}
+	
+	function test_bind_card_sms(){
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		$this->load->library('kqsms');
+		echo $this->kqsms->send_bind_card_sms('13166361023', '99999999');
+	}
 	
 	 public function message($to = 'World')
 	 {
@@ -191,21 +214,27 @@ class Kqtest extends CI_Controller{
 		// 调用这个接口，echo 'sss'之后，调用api 或 lib？
 		
 		
-	$fp = fsockopen("www.baidu.com",
-     80, $errno, $errstr, 30);   
-    if (!$fp) {   
-    	echo "$errstr ($errno)<br />\n";   
-    } else {   
-	    $out = "GET / HTTP/1.1\r\n";   
-	    $out .= "Host: www.baidu.com\r\n";   
-	    $out .= "Connection: Close\r\n\r\n";   
-     
-   		 fwrite($fp, $out);   
-    while (!feof($fp)) {   
-   		 echo fgets($fp, 128);   
-    }   
-  		  fclose($fp);   
-    }  
+//	$fp = fsockopen("www.baidu.com",
+//     80, $errno, $errstr, 30);   
+//    if (!$fp) {   
+//    	echo "$errstr ($errno)<br />\n";   
+//    } else {   
+//	    $out = "GET / HTTP/1.1\r\n";   
+//	    $out .= "Host: www.baidu.com\r\n";   
+//	    $out .= "Connection: Close\r\n\r\n";   
+//     
+//   		 fwrite($fp, $out);   
+//    while (!feof($fp)) {   
+//   		 echo fgets($fp, 128);   
+//    }   
+//  		  fclose($fp);   
+//    }  
+		
+		$str_bh='123456789';
+		$abc=substr($str_bh,-4);
+
+		echo $abc;
+
 		
 	}
 

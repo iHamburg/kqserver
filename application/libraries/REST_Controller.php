@@ -1366,7 +1366,7 @@ abstract class REST_Controller extends CI_Controller
 	}
 
 	/**
-	 * @todo Document this.
+	 *
 	 */
 	protected function _prepare_digest_auth()
 	{

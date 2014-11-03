@@ -54,23 +54,12 @@ AND `expireDate` > now()");
 			return false;
 	}
 	
-	/**
-	 * 当银联通知票券承兑，修改数据库， 把downloadedcoupon的
-	 * 
-	 * @param unknown_type $uid
-	 * @param unknown_type $unionUid
-	 * @param unknown_type $unionCouponId
-	 */
-	public function accept_coupon($uid, $unionCouponId){
-		
-		$this->db->query("");
-		
-	}
+
 	
 	
 	public function get_dcoupons($uid,$mode='unused',$limit=30,$skip=0){
 		
-		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent');
+		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent');
 		$this->db->from('downloadedcoupon as A');
 		$this->db->where('uid',$uid);
 		if($mode == 'unused'){
@@ -88,6 +77,17 @@ AND `expireDate` > now()");
 		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
 		$this->db->group_by('A.couponId');
 		$this->db->limit($limit,$skip);
+		
+//		$query = " SELECT `A`.`couponId`, count(A.couponId) as number, `B`.`title`, `B`.`endDate`, `C`.`avatarUrl`, `C`.`discountContent`
+//FROM (`downloadedcoupon` as A)
+//LEFT JOIN `coupon` as B ON `A`.`couponId` = `B`.`id`
+//LEFT JOIN `couponcontent` as C ON `A`.`couponId` = `C`.`couponId`";
+//		
+//$query.="WHERE `uid` =  $uid
+//AND `status` =  'unused'
+//AND `B`.`endDate` > now()
+//GROUP BY `A`.`couponId`
+//LIMIT $skip,$limit ";
 		
 		$query = $this->db->get();
 		
@@ -107,6 +107,25 @@ AND `expireDate` > now()");
 	 */
 	public function can_user_dcoupon($uid,$couponId){
 		
+		//TODO 活动快券的判定
+		
+		// 如果coupon是event，并且downloadedcoupon里有了，返回false
+		
+		$query = $this->db->query("select count(*) as num
+from downloadedcoupon A
+left join coupon B
+on A.couponId=B.id
+where B.`isEvent`=1
+and A.uid=$uid
+and A.couponId=$couponId");
+		
+		$results = $query->result_array();
+		$num = $results[0]['num'];
+		
+		if($num>0){
+			//如果用户已经下载过该活动快券，返回false
+			return false;
+		}
 		return true;
 	}
 	
@@ -123,8 +142,6 @@ AND `expireDate` > now()");
 	
 			// 如果用户可以继续下载
 	
-//			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq) values ($uid,$couponId,'$transSeq')");
-
 			$query = $this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ($uid,$couponId,'$transSeq',null)");
 		
 			if ($this->db->affected_rows() == 0){
@@ -144,62 +161,8 @@ AND `expireDate` > now()");
 	}
 
 
-	/**
-	 * 从银联下载优惠券
-	 * @param  $uid
-	 * @param  $mobile
-	 * @param  $unionUid
-	 * @param unknown_type $unionCouponId
-	 * @param unknown_type $transSeq
-	 * @return 成功返回data数组， 失败返回respCd
-	 */
-	public function download_union_coupon($uid,$mobile,$unionUid,$unionCouponId, $transSeq){
-		
-		
-		$data['chnlUsrId'] = $uid;
-		$data['chnlUsrMobile'] = $mobile;
-		$data['couponId'] = $unionCouponId;
-		$data['couponNum'] = '1';
-		$data['couponSceneId'] = '000';
-		$data['transSeq'] = $transSeq;
-		$data['userId'] = $unionUid;
-		
-//		print_r($data);
-		
-		$response = $this->unionpay->couponDwnById($data);
-	
-		$response = json_decode($response,true);
-		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
-			return $response['data'];
-		}
-		else {
-			return $respCd;
-		}
-		
-	}
-	
-	/**
-	 * 
-	 * Enter description here ...
-	 * @param unknown_type $uid
-	 */
-	public function download_batch_coupons($uid, $mobile, $unionUid, $coupons){
-		
-		foreach ($coupons as $coupon) {
-			$couponId = $coupon['id'];
-			$unionCouponId = $coupon['unionCouponId'];
-//			$transSeq = $coupon['transSeq'];
-	// transSeq 要从
-			
-			// 如果没有unioncouponid， 跳出
-			if (empty($unionCouponId) )
-				continue;
-			
-			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
-		}
-	}
+
+
 	
 	/**
 	 * 
@@ -288,6 +251,12 @@ AND `expireDate` > now()");
 	function update_password($username,$password){
 		$this->db->query("update user set password = '".$password."' where username = '".$username."'");
 		return $this->db->affected_rows();
+	}
+	
+	function test(){
+
+		return 'user_m test';		
+
 	}
 
 }
