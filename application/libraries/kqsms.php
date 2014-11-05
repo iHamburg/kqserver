@@ -26,7 +26,8 @@ class Kqsms{
 	 */
 	public function send_register_sms($mobile, $captcha){
 		
-		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+//		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+		$content = "注册验证码：【".$captcha."】，请完成验证。如非本人操作，千万提高警惕，一定有人在惦记着你！";
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
 		$response = $this->get($url);
@@ -53,8 +54,8 @@ class Kqsms{
 	
 	public function send_forgetpwd_sms($mobile, $captcha){
 		
-		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
-
+//		$content = "您的验证码是：【".$captcha."】。请不要把验证码泄露给其他人。";
+		$content = "找回密码验证码：【".$captcha."】，请完成验证。如非本人操作，千万提高警惕，一定有人在惦记着你！";
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
 		$response = $this->get($url);
@@ -70,10 +71,10 @@ class Kqsms{
 		
 	}
 	
-	public function send_bind_card_sms($mobile,$cardNo){
+	public function send_bind_card_sms($mobile,$endCardNo){
 	
 		
-		$endCardNo =substr($cardNo,-4);
+	
 		
 //		
 		$content = "尾号【".$endCardNo."】的银联卡已在快券添加成功，您会同时收到来自银联的相关服务通知！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";

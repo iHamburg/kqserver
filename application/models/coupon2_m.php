@@ -43,6 +43,24 @@ class Coupon2_m extends MY_Model{
 			return false;
 		}
 	}
+	
+	public function get_complete_title($couponId){
+		
+		$query = $this->db->query("select A.title , B.`discountContent`
+from coupon A
+left join couponcontent B
+on A.id=B.couponId
+where A.id=$couponId");
+		
+		$results = $query->result_array();
+		
+		$result = $results[0];
+		
+		$title = $result['title'].$result['discountContent'];
+		
+		return $title;
+		
+	}
 
 	
 }

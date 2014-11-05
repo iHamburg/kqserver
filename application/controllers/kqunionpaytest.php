@@ -167,8 +167,12 @@ sp5Ykcw0iwSbUA==
 //		$mobile = '15166412996';
 		
 		if (empty($mobile)){
-			$mobile = '13166361023';
-//			$mobile = '15166412996';
+//			$mobile = '13917368904';
+
+			$mobile = '13816773779';
+			
+//			$mobile = '13166361023';
+//			
 		}
 		$response = $this->unionpay->getUserByMobile($mobile);
 
@@ -252,7 +256,8 @@ sp5Ykcw0iwSbUA==
 //		$cardNo = '6222021001128509530';
 		$userId = 'c00055685346';
 		$cardNo = '6222021001128509533';
-		
+//		$cardNo = '6225210218627927';
+				
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 
 		echo $response;

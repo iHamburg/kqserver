@@ -291,10 +291,13 @@ class Kqapi4 extends REST_Controller
 
 		$img = base64_decode($avatar);
 		
-		$data = file_put_contents("public/uploads/avatar_$uid.jpg", $img);
+		$timestamp = now();
+		$filePath = "public/uploads/avatar_$uid_$timestamp.jpg";
+		$data = file_put_contents($filePath, $img);
+		
 		
 		if(!empty($data)){
-			$avatarurl = base_url("public/uploads/avatar_$uid.jpg");
+			$avatarurl = base_url($filePath);
 			$this->db->query("update user set avatarUrl='$avatarurl' where id=$uid");
 		}
 		
@@ -509,19 +512,22 @@ and id>$lastNewsId");
 		$unionUid = $user['unionId'];
 		$username = $user['username'];
 					
-		
+//		return $this->output_results($unionUid);
 		//凡事数据库没有unionUid，说明没有绑定银联用户，如果成功注册或是登录，需要把之前下载的快券登记到银联中去
 		if(empty($unionUid)){
 			//如果用户没有unionId，先查询再注册, 获得unionUid
-					
-			$unionUser = $this->user->get_union_user($username);
+	
+//			$unionUser = $this->user->get_union_user($username);
+			$unionUser = $this->kqlibrary->get_union_user($username);
+			
+//			return $this->output_results($unionUser);
+
 		
-//			var_dump($unionUser);
-		
-		 	if($unionUser == ErrorUnionEmptyUser ){
+		 	if($unionUser == ErrorUnionEmptyUser){
 			//如果银联没有该用户，说明需要注册 
 			
-		 		$response = $this->user->register_union($username);
+//		 		$response = $this->user->register_union($username);
+		 		$response = $this->kqlibrary->register_union($username);
 		 		
 		 		if (!is_array($response)){
 		 			// 如果注册没有成功，报错
@@ -559,9 +565,13 @@ and id>$lastNewsId");
 		}
 
 		//用户已经绑定银联帐号，绑卡
-		$response = $this->user->bind_union_card($unionUid,$cardNo);
 		
-//		return $this->output_results($response);
+//		echo "unionId $unionUid, cardno # $cardNo";
+		
+//		$response = $this->user->bind_union_card($unionUid,$cardNo);
+		$response = $this->kqlibrary->bind_union_card($unionUid,$cardNo);
+		
+//		return $this->output_results('aaa');
 		
 		if($response == ErrorUnionInvalidCard || $response == ErrorUnionExistCard || $response == ErrorUnionLimitCardNumber){
 			// 对于绑卡的错误判定
@@ -571,7 +581,7 @@ and id>$lastNewsId");
 		}
 		else if(!is_array($response)){
 		//绑卡其他错误
-		
+//			echo $response;
 			return $this->output_error(ErrorUnionBindCard);
 
 		}
@@ -613,23 +623,44 @@ and id>$lastNewsId");
 		 $this->db->query("insert into card (userId, title, bankTitle, bankId) values ($uid,'$cardNo','$issuerName',$bankId)"); // return 1
 	
 
-		 //发送短信
+		 ///-----发送短信
 	    $this->load->library('kqsms');
-		$smsResp = $this->kqsms->send_bind_card_sms($username, $cardNo);
+	    
+	    $endCardNo =substr($cardNo,-4);
+	    
+		$smsResp = $this->kqsms->send_bind_card_sms($username, $endCardNo);
 		 
 		// 发送的结果
  		if ($smsResp === true){
 		// 发送成功
-			$this->db->query("insert into s_sms (type,code,mobile) values ('bindcard',$response,$mobile)");
+			$this->db->query("insert into s_sms (type,code,mobile) values ('bindcard',1,$username)");
 			
 		}
 		else{
-//			echo 'failure';
+		//	echo 'failure';
 			
-			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$mobile);
-			
+			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$username);
 		}
+		
+		///-----End of 发送短信
 		 
+		/// --- 发送站内信
+		
+   		unset($data);
+   		$data['uid'] = $uid;
+   		$data['title'] = '绑定应银联卡';
+   		$data['text'] = "阁下已成功添加尾号$endCardNo的银联卡！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
+   		
+   		$this->load->model('news2_m','news');
+   		$newsId = $this->news->insert($data);
+   		
+   		if (empty($newsId)){
+   		// 如果没有insert成功
+   			log_message('error','bind card insert news error, uid #'.$uid);
+   		}
+		
+		/// --- Endof发送站内信
+		
 		// 返回银行卡的信息
 		
 		$query = $this->db->query("select * from card where title = '$cardNo'");
@@ -815,14 +846,13 @@ and id>$lastNewsId");
 		$card = $this->post('card');	
 		$sessionToken = $this->post('sessionToken');
 	
-		
-		$this->load->model('user2_m','user');
+//		echo "id: # $uid, card # $card, session # $sessionToken";
 		
 		if(empty($uid) || empty($card) || empty($sessionToken)){
 		
 			return $this->output_error(ErrorEmptyParameter);
 		}
-		
+//		$this->load->model('user2_m','user');
 		if(!$user = $this->user->isSessionValid($uid,$sessionToken)){
 
 			return $this->output_error(ErrorInvalidSession);
@@ -855,35 +885,47 @@ and id>$lastNewsId");
 			return  $this->output_error(ErrorEmptyUnionUid);
 		}
 		
-		// 银联解绑
-		$response = $this->user->unbind_union_card($unionUid, $cardNo);
+//		return $this->output_results($unionUid);
+
 		
+		// 银联解绑
+//		$response = $this->user->unbind_union_card($unionUid, $cardNo);
+		$response = $this->kqlibrary->unbind_union_card($unionUid, $cardNo);
+//		return $this->output_results('银联解绑成功');
 		
 //		echo 'unionId'.$unionUid;
 //		echo 'card'.$cardNo;
 //		return $this->output_results($response);
+
+//		echo 'resposne '.$response;
 		
 		
-		if($response == ErrorUnionInvalidParameter){
+		if($response === true){
+			// 银联解绑成功
+		
+			
+			// 服务器删除银行卡
+			$this->card->delete_by($data);
+				
+			if ($this->db->affected_rows() < 1){
+				return $this->output_error(ErrorDBDelete);
+			}
+			else{
+				return $this->output_success();
+			}
+		}
+		else if($response == ErrorUnionInvalidParameter){
 			// 如果参数不对错误
+//			echo 'invalid'.$response;
 			return $this->output_error($response);
 		}
-		else if($response !== true){
+		else {
 			// 如果其他未知错误
+//			echo 'not true';
 			return $this->output->error(ErrorUnionUnbindCard);
 		}
 		
-		// 银联解绑成功
 		
-		// 服务器删除银行卡
-		$this->card->delete_by($data);
-			
-		if ($this->db->affected_rows() < 1){
-			return $this->output_error(ErrorDBDelete);
-		}
-		else{
-			return $this->output_success();
-		}
 		
 	}
 	
@@ -1001,6 +1043,7 @@ group by A.couponId
 	
 		$this->load->model('user2_m','user');
 		
+//		echo 'mode'.$mode;
 		$results = $this->user->get_dcoupons($uid,$mode,$limit,$skip);
 		
 //		$this->output->enable_profiler(TRUE);
@@ -1094,27 +1137,6 @@ group by A.couponId
 		//
 		
 		// 服务器下载快券
-//		$couponId = $this->user->download_coupon($uid,$couponId, $transSeq);
-//		
-//
-//		// 是否应该在这里做download的increment工作？
-//		
-//		if($couponId === false){
-//			
-////			log_message('error','Insert DownloadedCoupon: uid# '.$uid.', couponId #'.$couponId);
-//			
-//			return $this->output_error(ErrorDBInsert);
-//		}
-//		else{
-//			
-//			if($this->coupon->dcount_increment($couponId) != true){
-//				//如果自增没有完成，log
-//				
-//				log_message('error','DCount Increment: uid # '.$uid,', couponId #',$couponId,',downloadedCouponId #'.$id);
-//			}
-//			
-//			return $this->output_success();
-//		}
 
 		$couponId = $this->kqlibrary->download_coupon($uid,$couponId, $transSeq);
 		
@@ -1126,7 +1148,30 @@ group by A.couponId
 			return $this->output_error(ErrorDBInsert);
 		}
 		else{
+			//如果没有绑定银联用户，发送站内信
+			if(empty($unionUid)){
+				
+				// 发送站内信
+		   		unset($data);
+		   		$data['uid'] = $uid;
+		   		$data['title'] = '绑定应银联卡';
+		   		// 要获得优惠券的完整title
+		   		$completeTitle = $this->coupon->get_complete_title($couponId);
+		   		
+		   		
+		   		$data['text'] = "您已成功下载$completeTitle快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
+		   		
+		   		$this->load->model('news2_m','news');
+		   		$newsId = $this->news->insert($data);
+		   		
+		   		if (empty($newsId)){
+		   		// 如果没有insert成功
+		   			log_message('error','download coupon insert news error, uid #'.$uid);
+		   		}
 	
+				/// --- Endof发送站内信
+			}
+			
 			return $this->output_success();
 		}
 	
@@ -1161,7 +1206,7 @@ group by A.couponId
 	
 		 	
 		
-		$this->db->select('A.couponId,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent');
+		$this->db->select('A.couponId,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent,B.active');
 		$this->db->from('favoritedcoupon as A');
 		$this->db->where('A.userId',$uid);
 		$this->db->join('coupon as B','A.couponId = B.id','left');
@@ -1645,8 +1690,9 @@ LIMIT $skip,$limit");
 		
 		$this->load->model('shopbranch2_m','shopBranch');
 		
-		$results = $this->shopBranch->get_by('shopId',$shopId);
+//		$results = $this->shopBranch->get_by('shopId',$shopId);
 		
+		$results = $this->shopBranch->get_shopbranches_from_shopId($shopId);
 		
 		return $this->output_results(array('shopbranches'=>$results));
 	}
@@ -1829,19 +1875,7 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
    	
- 	  	$query = "A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address, A.isSellOut, A.isEvent";
- 	  		
-//		if(empty($latitude) || empty($longitude)){
-//
-//			$this->db->select('A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address');
-//		
-//		}
-//		else{
-//
-//			$this->db->select("A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.downloadedCount,C.address,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
-//			
-//	
-//		}
+ 	  	$query = "A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.displayedDCount as downloadedCount,C.address, A.isSellOut, A.isEvent, C.title as shopbranchTitle"; 	  		
 
  	  	if(!empty($latitude) && !empty($longitude)){
  	  		$query.=",ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance";
@@ -1865,6 +1899,7 @@ LIMIT $skip,$limit");
 		
 		$this->db->where('A.active','1');
 		$this->db->where('B.active','1');
+		$this->db->where('C.active','1');
 
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 			
@@ -1899,7 +1934,7 @@ LIMIT $skip,$limit");
 			return $this->output_error(ErrorEmptyCouponId);
 		}
 		
- 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
+ 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.displayedDCount as downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
  	  	$this->db->from('coupon as A');
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
 		$this->db->where('A.id',$cid);
@@ -2235,10 +2270,13 @@ where B.id=$uid");
    // --------------- TEST -----------------
    public function test_get(){
    		
- 
-   	$url = site_url($this->apiName."/batchDownloadUnionCoupon");
-   	asyn_get($url);
-//   	$url = "http://www.localhost";
+   		$response = $this->user->can_user_dcoupon(57, 36);
+   	
+// 		$response = $this->kqlibrary->get_union_user('13166361023');
+   	
+//   	$url = site_url($this->apiName."/batchDownloadUnionCoupon");
+//   	asyn_get($url);
+////   	$url = "http://www.localhost";
 //   	$url = site_url();
    	
 //   		$result = array('1'=>$this->kqlibrary->test());
@@ -2250,7 +2288,7 @@ where B.id=$uid");
 //   		$this->output_results($url);
    		
    		
-   		$this->output_results($url);
+   		$this->output_results($response);
    
 //   	$this->output_success();
 

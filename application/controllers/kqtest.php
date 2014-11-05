@@ -68,14 +68,13 @@ class Kqtest extends CI_Controller{
 		$linkPrepend = 'http://localhost/kq/index.php/kqtest/';
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
-		$apiLink = array('test_dcoupon','test_error_log','test_coupon_dincrement','test_acoupon_increment','test_accept_coupon','test_bind_card_sms');
+		$apiLink = array('test_dcoupon','test_error_log','test_remote_coupon_accepted','test_coupon_dincrement','test_acoupon_increment','test_accept_coupon','test_bind_card_sms');
 		$apiTitle = $apiLink;
 		
 		
 		foreach ($apiLink as $link) {
 			$newApiLink[] = $linkPrepend.$link.'/'.$servername;
 		}
-		
 		
 		$data['title'] = '系统内部测试套装';
 		
@@ -158,6 +157,10 @@ class Kqtest extends CI_Controller{
 		echo $this->kqsms->send_bind_card_sms('13166361023', '99999999');
 	}
 	
+	function test_user(){
+		
+	}
+	
 	 public function message($to = 'World')
 	 {
 	    echo "Hello {$to}!".PHP_EOL;
@@ -206,6 +209,7 @@ class Kqtest extends CI_Controller{
 	  
 	  
 	public function test(){
+			header( 'Content-Type:text/html;charset=utf-8 ');
 //	
 //		$this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ('sdfsdf',1,1,null) ");
 //		
@@ -230,12 +234,75 @@ class Kqtest extends CI_Controller{
 //  		  fclose($fp);   
 //    }  
 		
-		$str_bh='123456789';
-		$abc=substr($str_bh,-4);
-
-		echo $abc;
+//		$str_bh='123456789';
+//		$abc=substr($str_bh,-4);
+//
+//		echo $abc;
 
 		
+//		if(1 == ErrorUnionInvalidParameter){
+//			// 如果参数不对错误
+//			echo 'invalid';
+////			return $this->output_error($response);
+//		}
+//		else{
+//			echo 'success';		
+//		}
+
+//		echo $this->coupon->get_complete_title(36);
+
+//			$this->load->library('umengpush');
+//			
+//			echo $this->umengpush->send_customized_notification(84,'hahah','lksldkfjsdkl');
+			
+//			echo $this->umengpush->sendAndroidCustomizedcast();
+			
+//			$demo = new Demo("5445cf0bfd98c5d70001d213", "bqalj5hvoltwhiy9gtmnthurulr8woxf");
+//$demo->sendAndroidCustomizedcast();
+
+//			$this->kqlibrary->test();
+
+//		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent, B.active');
+//		$this->db->from('downloadedcoupon as A');
+//		$this->db->where('uid',$uid);
+//		if($mode == 'unused'){
+//			$this->db->where('status','unused');
+//			$this->db->where('B.endDate <','now()');
+//		}
+//		else if($mode == 'used'){
+//			$this->db->where('status','used');
+//		}
+//		else if($mode == 'expired'){
+//			$this->db->where('status','unused');
+//			$this->db->where('B.endDate >','now()');
+//		}
+//		$this->db->join('coupon as B','A.couponId = B.id','left');
+//		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+//		$this->db->group_by('A.couponId');
+//		$this->db->limit($limit,$skip);
+//		
+//		$query = $this->db->get();
+		
+//		$sql = "SELECT `A`.`couponId`, count(A.couponId) as number, `B`.`title`, `B`.`endDate`, `C`.`avatarUrl`, `C`.`discountContent`,B.isSellOut,B.isEvent,B.active
+//FROM (`downloadedcoupon` as A)
+//LEFT JOIN `coupon` as B ON `A`.`couponId` = `B`.`id`
+//LEFT JOIN `couponcontent` as C ON `A`.`couponId` = `C`.`couponId`";
+//		$sql.="
+//WHERE `uid` =  $uid
+//AND `status` =  'unused'
+//AND `B`.`endDate` > now()";
+//		$sql.="
+//GROUP BY `A`.`couponId`
+//LIMIT $skip,$limit";	
+//			
+//		$results = $query->result_array();
+//		
+//		
+//		print_r($results);
+//		$this->output->enable_profiler(TRUE);
+		
+			
+			echo 'now '.now().'now string'.strtolower(now());
 	}
 
 

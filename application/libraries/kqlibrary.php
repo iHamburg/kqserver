@@ -1,7 +1,7 @@
 <?php
 
-require_once(APPPATH.'libraries/unionpay.php'); 
-//require_once(APPPATH.'libraries/kqsms.php');
+require_once(APPPATH.'libraries/unionpay.php');
+require_once(APPPATH.'libraries/umengpush.php');
 require_once(APPPATH.'models/user2_m.php'); 
 require_once(APPPATH.'models/coupon2_m.php'); 
 
@@ -30,22 +30,110 @@ class Kqlibrary{
 	 */
 	var $coupon;
 	
+	
+	
+	
      public function __construct(){
 		
 //		echo 'kqsms init';
 
-//     	$this->load->library('unionpay');
-
      	$this->unionpay = new Unionpay();
-     	$this->user = new User2_m();
+     	
+//     	$this->user = new User2_m();
      	$this->coupon = new Coupon2_m();
      	
-//     	$this->load->model('user2_m','user');
 	}
 
 
 	
 	
+	/**
+	 * 
+	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
+	 * @param unknown_type $mobile
+	 */
+	public function get_union_user($mobile){
+		
+//		$this->load->library("unionpay");
+		
+//		echo 'before get union user';
+		$response = $this->unionpay->getUserByMobile($mobile);
+		
+//		echo 'resposne'.$response;
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
+		}
+	}
+	
+	public function register_union($mobile){
+		
+//		$this->load->library("unionpay");
+		
+		$response = $this->unionpay->regByMobile($mobile);
+		
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
+		}
+	}
+	
+		public function bind_union_card($unionUid, $cardNo){
+		
+//		echo 'begin bind union card';
+
+//		$this->load->library("unionpay");
+		
+		$response = $this->unionpay->bindCard($unionUid,$cardNo);
+		
+//		echo 'response '.$response;
+		
+		$response = json_decode($response,true);
+		
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return $response['data'];
+		}
+		else {
+			return $respCd;
+		}
+	}
+	
+	/**
+	 * 银联解绑卡
+	 * 成功返回true!!!
+	 * 失败反悔respCd
+	 * @param unknown_type $unionUid
+	 * @param unknown_type $cardNo
+	 */
+	public function unbind_union_card($unionUid, $cardNo){
+		
+		$this->load->library("unionpay");
+//		echo 'begin unbind union card';
+		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
+//		echo 'response '.$response;
+		$response = json_decode($response,true);
+		
+		$respCd = $response['respCd'];
+		
+		if ($respCd == '000000'){
+			return true;
+		}
+		else {
+			return $respCd;
+		}
+	}
 	/**
 	 * 从银联下载优惠券
 	 * @param  $uid
@@ -120,10 +208,9 @@ class Kqlibrary{
 			}
 
 	}
+	
 
 
-	
-	
 	/**
 	 * 
 	 * 批量从银联下载coupons， 参数coupons应该包括 id，unionCouponId，transSeq
@@ -145,6 +232,8 @@ class Kqlibrary{
 			
 			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
 			
+//			print_r($response);
+			
 			if (!is_array($response)){
 			//如果下载银联的快券出错, 就必须把用户下载的快券从数据库中删除！ dCouponCount也应该减小
 
@@ -156,7 +245,11 @@ class Kqlibrary{
 					log_message('error',"Batch Download Coupon, delete server record error. transSeq # $transSeq");
 				}
 				
+				
+				
 			}
+			
+			// 返回array，下载成功
 			
 		}
 	}
@@ -203,6 +296,18 @@ limit 1");
 //			echo 'increment sucess';
 		}
 		
+		$umengpush = new UmengPush();
+//		
+		$completeTitle = $this->coupon->get_complete_title($couponId);
+//		$title = '优惠券承兑完成';
+		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
+
+		$umengpush->send_customized_notification($uid,$title, $text);
+		
+//		$this->load->library('umengpush');
+//			
+//		echo $this->umengpush->send_customized_notification(84,'','');
+//		
 	}
 	
 
@@ -213,7 +318,14 @@ limit 1");
 //		echo 'kqlibrary test';
 		
 //		echo $this->unionpay->test();
-		return $this->user->test();
+//		return $this->user->test();
+		
+//		$this->load->library('umengpush');
+			
+//		$this->umengpush->send_customized_notification(84,'','');
+		
+		$umengpush = new UmengPush();
+		echo $umengpush->test();
 		
 	}
 	

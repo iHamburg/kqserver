@@ -59,7 +59,43 @@ AND `expireDate` > now()");
 	
 	public function get_dcoupons($uid,$mode='unused',$limit=30,$skip=0){
 		
-		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent');
+//		echo 'mode'.$mode;
+		
+			$sql = "SELECT `A`.`couponId`, count(A.couponId) as number, `B`.`title`, `B`.`endDate`, `C`.`avatarUrl`, `C`.`discountContent`,B.isSellOut,B.isEvent,B.active
+FROM (`downloadedcoupon` as A)
+LEFT JOIN `coupon` as B ON `A`.`couponId` = `B`.`id`
+LEFT JOIN `couponcontent` as C ON `A`.`couponId` = `C`.`couponId`
+WHERE `uid` =  $uid";
+			
+			if($mode=="unused"){
+				$sql.="
+AND `status` =  'unused'
+AND `B`.`endDate` > now()";
+			}
+			else if($mode == "used"){
+				$sql.="
+AND `status` =  'used'";
+			}
+			else if($mode == "expired"){
+		$sql.="
+AND `status` =  'unused'
+AND `B`.`endDate` < now()";		
+			}
+		
+		$sql.="
+GROUP BY `A`.`couponId`
+LIMIT $skip,$limit";
+		
+		$query = $this->db->query($sql);
+		
+		$results = $query->result_array();
+		
+		return $results;
+	}
+	
+	public function get_dcoupons2($uid,$mode='unused',$limit=30,$skip=0){
+		
+		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent, B.active');
 		$this->db->from('downloadedcoupon as A');
 		$this->db->where('uid',$uid);
 		if($mode == 'unused'){
@@ -163,80 +199,96 @@ and A.couponId=$couponId");
 
 
 
+//	
+//	/**
+//	 * 
+//	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
+//	 * @param unknown_type $mobile
+//	 */
+//	public function get_union_user($mobile){
+//		
+//		$this->load->library("unionpay");
+//		
+////		echo 'before get union user';
+//		$response = $this->unionpay->getUserByMobile($mobile);
+//		
+////		echo 'resposne'.$response;
+//		$response = json_decode($response,true);
+//		$respCd = $response['respCd'];
+//		
+//		if ($respCd == '000000'){
+//			return $response['data'];
+//		}
+//		else {
+//			return $respCd;
+//		}
+//	}
 	
-	/**
-	 * 
-	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
-	 * @param unknown_type $mobile
-	 */
-	public function get_union_user($mobile){
-		
-		$response = $this->unionpay->getUserByMobile($mobile);
-		
-		$response = json_decode($response,true);
-		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
-			return $response['data'];
-		}
-		else {
-			return $respCd;
-		}
-	}
+//	public function register_union($mobile){
+//		
+//		$this->load->library("unionpay");
+//		
+//		$response = $this->unionpay->regByMobile($mobile);
+//		
+//		$response = json_decode($response,true);
+//		$respCd = $response['respCd'];
+//		
+//		if ($respCd == '000000'){
+//			return $response['data'];
+//		}
+//		else {
+//			return $respCd;
+//		}
+//	}
 	
-	public function register_union($mobile){
-		$response = $this->unionpay->regByMobile($mobile);
-		
-		$response = json_decode($response,true);
-		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
-			return $response['data'];
-		}
-		else {
-			return $respCd;
-		}
-	}
-	
-	public function bind_union_card($unionUid, $cardNo){
-		$response = $this->unionpay->bindCard($unionUid,$cardNo);
-		
-		$response = json_decode($response,true);
-		
-		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
-			return $response['data'];
-		}
-		else {
-			return $respCd;
-		}
-	}
+//	public function bind_union_card($unionUid, $cardNo){
+//		
+////		echo 'begin bind union card';
+//
+//		$this->load->library("unionpay");
+//		
+//		$response = $this->unionpay->bindCard($unionUid,$cardNo);
+//		
+////		echo 'response '.$response;
+//		
+//		$response = json_decode($response,true);
+//		
+//		$respCd = $response['respCd'];
+//		
+//		if ($respCd == '000000'){
+//			return $response['data'];
+//		}
+//		else {
+//			return $respCd;
+//		}
+//	}
 	
 
 	
-	/**
-	 * 银联解绑卡
-	 * 成功返回true
-	 * 失败反悔respCd
-	 * @param unknown_type $unionUid
-	 * @param unknown_type $cardNo
-	 */
-	public function unbind_union_card($unionUid, $cardNo){
-		
-		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
-		
-		$response = json_decode($response,true);
-		
-		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
-			return true;
-		}
-		else {
-			return $respCd;
-		}
-	}
+//	/**
+//	 * 银联解绑卡
+//	 * 成功返回true!!!
+//	 * 失败反悔respCd
+//	 * @param unknown_type $unionUid
+//	 * @param unknown_type $cardNo
+//	 */
+//	public function unbind_union_card($unionUid, $cardNo){
+//		
+//		$this->load->library("unionpay");
+////		echo 'begin unbind union card';
+//		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
+////		echo 'response '.$response;
+//		$response = json_decode($response,true);
+//		
+//		$respCd = $response['respCd'];
+//		
+//		if ($respCd == '000000'){
+//			return true;
+//		}
+//		else {
+//			return $respCd;
+//		}
+//	}
 	
 	function login($username,$password){
 

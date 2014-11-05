@@ -55,7 +55,7 @@ class Kqapitest extends CI_Controller{
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
 		$apiLink = array('test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
-			'test_captcha_register','test_mynews','test_search');
+			'test_captcha_register','test_mynews','test_search','test_batch_union_dcoupon');
 		$apiTitle = $apiLink;
 		
 		
@@ -146,11 +146,11 @@ class Kqapitest extends CI_Controller{
 		
 		$url = $host.'/kq/index.php/kqapi4/mycard';
 	
-//		$post = array('uid'=>'84','card'=>'6222021001128509533','sessionToken'=>'bwqHfit2vkSXPceG9RAK');
+		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
 //		$post = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','card'=>'6222021001128509533');
 	
-		$post = array('uid'=>'84','card'=>'6228480031689252414','sessionToken'=>'bwqHfit2vkSXPceG9RAK');
-		
+//		$post = array('uid'=>'84','card'=>'6228480031689252414','sessionToken'=>'bwqHfit2vkSXPceG9RAK');
+//		$post = array('uid'=>'91','card'=>'6228480031689252414','sessionToken'=>'TKdrBPFhwy17AZWbCtQv');
 		
 		$response = post($url,$post);
 		echo $response;
@@ -164,9 +164,10 @@ class Kqapitest extends CI_Controller{
 		
 		$url = $host.'/kq/index.php/kqapi4/deleteMyCard';
 		
-		$data = array('uid'=>'84','sessionToken'=>'yeKPTVEqWIu4d29hsvtJ','card'=>'6228480031689252414');
+//		$data = array('uid'=>'84','sessionToken'=>'yeKPTVEqWIu4d29hsvtJ','card'=>'6228480031689252414');
+		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
 		
-		$response = post($url,$data);
+		$response = post($url,$post);
 		
 		echo $response;
 	}
@@ -175,7 +176,8 @@ class Kqapitest extends CI_Controller{
 	function test_get_download_coupon($servername){
 		$host = get_host($servername);
 //		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57';
-		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/mode/expired';
+//		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/mode/expired';
+		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/';
 		
 		$response = get($url);
 		echo $response;
@@ -244,6 +246,16 @@ class Kqapitest extends CI_Controller{
 		echo $response;
 	
 		
+	}
+	
+	function test_batch_union_dcoupon($servername){
+			$host = get_host($servername);
+		$url =  $host.'/kq/index.php/kqapi4/batchDownloadUnionCoupon/uid/57';
+
+		
+		$response = get($url);
+		
+		echo $response;
 	}
 	
 	function testFavoriteCoupon(){
