@@ -522,11 +522,9 @@ and id>$lastNewsId");
 			
 //			return $this->output_results($unionUser);
 
-		
 		 	if($unionUser == ErrorUnionEmptyUser){
 			//如果银联没有该用户，说明需要注册 
 			
-//		 		$response = $this->user->register_union($username);
 		 		$response = $this->kqlibrary->register_union($username);
 		 		
 		 		if (!is_array($response)){
@@ -587,7 +585,7 @@ and id>$lastNewsId");
 		}
 
 		
-		//银联绑卡成功
+		///-------- Endof 银联绑卡成功
 		
 		//------ 获得发卡行信息
 		$issuerName = $response['issuerName'];  // 银行名称
@@ -648,8 +646,8 @@ and id>$lastNewsId");
 		
    		unset($data);
    		$data['uid'] = $uid;
-   		$data['title'] = '绑定应银联卡';
-   		$data['text'] = "阁下已成功添加尾号$endCardNo的银联卡！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
+   		$data['title'] = '绑定银联卡';
+   		$data['text'] = "阁下已成功添加尾号".$endCardNo."的银联卡！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
    		
    		$this->load->model('news2_m','news');
    		$newsId = $this->news->insert($data);
@@ -669,12 +667,8 @@ and id>$lastNewsId");
 		$response['logoUrl'] = $logoUrl;
 		
 		
-		
-		
 		return $this->output_results($response);
 
-		
-		
   		
    }
 //   
@@ -878,7 +872,6 @@ and id>$lastNewsId");
 	
 		$unionUid = $user['unionId'];
 		
-//		return $this->output_results($user);
 		
 		if (empty($unionUid)){
 			// 如果用户没有银联帐号
@@ -890,19 +883,19 @@ and id>$lastNewsId");
 		
 		// 银联解绑
 //		$response = $this->user->unbind_union_card($unionUid, $cardNo);
+		
+//		return $this->output_results($user);
+		
 		$response = $this->kqlibrary->unbind_union_card($unionUid, $cardNo);
 //		return $this->output_results('银联解绑成功');
 		
-//		echo 'unionId'.$unionUid;
-//		echo 'card'.$cardNo;
-//		return $this->output_results($response);
 
 //		echo 'resposne '.$response;
 		
-		
+//		var_dump($response);
 		if($response === true){
 			// 银联解绑成功
-		
+//			echo '解绑成功';
 			
 			// 服务器删除银行卡
 			$this->card->delete_by($data);
@@ -1352,7 +1345,13 @@ group by A.couponId
 		}
 		
 		
-		$query = $this->db->query("select B.* from favoritedshopbranch as A left join shopbranch as B on A.shopbranchId = B.id where userId=$uid 
+		$query = $this->db->query("select B.*,C.title as district 
+		from favoritedshopbranch as A 
+		left join shopbranch as B 
+		on A.shopbranchId = B.id 
+		left join district as C
+		on B.districtId = C.id
+		where userId=$uid 
 		limit $skip,$limit");
 	
 		$results = $query->result_array();
@@ -1740,15 +1739,18 @@ LIMIT $skip,$limit");
  	  		
 	  	
 		if(empty($latitude) || empty($longitude)){
-			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId');
+			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.averagePreis,latitude,longitude,districtId,typeId, C.title as district');
 		}
 		else{
-			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,latitude,longitude,districtId,typeId,ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.averagePreis,latitude,longitude,districtId,typeId,  C.title as district,
+			ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
 		}
 		
 		
  	  	$this->db->from('shopbranch as A');
 		$this->db->join('shop as B', 'A.shopId = B.id');
+		$this->db->join('district as C', 'A.districtId = C.id');
+		
 		if (!empty($districtId)){
 			$this->db->where('districtId',$districtId);
 		}
@@ -1759,8 +1761,8 @@ LIMIT $skip,$limit");
 		$this->db->where('A.active','1');
 		$this->db->where('B.active','1');
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
-//			$this->db->order_by("ACOS(SIN((31.2 * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((31.2 * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((121.4 * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380");
-				$this->db->order_by('distance');
+
+			$this->db->order_by('distance');
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -2053,7 +2055,7 @@ AND active = 1");
 			
 			
 			/// ----------shopCoupons
-			$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`,A.isSellOut,A.isEvent
+			$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`,A.isSellOut,A.isEvent, B.slogan
 FROM (`coupon` A) 
 JOIN `couponcontent` B
 ON `A`.`id` = `B`.`couponId`
@@ -2077,18 +2079,20 @@ AND A.shopId = $shopId "
 	  		return $this->output_error(ErrorEmptyShopId);
 	  	}
 	  	
+	  	
 	  	$this->load->model('shopbranch2_m','shopbranch');
 	  	
-	  	$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl
-from shopbranch
+	  	
+	  	$query = $this->db->query("select A.id,shopId,A.title,openTime,phone,address,longitude,latitude,logoUrl,averagePreis,B.title as district
+from shopbranch A
+left join district B
+on A.districtId=B.id
 where shopId = $shopId
-AND active = 1");
+and active=1");
+	  	
+	  	
 	  
   		$results = $query->result_array();	
-//  		
-//  		$query = $this->db->query("select description from shop where id=$shopId");
-//  		
-//  		$description = $query->result_array();
 //  		
   		
   		$response['shopbranches'] = $results;

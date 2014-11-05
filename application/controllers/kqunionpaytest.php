@@ -255,11 +255,12 @@ sp5Ykcw0iwSbUA==
 //		$userId = 'c00050001985';
 //		$cardNo = '6222021001128509530';
 		$userId = 'c00055685346';
-		$cardNo = '6222021001128509533';
-//		$cardNo = '6225210218627927';
+//		$cardNo = '6222021001128509533';
+		$cardNo = '6225210118627927';
 				
 		$response = $this->unionpay->bindCard($userId, $cardNo);
 
+		echo $cardNo;
 		echo $response;
 	
 	}
@@ -275,8 +276,9 @@ sp5Ykcw0iwSbUA==
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		
 		
-		$userId = 'c00050001985';
-		$cardNo = '6222021001128509534';
+		$userId = 'c00055685346';
+//		$cardNo = '6222021001128509533';
+		$cardNo = '6225210118627927';
 		
 		$response = $this->unionpay->unbindCard($userId, $cardNo);
 		echo $response;

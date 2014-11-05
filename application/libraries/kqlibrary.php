@@ -4,6 +4,7 @@ require_once(APPPATH.'libraries/unionpay.php');
 require_once(APPPATH.'libraries/umengpush.php');
 require_once(APPPATH.'models/user2_m.php'); 
 require_once(APPPATH.'models/coupon2_m.php'); 
+require_once(APPPATH.'models/news2_m.php');
 
 class Kqlibrary{
 	
@@ -39,7 +40,6 @@ class Kqlibrary{
 
      	$this->unionpay = new Unionpay();
      	
-//     	$this->user = new User2_m();
      	$this->coupon = new Coupon2_m();
      	
 	}
@@ -54,12 +54,9 @@ class Kqlibrary{
 	 */
 	public function get_union_user($mobile){
 		
-//		$this->load->library("unionpay");
-		
-//		echo 'before get union user';
 		$response = $this->unionpay->getUserByMobile($mobile);
 		
-//		echo 'resposne'.$response;
+
 		$response = json_decode($response,true);
 		$respCd = $response['respCd'];
 		
@@ -73,7 +70,6 @@ class Kqlibrary{
 	
 	public function register_union($mobile){
 		
-//		$this->load->library("unionpay");
 		
 		$response = $this->unionpay->regByMobile($mobile);
 		
@@ -88,15 +84,9 @@ class Kqlibrary{
 		}
 	}
 	
-		public function bind_union_card($unionUid, $cardNo){
-		
-//		echo 'begin bind union card';
-
-//		$this->load->library("unionpay");
+	public function bind_union_card($unionUid, $cardNo){
 		
 		$response = $this->unionpay->bindCard($unionUid,$cardNo);
-		
-//		echo 'response '.$response;
 		
 		$response = json_decode($response,true);
 		
@@ -119,10 +109,8 @@ class Kqlibrary{
 	 */
 	public function unbind_union_card($unionUid, $cardNo){
 		
-		$this->load->library("unionpay");
-//		echo 'begin unbind union card';
 		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
-//		echo 'response '.$response;
+
 		$response = json_decode($response,true);
 		
 		$respCd = $response['respCd'];
@@ -279,6 +267,8 @@ class Kqlibrary{
 			return;
 		}
 		
+//		echo 'couponId'.$couponId;
+		
 		//改变downloadedcoupon中的记录,吧unused变成used
 		$CI->db->query("update downloadedcoupon 
 set status='used'
@@ -297,16 +287,28 @@ limit 1");
 		}
 		
 		$umengpush = new UmengPush();
-//		
 		$completeTitle = $this->coupon->get_complete_title($couponId);
-//		$title = '优惠券承兑完成';
+		$title = '优惠券承兑完成';
 		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
 
 		$umengpush->send_customized_notification($uid,$title, $text);
 		
-//		$this->load->library('umengpush');
-//			
-//		echo $this->umengpush->send_customized_notification(84,'','');
+//		/// --- 发送站内信
+//		
+//   		unset($data);
+//   		$data['uid'] = $uid;
+//   		$data['title'] = '票券承兑成功';
+//   		$data['text'] = $text;
+//   		
+//   		$news = new News2_m();
+//   		$newsId = $news->insert($data);
+//   		
+//   		if (empty($newsId)){
+//   		// 如果没有insert成功
+//   			log_message('error','bind card insert news error, uid #'.$uid);
+//   		}
+//		
+//		/// --- Endof发送站内信
 //		
 	}
 	

@@ -37,6 +37,7 @@ define("ErrorUnionInvalidCoupon", 500046);
 define("ErrorUnionInvalidParameter", 300002);
 define("ErrorUnionEmptyUser", 300200);  // 查询结果
 define("ErrorUnionNoCardBunden", 500058);
+define("ErrorUnionBindCardToOften", 300521);  
 
 
 define("ErrorUnionGetUser", 900);
@@ -164,7 +165,9 @@ function msg_with_error($error){
 		case ErrorUnionEmptyUser:
 			$msg = '银联用户不存在';
 		break;
-		
+		case ErrorUnionBindCardToOften:
+			$msg = '银联解绑卡过于频繁';
+		break;
 		default:
 		 $msg = '服务器未知错误';
 		break;
