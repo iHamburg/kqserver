@@ -1147,12 +1147,12 @@ group by A.couponId
 				// 发送站内信
 		   		unset($data);
 		   		$data['uid'] = $uid;
-		   		$data['title'] = '绑定应银联卡';
+		   		$data['title'] = '下载优惠券';
 		   		// 要获得优惠券的完整title
 		   		$completeTitle = $this->coupon->get_complete_title($couponId);
 		   		
 		   		
-		   		$data['text'] = "您已成功下载$completeTitle快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
+		   		$data['text'] = "您已成功下载".$completeTitle."快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
 		   		
 		   		$this->load->model('news2_m','news');
 		   		$newsId = $this->news->insert($data);
@@ -1204,6 +1204,7 @@ group by A.couponId
 		$this->db->where('A.userId',$uid);
 		$this->db->join('coupon as B','A.couponId = B.id','left');
 		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
+		$this->db->order_by('A.id','desc');
 		$this->db->limit($limit,$skip);
 		
 		$query = $this->db->get();
@@ -1352,6 +1353,7 @@ group by A.couponId
 		left join district as C
 		on B.districtId = C.id
 		where userId=$uid 
+		order by A.id desc
 		limit $skip,$limit");
 	
 		$results = $query->result_array();
@@ -1739,10 +1741,10 @@ LIMIT $skip,$limit");
  	  		
 	  	
 		if(empty($latitude) || empty($longitude)){
-			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.averagePreis,latitude,longitude,districtId,typeId, C.title as district');
+			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.phone,A.averagePreis,latitude,longitude,districtId,typeId, C.title as district');
 		}
 		else{
-			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.averagePreis,latitude,longitude,districtId,typeId,  C.title as district,
+			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.phone,A.averagePreis,latitude,longitude,districtId,typeId,  C.title as district,
 			ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
 		}
 		
@@ -1763,6 +1765,12 @@ LIMIT $skip,$limit");
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 
 			$this->db->order_by('distance');
+		}
+		else if($order == 'coupon'){
+			// 按快券优先
+		}
+		else{
+			
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -1906,7 +1914,17 @@ LIMIT $skip,$limit");
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 			
 			$this->db->order_by('distance');
+		
 		}
+		else if($order == 'hot'){
+
+			$this->db->order_by('A.displayedDCount','desc');
+			
+		}
+		else{
+			$this->db->order_by('rand()');  // 随机排序
+		}
+		
  	  	$this->db->limit($limit,$skip);
  	  	
  	  	$query = $this->db->get();
@@ -1914,6 +1932,9 @@ LIMIT $skip,$limit");
 		$results = $query->result_array();	
 		
 //		$this->output->enable_profiler(TRUE);
+
+		   
+		
 		
 		return $this->output_results(array('coupons'=>$results));
 	}

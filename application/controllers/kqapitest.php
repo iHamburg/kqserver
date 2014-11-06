@@ -55,7 +55,7 @@ class Kqapitest extends CI_Controller{
 //		$linkPrepend = $host.'/kq/index.php/kqapitest/';
 		
 		$apiLink = array('test_coupon_accepted','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
-			'test_captcha_register','test_mynews','test_search','test_batch_union_dcoupon');
+			'test_captcha_register','test_mynews','test_search','test_aroundShopBranches','test_batch_union_dcoupon');
 		$apiTitle = $apiLink;
 		
 		
@@ -238,6 +238,7 @@ class Kqapitest extends CI_Controller{
 
 		$url.='/longitude/121.4/latitude/31.2';
 		$url.='/keyword/0';
+		$url.='/order/ai';
 		$url.='/limit/20';
 		
 		$response = get($url);
@@ -274,6 +275,22 @@ class Kqapitest extends CI_Controller{
 		$response = get($url);
 		
 		echo $response;
+	}
+	
+	
+	function test_aroundShopBranches($servername){
+		$host = get_host($servername);
+		$url = $host.'/kq/index.php/kqapi4/aroundShopbranches';
+		
+//		$url.='/districtId/13';
+//		$url.='/shopTypeId/1';
+		$url.='/longitude/121.4/latitude/31.2';
+		
+		$response = get($url);
+		
+		echo $response;
+		
+		
 	}
 	
 	function testFavoriteCoupon(){

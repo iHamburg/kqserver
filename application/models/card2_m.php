@@ -14,6 +14,7 @@ class Card2_m extends MY_Model{
 	
 	
 	public function get_id($id){
+
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
 		$this->db->from('card as A');
 		$this->db->join('bank as B','A.bankId = B.id','left');

@@ -84,6 +84,7 @@ AND `B`.`endDate` < now()";
 		
 		$sql.="
 GROUP BY `A`.`couponId`
+ORDER BY A.id desc
 LIMIT $skip,$limit";
 		
 		$query = $this->db->query($sql);
