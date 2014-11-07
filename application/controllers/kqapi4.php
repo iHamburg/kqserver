@@ -253,6 +253,8 @@ class Kqapi4 extends REST_Controller
    	
    	$this->load->model('user2_m','user');
    		
+//   	return $this->output_results('hhhhh');
+   	
    	if (empty($uid) || empty($sessionToken)){
    		return $this->output_error(ErrorEmptyParameter);
    	}
@@ -292,7 +294,10 @@ class Kqapi4 extends REST_Controller
 		$img = base64_decode($avatar);
 		
 		$timestamp = now();
-		$filePath = "public/uploads/avatar_$uid_$timestamp.jpg";
+		$filePath = "public/uploads/avatar_".$uid."_".$timestamp.".jpg";
+//		echo 'filepath '.$filePath;
+//		echo $filePath;
+//		$filePath = "public/uploads/avatar_".$uid.".jpg";
 		$data = file_put_contents($filePath, $img);
 		
 		
