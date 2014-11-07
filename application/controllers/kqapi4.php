@@ -401,8 +401,6 @@ and id>$lastNewsId");
 		
 		}
 	
-
-		
 		$this->db->select('A.id as cardId,A.title,logoUrl,B.title as bankTitle');
 		$this->db->from('card as A');
 		$this->db->join('bank as B','A.bankId = B.id','left');
@@ -1109,8 +1107,7 @@ group by A.couponId
 			// 从银联下载优惠券
 	
 			
-//			$result = $this->user->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
-
+			
 			$result = $this->kqlibrary->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
 			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
@@ -1120,7 +1117,8 @@ group by A.couponId
 			}
 			else if(!is_array($result)){
 				// 其他union下载的错误
-				return $this->output_error(ErrorUnionDownloadCoupon);
+//				return $this->output_error(ErrorUnionDownloadCoupon);
+				return $this->output_error($result);
 			}
 			
 			//成功从银联下载了优惠券

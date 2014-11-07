@@ -267,14 +267,19 @@ class Kqlibrary{
 			return;
 		}
 		
+		
 //		echo 'couponId'.$couponId;
+//		echo 'uid'.$uid;
 		
 		//改变downloadedcoupon中的记录,吧unused变成used
 		$CI->db->query("update downloadedcoupon 
 set status='used'
 where status='unused'
 and couponId=$couponId
+and uid=$uid
 limit 1");
+		
+//		echo 'after update';
 		
 		// 增加优惠券的承兑量
 //		echo 'couponId'.$couponId;
@@ -286,6 +291,8 @@ limit 1");
 //			echo 'increment sucess';
 		}
 		
+//		echo 'after increment acount';
+		
 		$umengpush = new UmengPush();
 		$completeTitle = $this->coupon->get_complete_title($couponId);
 		$title = '优惠券承兑完成';
@@ -293,8 +300,8 @@ limit 1");
 
 		$umengpush->send_customized_notification($uid,$title, $text);
 		
-//		/// --- 发送站内信
-//		
+		/// --- 发送站内信
+		
 //   		unset($data);
 //   		$data['uid'] = $uid;
 //   		$data['title'] = '票券承兑成功';
@@ -307,8 +314,8 @@ limit 1");
 //   		// 如果没有insert成功
 //   			log_message('error','bind card insert news error, uid #'.$uid);
 //   		}
-//		
-//		/// --- Endof发送站内信
+		
+		/// --- Endof发送站内信
 //		
 	}
 	

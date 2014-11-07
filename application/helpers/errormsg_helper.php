@@ -37,7 +37,8 @@ define("ErrorUnionInvalidCoupon", 500046);
 define("ErrorUnionInvalidParameter", 300002);
 define("ErrorUnionEmptyUser", 300200);  // 查询结果
 define("ErrorUnionNoCardBunden", 500058);
-define("ErrorUnionBindCardToOften", 300521);  
+define("ErrorUnionBindCardToOften", 300521);
+define("ErrorUnionDCouponLimt", 500048);  
 
 
 define("ErrorUnionGetUser", 900);
@@ -167,6 +168,9 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionBindCardToOften:
 			$msg = '银联解绑卡过于频繁';
+		break;
+		case ErrorUnionDCouponLimt:
+			$msg = '银联优惠券下载张数超过单用户下载限制';
 		break;
 		default:
 		 $msg = '服务器未知错误';

@@ -77,29 +77,36 @@ transFwdInsId 	string 	可选 	交易发送机构
 		}
 		
 		
-		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-		
-		
-		// 把数据存入数据库中
-		$this->uCouponAccepted->insert($data);
-		
-		
-		if($this->db->affected_rows() == 0){
-			//如果数据库没有登记成功，登记在logo中
+		if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){
 			
-			log_message('error', 'Union CouponAccepted DBInsert #'.$post);
-		
+			$query = $this->db->insert('u_coupon_accepted2',$data);
+			
+		}
+		else if(ENVIRONMENT == 'production'){
+			
+			$this->load->model('u_coupon_accepted_m','uCouponAccepted');	
+			
+			// 把数据存入数据库中
+			$this->uCouponAccepted->insert($data);
+			
+			
+			if($this->db->affected_rows() == 0){
+				//如果数据库没有登记成功，登记在logo中
+				
+				log_message('error', 'Union CouponAccepted DBInsert #'.$post);
+			
+			}
+			
+			
+			// TODO 票券承兑如果成功写入数据库，除了写log_message,我还要有其他的预警手段，比如友盟
+			// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
+			$uid = $data['chnlUsrId'];
+			$unionCouponId = $data['couponId'];
+			
+			$this->kqlibrary->accept_coupon($uid, $unionCouponId);
+				
 		}
 		
-		// 如果是要异步调用的话，一定要是api，否则也可以在这里做 
-		// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
-		$uid = $data['chnlUsrId'];
-		$unionCouponId = $data['couponId'];
-		$this->kqlibrary->accept_coupon($uid, $unionCouponId);
-		
-		
-		// 如果能获得uid，就不用join user了
-
 		
 		
 		$response = array('respCd'=>'000000','msg'=>'');

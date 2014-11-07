@@ -206,8 +206,9 @@ class Kqapitest extends CI_Controller{
 		$host = get_host($servername);
 		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/';
 		
-//		$data = array('uid'=>'57','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ','couponId'=>'38');
-		$data = array('uid'=>'61','sessionToken'=>'f3TubJFYWiewIZ1PkhDx','couponId'=>'38');
+		$data = array('uid'=>'57','sessionToken'=>'ZgRrx0JTtwI5P3Hqb4Ap','couponId'=>'38');
+//		$data = array('uid'=>'79','sessionToken'=>'jzDICdGEqfatgAv89ycY','couponId'=>'36');
+//		$data = array('uid'=>'73','sessionToken'=>'YrEvIXp7HjVUuT6bQaex','couponId'=>'36');
 		
 		$response = post($url,$data);
 

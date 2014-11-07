@@ -148,7 +148,8 @@ class Kqtest extends CI_Controller{
 		
 	function test_accept_coupon(){
 		
-		echo $this->kqlibrary->accept_coupon(33, 'D00000000008029');
+		echo $this->kqlibrary->accept_coupon(84, 'Z00000000008039');
+		
 	}
 	
 	function test_bind_card_sms(){
