@@ -520,7 +520,6 @@ and id>$lastNewsId");
 		if(empty($unionUid)){
 			//如果用户没有unionId，先查询再注册, 获得unionUid
 	
-//			$unionUser = $this->user->get_union_user($username);
 			$unionUser = $this->kqlibrary->get_union_user($username);
 			
 //			return $this->output_results($unionUser);

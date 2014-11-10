@@ -103,43 +103,37 @@ NVuI+eXtaUQW
 		$data = array('mobile' => $mobile);
 		
 		$post = $this->generate_post_json($data);
-		
-//		echo $post;
-		
-		
-		
+			
 		$response = $this->post($url, $post);
 
 		return $response;
 		
 	}
 
-	public function getUserByMobile2($mobile){
- 
-	
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile' => $mobile);
-		
-		$dataJson = json_encode($data);
-
-//		echo 'data '.$data;
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post2 = json_encode($post);
-
-		echo 'url '.$url;
-		echo $post2;
-		
-//		echo 'ssss';
+//	public function getUserByMobile2($mobile){
+// 
+//	
+//		$url = $this->host.'getUserByMobile';
+//		
+//		$data = array('mobile' => $mobile);
+//		
+//		$dataJson = json_encode($data);
+//
+////		echo 'data '.$data;
+//		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+//		
+//		$signToken = bin2hex($signToken);
+//
+//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+//
+//		$post2 = json_encode($post);
+//
+//	
+//		
+////		echo 'ssss';
 //		$response = $this->post($url, $post);
-
 //		return $response;
-	}
+//	}
 	
 	/**
 	 * 
@@ -176,35 +170,35 @@ NVuI+eXtaUQW
 		
 		return $response;
 	}
-	
-	public function regByMobile2($mobile){
-		
-		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
-		$url = $this->host.'regByMobile';
-		
-		$data = array(
-			'infSource'=>$this->infSource,
-			'mobile'=>$mobile
-		);
-		
-		$dataJson = json_encode($data);
-		
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-		
-//		echo $dataJson;
-//		echo $post;
-		
-		$response = $this->post($url, $post);
-
-		
-		return $response;
-	}
+//	
+//	public function regByMobile2($mobile){
+//		
+//		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
+//		$url = $this->host.'regByMobile';
+//		
+//		$data = array(
+//			'infSource'=>$this->infSource,
+//			'mobile'=>$mobile
+//		);
+//		
+//		$dataJson = json_encode($data);
+//		
+//		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+//		
+//		$signToken = bin2hex($signToken);
+//
+//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+//
+//		$post = json_encode($post);
+//		
+////		echo $dataJson;
+////		echo $post;
+//		
+//		$response = $this->post($url, $post);
+//
+//		
+//		return $response;
+//	}
 	
 
 	
@@ -341,53 +335,28 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		
 	}
 	
-	function couponDwnById2($data){
-	
-		$url = $this->host.'couponDwnById';
-		
-		$dataJson = json_encode($data);
-		
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
+//	function couponDwnById2($data){
+//	
+//		$url = $this->host.'couponDwnById';
+//		
+//		$dataJson = json_encode($data);
+//		
+//		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
+//		
+//		$signToken = bin2hex($signToken);
+//
+//		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
+//
+//		$post = json_encode($post);
+//
+////		echo $post;
+//		
+//		$response = $this->post($url, $post);
+//		return $response;
+//		
+//	}
+//	
 
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-
-//		echo $post;
-		
-		$response = $this->post($url, $post);
-		return $response;
-		
-	}
-	
-	public function is_server_alive(){
-
-		$mobile = '111';
-		
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile' => $mobile);
-		
-		$dataJson = json_encode($data);
-
-//		echo 'data '.$data;
-		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-		
-//		echo 'post '.$post;
-		
-		$response = $this->post($url, $post);
-
-		
-		return $response;	
-	}
 	
 	public function test(){
 		
@@ -395,7 +364,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		return 'unionpay->test()'.$this->host;
 	}
 	
-	/////////////////
+
 	
 
 	private function post($url='',$objJson=''){
