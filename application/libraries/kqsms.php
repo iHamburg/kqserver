@@ -64,6 +64,8 @@ class Kqsms{
 		
 		$code = $xml->code;
 		
+//		var_dump($code);
+		
 		if ($code == 2)
 			return true;
 		else 

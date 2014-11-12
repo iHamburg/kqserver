@@ -2172,8 +2172,6 @@ and active=1");
 	
 		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
 
-		
-		
 		if ($response === true){
 			$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
 
@@ -2185,7 +2183,7 @@ and active=1");
 			
 //			echo 'failure';
 
-			log_message('error','SMS Forget error #'.$response.', mobiel # '.$mobile);
+			log_message('error','SMS Forget error #'.$response.', mobile # '.$mobile);
 			
 			return $this->output_error(ErrorFailureSMS);
 		}
@@ -2287,7 +2285,7 @@ where B.id=$uid");
    private function output_error($status,$errorMsg=''){
    	
    			$msg = msg_with_error($status);
-   			
+   	
   			$error = array('status'=>$status,'msg'=>$msg);
    			$response = json_encode($error);
 			echo $response;
@@ -2298,7 +2296,7 @@ where B.id=$uid");
    // --------------- TEST -----------------
    public function test_get(){
    		
-   		$response = $this->user->can_user_dcoupon(57, 36);
+//   		$response = $this->user->can_user_dcoupon(57, 36);
    	
 // 		$response = $this->kqlibrary->get_union_user('13166361023');
    	
@@ -2316,10 +2314,12 @@ where B.id=$uid");
 //   		$this->output_results($url);
    		
    		
-   		$this->output_results($response);
+//   		$this->output_results($response);
    
-//   	$this->output_success();
+   	$this->output_success();
 
+//   	log_message('error','SMS Forget error #111, mobile # 111');
+   	
    	
    }
    
