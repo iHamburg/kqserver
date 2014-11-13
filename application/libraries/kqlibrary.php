@@ -51,6 +51,7 @@ class Kqlibrary{
 	 * 
 	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
 	 * @param unknown_type $mobile
+	 * @return 如果成功返回array， 如果失败返回状态码
 	 */
 	public function get_union_user($mobile){
 		
@@ -121,7 +122,10 @@ class Kqlibrary{
 		else {
 			return $respCd;
 		}
+		
 	}
+	
+	
 	/**
 	 * 从银联下载优惠券
 	 * @param  $uid
