@@ -531,15 +531,15 @@ and id>$lastNewsId");
 		 		
 		 		if (!is_array($response)){
 		 			// 如果注册没有成功，报错
-		 			return $this->output_error(ErrorUnionRegister);
+		 			return $this->output_error($response);
 		 		}
 		
 			}
 			else if(!is_array($unionUser)){
 				// 其他union查询的错误
 
-				return $this->output_error(ErrorUnionGetUser);
-			
+//				return $this->output_error(ErrorUnionGetUser);
+				return $this->output_error($unionUser);
 			}
 			else{
 			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
@@ -568,21 +568,14 @@ and id>$lastNewsId");
 		
 //		echo "unionId $unionUid, cardno # $cardNo";
 		
-//		$response = $this->user->bind_union_card($unionUid,$cardNo);
 		$response = $this->kqlibrary->bind_union_card($unionUid,$cardNo);
 		
 //		return $this->output_results('aaa');
 		
-		if($response == ErrorUnionInvalidCard || $response == ErrorUnionExistCard || $response == ErrorUnionLimitCardNumber){
-			// 对于绑卡的错误判定
-			
-			return $this->output_error($response);
-		
-		}
-		else if(!is_array($response)){
+	    if(!is_array($response)){
 		//绑卡其他错误
 //			echo $response;
-			return $this->output_error(ErrorUnionBindCard);
+			return $this->output_error($response);
 
 		}
 
@@ -909,15 +902,10 @@ and id>$lastNewsId");
 				return $this->output_success();
 			}
 		}
-		else if($response == ErrorUnionInvalidParameter){
-			// 如果参数不对错误
-//			echo 'invalid'.$response;
-			return $this->output_error($response);
-		}
 		else {
 			// 如果其他未知错误
 //			echo 'not true';
-			return $this->output->error(ErrorUnionUnbindCard);
+			return $this->output->error($response);
 		}
 		
 		
@@ -1109,27 +1097,25 @@ group by A.couponId
 			}
 		
 			// 从银联下载优惠券
-	
-			
-			
+
 			$result = $this->kqlibrary->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
 			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
 
 				//处理无效的uionUid和unionCouponId, 用户没有绑卡错误
 				return $this->output_error($result);
+			
 			}
 			else if(!is_array($result)){
 				// 其他union下载的错误
-//				return $this->output_error(ErrorUnionDownloadCoupon);
+
 				return $this->output_error($result);
 			}
 			
-			//成功从银联下载了优惠券
+			// 成功从银联下载了优惠券
 			
 		}
 	
-		//
 		
 		// 服务器下载快券
 

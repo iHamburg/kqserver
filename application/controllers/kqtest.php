@@ -211,7 +211,12 @@ class Kqtest extends CI_Controller{
 	  
 	public function test(){
 			header( 'Content-Type:text/html;charset=utf-8 ');
-//	
+			
+//			$result = $this->user->delete(21);
+//			
+//			echo $result;
+//			echo $this->db->affected_rows();
+
 //		$this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ('sdfsdf',1,1,null) ");
 //		
 //		echo $this->db->insert_id();
@@ -303,7 +308,7 @@ class Kqtest extends CI_Controller{
 //		$this->output->enable_profiler(TRUE);
 		
 			
-			echo 'now '.now().'now string'.strtolower(now());
+//			echo 'now '.now().'now string'.strtolower(now());
 	}
 
 

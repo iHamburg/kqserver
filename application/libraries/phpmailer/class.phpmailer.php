@@ -226,7 +226,7 @@ class PHPMailer
     /**
      * The default SMTP server port.
      * @type integer
-     * @TODO Why is this needed when the SMTP class takes care of it?
+     * 
      */
     public $Port = 25;
 
@@ -342,7 +342,7 @@ class PHPMailer
     /**
      * Storage for addresses when SingleTo is enabled.
      * @type array
-     * @TODO This should really not be public
+     * 
      */
     public $SingleToArray = array();
 
@@ -3154,7 +3154,7 @@ class PHPMailer
      * NOTE: will not work with arrays, there are no arrays to set/reset
      * @throws phpmailerException
      * @return boolean
-     * @TODO Should this not be using __set() magic function?
+     * 
      */
     public function set($name, $value = '')
     {

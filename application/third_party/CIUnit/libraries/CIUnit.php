@@ -89,7 +89,7 @@ class CIUnit {
 		{
 			self::$controllers[self::$current]['models'] = $loader->_ci_models;
 			//this might be an update if it was there before
-			// FIXME, all additional properties of the loader / controllers
+			// 
 			// that have to be reset must go in some test config file..
 			//'components' => $loader->_ci_components,
 			//'classes' => $loader->_ci_classes

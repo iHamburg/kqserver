@@ -18,6 +18,7 @@ class User2_m extends MY_Model{
 	 * 如果成功返回user， 否则返回NULL
 	 * @param unknown_type $uid
 	 * @param unknown_type $sessionToken
+	 * @return 如果session没过期返回user数组，否则返回null
 	 */
 	public function isSessionValid($uid,$sessionToken){
 
@@ -29,7 +30,6 @@ AND `expireDate` > now()");
 		$results = $query->result_array();
 		
 		$result = $results[0];  // array or NULL
-		
 
 		return $result;
 	
@@ -38,20 +38,20 @@ AND `expireDate` > now()");
 
 
 	/**
-	 * 返回true 或 false 
 	 * 
 	 * @param unknown_type $uid
 	 * @param unknown_type $unionId
+	 *  
 	 */
 	public function update_unionid_by_uid($uid,$unionId){
 		
 		$this->db->query("update user set unionId='$unionId' where id=$uid");
 		
-		if($this->db->affected_rows()>0){
-			return true;
-		}
-		else 
-			return false;
+//		if($this->db->affected_rows()>0){
+//			return true;
+//		}
+//		else 
+//			return false;
 	}
 	
 
@@ -88,45 +88,6 @@ ORDER BY A.id desc
 LIMIT $skip,$limit";
 		
 		$query = $this->db->query($sql);
-		
-		$results = $query->result_array();
-		
-		return $results;
-	}
-	
-	public function get_dcoupons2($uid,$mode='unused',$limit=30,$skip=0){
-		
-		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent, B.active');
-		$this->db->from('downloadedcoupon as A');
-		$this->db->where('uid',$uid);
-		if($mode == 'unused'){
-			$this->db->where('status','unused');
-			$this->db->where('B.endDate <','now()');
-		}
-		else if($mode == 'used'){
-			$this->db->where('status','used');
-		}
-		else if($mode == 'expired'){
-			$this->db->where('status','unused');
-			$this->db->where('B.endDate >','now()');
-		}
-		$this->db->join('coupon as B','A.couponId = B.id','left');
-		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
-		$this->db->group_by('A.couponId');
-		$this->db->limit($limit,$skip);
-		
-//		$query = " SELECT `A`.`couponId`, count(A.couponId) as number, `B`.`title`, `B`.`endDate`, `C`.`avatarUrl`, `C`.`discountContent`
-//FROM (`downloadedcoupon` as A)
-//LEFT JOIN `coupon` as B ON `A`.`couponId` = `B`.`id`
-//LEFT JOIN `couponcontent` as C ON `A`.`couponId` = `C`.`couponId`";
-//		
-//$query.="WHERE `uid` =  $uid
-//AND `status` =  'unused'
-//AND `B`.`endDate` > now()
-//GROUP BY `A`.`couponId`
-//LIMIT $skip,$limit ";
-		
-		$query = $this->db->get();
 		
 		$results = $query->result_array();
 		

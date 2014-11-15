@@ -190,7 +190,7 @@ abstract class REST_Controller extends CI_Controller
 
 	/**
 	 * Constructor function
-	 * @todo Document more please.
+	 * 
 	 */
 	public function __construct()
 	{
@@ -1330,7 +1330,7 @@ abstract class REST_Controller extends CI_Controller
 	}
 
 	/**
-	 * @todo document this.
+	 * 
 	 */
 	protected function _prepare_basic_auth()
 	{
@@ -1462,7 +1462,7 @@ abstract class REST_Controller extends CI_Controller
 	}
 
 	/**
-	 * @todo Document this.
+	 * 
 	 *
 	 * @param string $nonce
 	 */
