@@ -501,13 +501,7 @@ and id>$lastNewsId");
 				$unionUid = $unionUser['userId'];			
 			}
 
-			
-			//把银联的Uid更新到服务器中
-			$this->user->update_unionid_by_uid($uid,$unionUid);
-			
-		
-			
-	
+
 		}
 
 		//用户已经绑定银联帐号，绑卡
@@ -525,8 +519,14 @@ and id>$lastNewsId");
 
 		}
 
-		
 		///-------- Endof 银联绑卡成功
+
+		/// user表更新unionId，必须在绑卡成功之后
+		//把银联的Uid更新到服务器中
+		$this->user->update_unionid_by_uid($uid,$unionUid);
+
+		
+		
 		
 		//------ 获得发卡行信息
 		$issuerName = $response['issuerName'];  // 银行名称

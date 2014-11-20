@@ -250,9 +250,7 @@ class Kqlibrary{
 //				// 服务器删除出错
 //					log_message('error',"Batch Download Coupon, delete server record error. transSeq # $transSeq");
 //				}
-				
-				
-				
+			
 			}
 			
 			// 返回array，下载成功

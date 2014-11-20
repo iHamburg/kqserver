@@ -546,9 +546,9 @@ public function myCard_post(){
 			}
 
 			
-			//把银联的Uid更新到服务器中
-			$this->user->update_unionid_by_uid($uid,$unionUid);
-			
+//			//把银联的Uid更新到服务器中
+//			$this->user->update_unionid_by_uid($uid,$unionUid);
+//			
 		
 			
 	
@@ -571,6 +571,12 @@ public function myCard_post(){
 
 		
 		///-------- Endof 银联绑卡成功
+		
+		
+		/// user表更新unionId，必须在绑卡成功之后
+		//把银联的Uid更新到服务器中
+		$this->user->update_unionid_by_uid($uid,$unionUid);
+		
 		
 		//------ 获得发卡行信息
 		$issuerName = $response['issuerName'];  // 银行名称
