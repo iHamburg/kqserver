@@ -161,14 +161,15 @@ class Kqapitest extends CI_Controller{
 	
 		$host = get_host($servername);
 		
-		$url = $host.'/kq/index.php/kqapi4/mycard';
+		$url = $host.'/kq/index.php/kqapi6/mycard2';
 	
-		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
+		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'G9h1KDWQiZXg6p5YqIxy');
+		
 //		$post = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','card'=>'6222021001128509533');
 	
 //		$post = array('uid'=>'84','card'=>'6228480031689252414','sessionToken'=>'bwqHfit2vkSXPceG9RAK');
 //		$post = array('uid'=>'91','card'=>'6228480031689252414','sessionToken'=>'TKdrBPFhwy17AZWbCtQv');
-		$post = array('uid'=>'85','card'=>'6225210118627927','sessionToken'=>'z8WGXHeBU1h9KJFZIdr2');
+//		$post = array('uid'=>'85','card'=>'6225210118627927','sessionToken'=>'z8WGXHeBU1h9KJFZIdr2');
 		
 		$response = post($url,$post);
 		echo $response;
@@ -270,7 +271,7 @@ class Kqapitest extends CI_Controller{
 	}
 	
 	function test_batch_union_dcoupon($servername){
-			$host = get_host($servername);
+		$host = get_host($servername);
 		$url =  $host.'/kq/index.php/kqapi4/batchDownloadUnionCoupon/uid/57';
 
 		

@@ -210,32 +210,46 @@ class Kqlibrary{
 	 */
 	public function download_batch_coupons($uid, $mobile, $unionUid, $coupons){
 		$CI =& get_instance();
+
+//		echo 'before download batch';
+		//TODO: Test用
+		$msg = '';
 		foreach ($coupons as $coupon) {
 			$couponId = $coupon['id'];
 			$unionCouponId = $coupon['unionCouponId'];
 			$transSeq = $coupon['transSeq'];
 	
 			
-			//TODO  如果没有unioncouponid，应该服务器删除记录
+			//如果没有unioncouponid， 不用复制
 			if (empty($unionCouponId)){
 				continue;
 			
 			}
-			
+//			echo 'begin download union';
 			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
+//			$json = json_encode($response);
 			
-//			print_r($response);
-			
-			if (!is_array($response)){
-			//如果下载银联的快券出错, 就必须把用户下载的快券从数据库中删除！ dCouponCount也应该减小
+			if (is_array($response)){
+//				$str = implode(",", $response);
+				$str = json_encode($response);	
+			}
+			else{
+				$str = $response;
+			}
+			$msg = $msg.$str;
+//			var_dump($response);
 
+			//TODO: 需要确认是否删除没能复制到银联的本地快券
+			if (!is_array($response)){
+			// 如果下载银联的快券出错, 就必须把用户下载的快券从数据库中删除！ 
+				$msg.='delete '.$couponId;
 				//把transSeq的服务器记录删除
 				$CI->db->query("delete from downloadedcoupon where transSeq='$transSeq'");
 				
-				if($CI->db->affected_rows == 0){
-				// 服务器删除出错
-					log_message('error',"Batch Download Coupon, delete server record error. transSeq # $transSeq");
-				}
+//				if($CI->db->affected_rows == 0){
+//				// 服务器删除出错
+//					log_message('error',"Batch Download Coupon, delete server record error. transSeq # $transSeq");
+//				}
 				
 				
 				
@@ -244,6 +258,8 @@ class Kqlibrary{
 			// 返回array，下载成功
 			
 		}
+		
+		return $msg;
 	}
 	
 	/**

@@ -470,12 +470,7 @@ and id>$lastNewsId");
 //  		
 //   }
    
-   
-   /**
-    * 
-    * 用户
-    */
- 	public function myCard_post(){
+public function myCard_post(){
    	
   		$uid = $this->post('uid');
 		$card = $this->post('card');	
@@ -514,12 +509,16 @@ and id>$lastNewsId");
 		//获得unionUId
 		$unionUid = $user['unionId'];
 		$username = $user['username'];
-					
+		$couponCopyUnion = false;
+				
 //		return $this->output_results($unionUid);
 		//凡事数据库没有unionUid，说明没有绑定银联用户，如果成功注册或是登录，需要把之前下载的快券登记到银联中去
 		if(empty($unionUid)){
 			//如果用户没有unionId，先查询再注册, 获得unionUid
-	
+		
+			// 把需要重新copy本地coupon到银联的flag设为true
+			$couponCopyUnion = true;
+			
 			$unionUser = $this->kqlibrary->get_union_user($username);
 			
 //			return $this->output_results($unionUser);
@@ -536,32 +535,23 @@ and id>$lastNewsId");
 		
 			}
 			else if(!is_array($unionUser)){
-				// 其他union查询的错误
+			// 其他union查询的错误
 
-//				return $this->output_error(ErrorUnionGetUser);
 				return $this->output_error($unionUser);
+			
 			}
 			else{
 			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
-	
-				
-				$unionUid = $unionUser['userId'];	
-				
+				$unionUid = $unionUser['userId'];			
 			}
 
 			
 			//把银联的Uid更新到服务器中
-
-			if(!$this->user->update_unionid_by_uid($uid,$unionUid)){
-				
-				return $this->output_error(ErrorDBUpdate);
-			
-			}
+			$this->user->update_unionid_by_uid($uid,$unionUid);
 			
 		
-			// 绑定银联用户成功，异步调用下载优惠券
-			$url = site_url($this->apiName."/batchDownloadUnionCoupon");
-  		 	asyn_get($url);
+			
+	
 		}
 
 		//用户已经绑定银联帐号，绑卡
@@ -572,7 +562,7 @@ and id>$lastNewsId");
 		
 //		return $this->output_results('aaa');
 		
-	    if(!is_array($response)){
+		 if(!is_array($response)){
 		//绑卡其他错误
 //			echo $response;
 			return $this->output_error($response);
@@ -611,11 +601,22 @@ and id>$lastNewsId");
 		
 		// -- 服务器绑卡 -- 
 		
-//		var_dump($bankId);
-		
 		 $this->db->query("insert into card (userId, title, bankTitle, bankId) values ($uid,'$cardNo','$issuerName',$bankId)"); // return 1
 	
+		 //-----End of 服务器绑卡
+		 
+		 // -- Copy 已下载的快券到银联
+		 if ($couponCopyUnion){
+		 	// 如果需要copy快券给银联
+		 
+		 	$url = site_url($this->apiName."/batchDownloadUnionCoupon/uid/".$uid);
+			// echo $url;
+			 asyn_get($url);
+		 }
 
+		 
+		 // -- End:  Copy 已下载的快券到银联
+		 
 		 ///-----发送短信
 	    $this->load->library('kqsms');
 	    
@@ -666,161 +667,6 @@ and id>$lastNewsId");
 
   		
    }
-//   
-//	public function myCard2_post(){
-//   	
-//  		$uid = $this->post('uid');
-//		$card = $this->post('card');	
-//		$sessionToken = $this->post('sessionToken');
-//		
-//   		$this->load->model('user2_m','user');
-//   		$this->load->model('card2_m','card');
-//   		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$user = $this->user->isSessionValid($uid,$sessionToken)){
-//			
-//			return $this->output_error(ErrorInvalidSession);
-//		}
-//   		
-//
-//		$data['userId'] = $uid;
-//		$data['title'] = $card;
-//		$cardNo = $card;
-//
-//		$card = $this->card->get_by($data);	
-//		
-//		
-//		if(!empty($card)){
-//			///如果数据库里已经绑定了这张卡,报错
-//			
-//			return $this->output_error(ErrorCardExists);
-//		}
-//	
-//		//如果本地数据库没有卡号记录，先判断用户是否已经银联注册
-//
-//		//获得unionUId
-//		$unionUid = $user['unionId'];
-//		$username = $user['username'];
-//		
-////		$unionUser = $this->user->get_union_user($username);
-////		
-////		return $this->output_results($unionUser);
-////			
-//			if(empty($unionUid)){
-//			
-//				//如果用户没有unionId，先查询再注册
-//   		
-//					
-//			
-//		
-//	
-//			
-//				
-//		   		$response = $this->unionpay->getUserByMobile($username);
-//		   		
-//	//		   		echo 'response'.$response;
-//		   		$response = json_decode($response,true);
-//		   		$respCd = $response['respCd'];
-//	
-//		   		if ($respCd == '000000'){
-//		   		///手机号已经在银联注册
-//		   			
-//		   			$data = $response['data'];
-//		   			
-//		   			$unionUid = $data['userId'];
-//		
-//		   			//把银联的id登记到本地的数据库中去
-//		   			$this->user->update_unionid_by_uid($id,$unionUid);
-//		   			
-//		   		}
-//		   		else if($respCd == 300200){
-//		   			//不存在手机，需要注册
-//		   			
-//		   	 	  	$response = $this->unionpay->regByMobile($username);
-//			   		$response = json_decode($response,true);
-//					$respCd = $response['respCd'];
-//					
-//			  	 	if($respCd == '000000' ){
-//						$data = $response['data'];
-//			   			$unionUid = $data['userId'];
-//
-//						$this->user->update_unionid_by_uid($id,$unionUid);
-//			
-//					}
-//					else{
-//						// 银联注册的其他错误，不用反应，
-//						// 用户不注册不能绑卡的
-//						return $this->output_error(ErrorUnionRegister);
-//						
-//					}
-//		
-//		   		}
-//		   		else{
-//		   			
-//		   			// 不确定用户是否能查询到, 返回未知银联错误
-//		   			return $this->output_error(ErrorUnionGetUser);
-//		   			
-//		   		}
-//			
-//			}
-//		
-//			//--------绑卡----------
-//			// 确保有unionUid
-//			$response = $this->unionpay->bindCard($unionUid, $cardNo); //13166361023				
-//			
-//			$response = json_decode($response,true);
-//				
-//			$respCd = $response['respCd'];
-//	
-//			
-//			/// 同一个账户可以多次绑定一张卡
-//			if($respCd == '000000' ){
-//				//success
-//			//				这里要获得bank
-//
-//				$data = $response['data'];				
-//				$issuerName = $data['issuerName'];  // 银行名称
-//				
-//				
-//				
-//				 $this->db->query("insert into card (userId, title, bankTitle) values ($uid,'$cardNo','$issuerName')"); // return 1
-//				 $cardId = $this->db->insert_id();
-//
-//			}
-//			else if($respCd == ErrorUnionInvalidCard ||$respCd == ErrorUnionExistCard || $respCd == ErrorUnionLimitCardNumber){
-//				// 对于绑卡的错误判定
-//				
-//				return $this->output_error($respCd);
-//			
-//			}
-//			else{
-//
-//				return $this->output_error(ErrorUnionBindCard);
-//
-//			}
-//			
-//			//------ 绑卡成功 ----- 
-//			
-//			
-//			
-//	
-//
-//		// 返回银行卡的信息
-//		
-//		$query = $this->db->query("select * from card where id = $cardId");
-//		$results = $query->result_array();
-//		$response = $results[0];
-//		
-//		$response['logoUrl'] = '';
-//		return $this->output_results($response);
-//;
-//		
-//  		
-//   }
    
    /**
 	 * 
@@ -1135,7 +981,7 @@ group by A.couponId
 				// 发送站内信
 		   		unset($data);
 		   		$data['uid'] = $uid;
-		   		$data['title'] = '下载优惠券';
+		   		$data['title'] = '下载快券';
 		   		// 要获得优惠券的完整title
 		   		$completeTitle = $this->coupon->get_complete_title($couponId);
 		   		
@@ -1528,7 +1374,7 @@ group by A.couponId
 		}
    		
 		
-		$this->db->query("delete from favoritedshopbranch where userId = $uid");
+		$this->db->query("delete from favoritedshopbranch where userId = $uid AND shopbranchId=$shopbranchId");
 		
 		return $this->output_success();
 		

@@ -299,7 +299,8 @@ sp5Ykcw0iwSbUA==
 		
 		$data['chnlUsrId'] = '57';
 		$data['chnlUsrMobile'] = '13166361023';
-		$data['couponId'] = 'D00000000008334';
+		$data['couponId'] = 'Z00000000008039';//巴斯克75折
+//		$data['couponId'] = 'D00000000008931';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = 'C57D36T1424473970';
