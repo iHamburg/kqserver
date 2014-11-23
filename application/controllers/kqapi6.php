@@ -1726,7 +1726,7 @@ LIMIT $skip,$limit");
 			return $this->output_error(ErrorEmptyCouponId);
 		}
 		
- 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.displayedDCount as downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message, B.usage');
+ 	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.displayedDCount as downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message,B.slogan, B.usage');
  	  	$this->db->from('coupon as A');
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
 		$this->db->where('A.id',$cid);
@@ -1762,6 +1762,8 @@ LIMIT $skip,$limit");
 FROM (coupon as A)
 JOIN couponcontent as B ON A.id = B.couponId
 where A.active = 1
+and A.id!=$cid
+ORDER BY RAND()
 limit 3");
 		$results = $query->result_array();
 		$coupon['otherCoupons'] = $results;
@@ -1808,7 +1810,7 @@ limit 3");
 	  			return $this->output_error(ErrorEmptyShopId);
 	  		}
 	  		
-	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId, active
+	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId, active,averagePreis
 from shopbranch
 where id = $shopbranchId
 AND active = 1");
@@ -1854,7 +1856,7 @@ AND A.shopId = $shopId "
 );
 		
 	$response['shopCoupons'] =  $query->result_array();;
-//		$coupons = $query->result_array();
+
 	  		
 	  		return $this->output_results($response);
 	  

@@ -1879,7 +1879,7 @@ limit 3");
 	  			return $this->output_error(ErrorEmptyShopId);
 	  		}
 	  		
-	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId, active
+	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId, active,averagePreis
 from shopbranch
 where id = $shopbranchId
 AND active = 1");
