@@ -87,7 +87,10 @@ class Kqapi4 extends REST_Controller
 		
 		$username = $this->get('username');
 		$password = $this->get('password'); //md5加密
-		
+		$device = $this->get('device');
+		if(empty($device)){
+			$device = 'Android';
+		}
 		
 		$this->load->model('user2_m','user');
 		

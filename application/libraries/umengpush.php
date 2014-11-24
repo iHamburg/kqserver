@@ -316,6 +316,7 @@ class UmengPush {
 			$customizedcast->setPredefinedKeyValue("title",            $title);
 			$customizedcast->setPredefinedKeyValue("text",             $text);
 			$customizedcast->setPredefinedKeyValue("after_open",       "go_app");
+
 //			print("Sending customizedcast notification, please wait...\r\n");
 			$customizedcast->send();
 //			print("Sent SUCCESS\r\n");
