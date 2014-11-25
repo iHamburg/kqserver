@@ -66,7 +66,7 @@ class Kqtest extends CI_Controller{
 		$host = get_host($servername);
 		
 		$linkPrepend = 'http://localhost/kq/index.php/kqtest/';
-//		$linkPrepend = $host.'/kq/index.php/kqapitest/';
+
 		
 		$apiLink = array('test_dcoupon','test_error_log','test_remote_coupon_accepted','test_coupon_dincrement','test_acoupon_increment','test_accept_coupon','test_bind_card_sms');
 		$apiTitle = $apiLink;
@@ -148,7 +148,7 @@ class Kqtest extends CI_Controller{
 		
 	function test_accept_coupon(){
 		
-		echo $this->kqlibrary->accept_coupon(84, 'Z00000000008039');
+		echo $this->kqlibrary->accept_coupon(57, 'Z00000000008039');
 		
 	}
 	

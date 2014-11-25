@@ -978,7 +978,7 @@ and id>$lastNewsId");
 		else {
 			// 如果其他未知错误
 //			echo 'not true';
-			return $this->output->error($response);
+			return $this->output_error($response);
 		}
 		
 		
@@ -1626,12 +1626,10 @@ LIMIT $skip,$limit");
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 
 			$this->db->order_by('distance');
-		}
-		else if($order == 'coupon'){
-			// 按快券优先
+//			$this->db->order_by('rand()');
 		}
 		else{
-			
+				$this->db->order_by('rand()');
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -1654,8 +1652,9 @@ LIMIT $skip,$limit");
 		$order =  $this->get('order');
 		$keyword = $this->get('keyword');
 		
+		//默认是人气
 		if(empty($order)){
-			$order = 'distance';
+			$order = 'hot';
 		}
 		
 		$skip = intval($this->get('skip'));
@@ -1703,9 +1702,9 @@ LIMIT $skip,$limit");
 			$this->db->order_by('A.displayedDCount','desc');
 			
 		}
-		else{
-			$this->db->order_by('rand()');  // 随机排序
-		}
+//		else{
+//			$this->db->order_by('rand()');  // 随机排序
+//		}
 		
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -2104,9 +2103,21 @@ and active=1");
 
 //   	log_message('error','SMS Forget error #111, mobile # 111');
    	
-   	$this->kqlibrary->test_send_notification(57,38);
    	
+   	
+//		$content = "尾号【".title."】的银联卡已在快券添加成功，您会同时收到来自银联的相关服务通知！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
+		
+		
+//		echo 'content'.$content;
+		
+//		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
+//		
+//		$result = $this->get($url);
+//   	
+//		 	return $this->output_results($result);
    }
+   
+ 
    
    public function test_post(){
    		$id = $this->post('id');

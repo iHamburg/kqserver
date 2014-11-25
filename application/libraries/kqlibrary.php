@@ -302,8 +302,7 @@ and couponId=$couponId
 and uid=$uid
 limit 1");
 		
-		// 增加优惠券的承兑量
-//		echo 'couponId'.$couponId;
+
 		
 		if(!$this->coupon->increment_acount($couponId)){
 //			echo 'increment error';
@@ -316,34 +315,65 @@ limit 1");
 		
 		//发送通知： 如果是安卓就push，如果是ios就发短信		
 		
-		$umengpush = new UmengPush();
-		$completeTitle = $this->coupon->get_complete_title($couponId);
-		$title = '快券承兑完成';
-		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
-
-		$umengpush->send_customized_notification($uid,$title, $text);
+//		$umengpush = new UmengPush();
+//		$completeTitle = $this->coupon->get_complete_title($couponId);
+//		$title = '快券承兑完成';
+//		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
+//
+//		$umengpush->send_customized_notification($uid,$title, $text);
 		
+		// -- 发送通知
+		$user = $this->user->get($uid);
+		$completeTitle = $this->coupon->get_complete_title($couponId);
 
+		
+		$mobile = $user['username'];
+		$device = $user['device'];
+		
+		if ($device == 'iOS'){
+//			echo 'iOS';
+			$sms = new Kqsms();	
+			$response = $sms->send_coupon_accepted_sms($mobile,$completeTitle);
+			
+			log_message('error','iOS SMS CouponAccepted #'.$response.', mobile # '.$mobile);
+			
+//			echo $response;
+			
+		}
+		else {
+//			echo 'Android';
+			$umengpush = new UmengPush();
+			
+			$title = '优惠券承兑完成';
+			$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
+	
+			 $umengpush->send_customized_notification($uid,$title, $text);
+		
+		}
+
+		// End of 发送通知
 	}
 	
 
 	public function test_send_notification($uid,$couponId){
 		$user = $this->user->get($uid);
+		$completeTitle = $this->coupon->get_complete_title($couponId);
 //		var_dump($user);
-
+		$mobile = $user['username'];
 		$device = $user['device'];
 		
 		if ($device == 'iOS'){
 //			echo 'iOS';
 			$sms = new Kqsms();
-			$response = $sms->send_register_sms(13166363082, '2222');
+			
+			$response = $sms->send_coupon_accepted_sms($mobile,$completeTitle);
 			echo $response;
 			
 		}
-		else if($device == 'Android'){
+		else {
 //			echo 'Android';
 			$umengpush = new UmengPush();
-			$completeTitle = $this->coupon->get_complete_title($couponId);
+			
 			$title = '优惠券承兑完成';
 			$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
 	

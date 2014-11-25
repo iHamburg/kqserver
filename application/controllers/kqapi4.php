@@ -740,13 +740,6 @@ public function myCard_post(){
 			return  $this->output_error(ErrorEmptyUnionUid);
 		}
 		
-//		return $this->output_results($unionUid);
-
-		
-		// 银联解绑
-//		$response = $this->user->unbind_union_card($unionUid, $cardNo);
-		
-//		return $this->output_results($user);
 		
 		$response = $this->kqlibrary->unbind_union_card($unionUid, $cardNo);
 //		return $this->output_results('银联解绑成功');
@@ -772,7 +765,7 @@ public function myCard_post(){
 		else {
 			// 如果其他未知错误
 //			echo 'not true';
-			return $this->output->error($response);
+			return $this->output_error($response);
 		}
 		
 		

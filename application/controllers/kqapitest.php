@@ -184,7 +184,8 @@ class Kqapitest extends CI_Controller{
 		$url = $host.'/kq/index.php/kqapi4/deleteMyCard';
 		
 //		$data = array('uid'=>'84','sessionToken'=>'yeKPTVEqWIu4d29hsvtJ','card'=>'6228480031689252414');
-		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
+//		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'IWHSRv6T5rQAGe8FbaPZ');
+		$post = array('uid'=>'103','card'=>'6221883330049988776','sessionToken'=>'AfqbeYKCSX83B6TJaj4G');
 		
 		$response = post($url,$post);
 		
@@ -233,16 +234,14 @@ class Kqapitest extends CI_Controller{
 	function test_search($servername){
 		
 		$host = get_host($servername);
-		$url =  $host.'/kq/index.php/kqapi4/searchCoupons';
+		$url =  $host.'/kq/index.php/kqapi6/searchCoupons';
 		
 //		$url.='/districtId/13';
 //		$url.='/shopTypeId/1';
 
 		$url.='/longitude/121.4/latitude/31.2';
-		$url.='/keyword/0';
-		$url.='/order/ai';
-		$url.='/limit/20';
-		$url.='/shopTypeId/4';
+		$url.='/order/distance';
+		$url.='/shopTypeId/1';
 		
 		$response = get($url);
 		
