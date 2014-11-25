@@ -6,7 +6,7 @@ require(APPPATH.'libraries/REST_Controller.php');
 
 /**
  * 
- * 从测试服务器中获取数据
+ * 从测试服务器中获取数据, Android
  * @author Forest
  *
  */
@@ -88,6 +88,7 @@ class Kqapi4 extends REST_Controller
 		$username = $this->get('username');
 		$password = $this->get('password'); //md5加密
 		$device = $this->get('device');
+
 		if(empty($device)){
 			$device = 'Android';
 		}
@@ -98,6 +99,7 @@ class Kqapi4 extends REST_Controller
 		if(empty($username) || empty($password)){
 
 			return $this->output_error(ErrorEmptyUsernamePwd);
+		
 		}
 	
 		$results = $this->user->get_by(array('username'=>$username,'password'=>$password));
@@ -108,13 +110,23 @@ class Kqapi4 extends REST_Controller
 			return $this->output_error(ErrorInvalidUsernamePwd);
 		}
 		
+		
 	
+	
+		
 		//重设session和expireDate
 		$id = $results['id'];
 		$sessionToken = randomCharacter(20);
 		$expireDate = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
 	
-		$this->user->update($id,array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate));
+		$data = array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate);
+		$alt_device = $results['device'];
+		
+		if ($device!=$alt_device){
+			$data['device'] = $device;
+		}
+		
+		$this->user->update($id,$data);
 		
 		$results['sessionToken'] = $sessionToken;
 
@@ -1832,14 +1844,15 @@ LIMIT $skip,$limit");
 		
 		/// otherCoupons
 
-		$query = $this->db->query("SELECT A.id, A.title,  B.avatarUrl, B.discountContent
+			$query = $this->db->query("SELECT A.id, A.title,  B.avatarUrl, B.discountContent
 FROM (coupon as A)
 JOIN couponcontent as B ON A.id = B.couponId
 where A.active = 1
+and A.id!=$cid
+ORDER BY RAND()
 limit 3");
 		$results = $query->result_array();
 		$coupon['otherCoupons'] = $results;
-
 		
 		
 		///----------------nearestShop
@@ -1994,6 +2007,8 @@ and active=1");
 			log_message('error','SMS Register error #'.$response.', mobiel # '.$mobile);
 			
 			return $this->output_error(ErrorFailureSMS);
+
+//			return $this->output_error(90000 + $response);
 		}
 		
 	

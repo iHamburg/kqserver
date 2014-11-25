@@ -6,7 +6,7 @@ require(APPPATH.'libraries/REST_Controller.php');
 
 /**
  * 
- * 从测试服务器中获取数据
+ * 从测试服务器中获取数据, iOS
  * @author Forest
  *
  */
@@ -30,6 +30,7 @@ class Kqapi6 extends REST_Controller
 	 * @var Card2_m
 	 */
 	var $card;
+	
 	
 	/**
 	 * 
@@ -87,9 +88,14 @@ class Kqapi6 extends REST_Controller
 		
 		$username = $this->get('username');
 		$password = $this->get('password'); //md5加密
+		$device = $this->get('device');
+
+		if(empty($device)){
+			$device = 'Android';
+		}
 		
+		$this->load->model('user2_m','user');
 		
-//		$this->load->model('user2_m','user');
 		
 		//用户名或密码不能为空
 		if(empty($username) || empty($password)){
@@ -101,20 +107,27 @@ class Kqapi6 extends REST_Controller
 		
 		//用户名或密码错误
 		if(empty($results)){
+	
 			return $this->output_error(ErrorInvalidUsernamePwd);
 		}
+
 		
-	
 		//重设session和expireDate
 		$id = $results['id'];
 		$sessionToken = randomCharacter(20);
 		$expireDate = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
 	
-		$this->user->update($id,array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate));
+		$data = array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate);
+		$alt_device = $results['device'];
+		
+		if ($device!=$alt_device){
+			$data['device'] = $device;
+		}
+		
+		$this->user->update($id,$data);
 		
 		$results['sessionToken'] = $sessionToken;
 
-		//不把password传回去
 		unset($results['password']);
 		
 		return $this->output_results($results);
@@ -1654,7 +1667,7 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
    	
- 	  	$query = "A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.displayedDCount as downloadedCount,C.address, A.isSellOut, A.isEvent, C.title as shopbranchTitle"; 	  		
+ 	  	$query = "A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.displayedDCount as downloadedCount,C.address, A.isSellOut, A.isEvent, C.title as shopbranchTitle, C.longitude, C.latitude"; 	  		
 
  	  	if(!empty($latitude) && !empty($longitude)){
  	  		$query.=",ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance";
@@ -2087,10 +2100,11 @@ and active=1");
    		
 //   		$this->output_results($response);
    
-   	$this->output_success();
+//   	$this->output_success();
 
 //   	log_message('error','SMS Forget error #111, mobile # 111');
    	
+   	$this->kqlibrary->test_send_notification(57,38);
    	
    }
    

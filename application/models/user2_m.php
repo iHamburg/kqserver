@@ -149,8 +149,7 @@ and A.couponId=$couponId");
 			}
 			else{
 //				
-				//调用内部服务器的数据库更新
-				
+				//调用内部服务器的数据库更新	
 				$id =  $this->db->insert_id();
 
 				return $id;
@@ -158,99 +157,6 @@ and A.couponId=$couponId");
 
 	}
 
-
-
-
-//	
-//	/**
-//	 * 
-//	 * "userId":"c00055685346","mobile":"13166361023","email":"","userName":"","cardList":[{"cardNo":"196222***********9533","issuerName":"\u4e2d\u56fd\u5de5\u5546\u94f6\u884c"}]}
-//	 * @param unknown_type $mobile
-//	 */
-//	public function get_union_user($mobile){
-//		
-//		$this->load->library("unionpay");
-//		
-////		echo 'before get union user';
-//		$response = $this->unionpay->getUserByMobile($mobile);
-//		
-////		echo 'resposne'.$response;
-//		$response = json_decode($response,true);
-//		$respCd = $response['respCd'];
-//		
-//		if ($respCd == '000000'){
-//			return $response['data'];
-//		}
-//		else {
-//			return $respCd;
-//		}
-//	}
-	
-//	public function register_union($mobile){
-//		
-//		$this->load->library("unionpay");
-//		
-//		$response = $this->unionpay->regByMobile($mobile);
-//		
-//		$response = json_decode($response,true);
-//		$respCd = $response['respCd'];
-//		
-//		if ($respCd == '000000'){
-//			return $response['data'];
-//		}
-//		else {
-//			return $respCd;
-//		}
-//	}
-	
-//	public function bind_union_card($unionUid, $cardNo){
-//		
-////		echo 'begin bind union card';
-//
-//		$this->load->library("unionpay");
-//		
-//		$response = $this->unionpay->bindCard($unionUid,$cardNo);
-//		
-////		echo 'response '.$response;
-//		
-//		$response = json_decode($response,true);
-//		
-//		$respCd = $response['respCd'];
-//		
-//		if ($respCd == '000000'){
-//			return $response['data'];
-//		}
-//		else {
-//			return $respCd;
-//		}
-//	}
-	
-
-	
-//	/**
-//	 * 银联解绑卡
-//	 * 成功返回true!!!
-//	 * 失败反悔respCd
-//	 * @param unknown_type $unionUid
-//	 * @param unknown_type $cardNo
-//	 */
-//	public function unbind_union_card($unionUid, $cardNo){
-//		
-//		$this->load->library("unionpay");
-////		echo 'begin unbind union card';
-//		$response = $this->unionpay->unbindCard($unionUid,$cardNo);
-////		echo 'response '.$response;
-//		$response = json_decode($response,true);
-//		
-//		$respCd = $response['respCd'];
-//		
-//		if ($respCd == '000000'){
-//			return true;
-//		}
-//		else {
-//			return $respCd;
-//		}
-//	}
 	
 	function login($username,$password){
 

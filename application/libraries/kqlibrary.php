@@ -2,9 +2,12 @@
 
 require_once(APPPATH.'libraries/unionpay.php');
 require_once(APPPATH.'libraries/umengpush.php');
+require_once(APPPATH.'libraries/kqsms.php');
 require_once(APPPATH.'models/user2_m.php'); 
 require_once(APPPATH.'models/coupon2_m.php'); 
 require_once(APPPATH.'models/news2_m.php');
+
+
 
 class Kqlibrary{
 	
@@ -41,6 +44,8 @@ class Kqlibrary{
      	$this->unionpay = new Unionpay();
      	
      	$this->coupon = new Coupon2_m();
+     	
+     	$this->user = new User2_m();
      	
 	}
 
@@ -297,8 +302,6 @@ and couponId=$couponId
 and uid=$uid
 limit 1");
 		
-//		echo 'after update';
-		
 		// 增加优惠券的承兑量
 //		echo 'couponId'.$couponId;
 		
@@ -311,33 +314,45 @@ limit 1");
 		
 //		echo 'after increment acount';
 		
+		//发送通知： 如果是安卓就push，如果是ios就发短信		
+		
 		$umengpush = new UmengPush();
 		$completeTitle = $this->coupon->get_complete_title($couponId);
-		$title = '优惠券承兑完成';
+		$title = '快券承兑完成';
 		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
 
 		$umengpush->send_customized_notification($uid,$title, $text);
 		
-		/// --- 发送站内信
-		
-//   		unset($data);
-//   		$data['uid'] = $uid;
-//   		$data['title'] = '票券承兑成功';
-//   		$data['text'] = $text;
-//   		
-//   		$news = new News2_m();
-//   		$newsId = $news->insert($data);
-//   		
-//   		if (empty($newsId)){
-//   		// 如果没有insert成功
-//   			log_message('error','bind card insert news error, uid #'.$uid);
-//   		}
-		
-		/// --- Endof发送站内信
-//		
+
 	}
 	
 
+	public function test_send_notification($uid,$couponId){
+		$user = $this->user->get($uid);
+//		var_dump($user);
+
+		$device = $user['device'];
+		
+		if ($device == 'iOS'){
+//			echo 'iOS';
+			$sms = new Kqsms();
+			$response = $sms->send_register_sms(13166363082, '2222');
+			echo $response;
+			
+		}
+		else if($device == 'Android'){
+//			echo 'Android';
+			$umengpush = new UmengPush();
+			$completeTitle = $this->coupon->get_complete_title($couponId);
+			$title = '优惠券承兑完成';
+			$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
+	
+			$umengpush->send_customized_notification($uid,$title, $text);
+		
+		}
+		
+	
+	}
 	
 	
 	public function test(){

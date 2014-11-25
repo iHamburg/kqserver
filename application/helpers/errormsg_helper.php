@@ -40,14 +40,14 @@ define("ErrorUnionNoCardBunden", 500058);
 define("ErrorUnionBindCardToOften", 300521);
 define("ErrorUnionDCouponLimt", 500048);  
 
+define("ErrorSMSCaptchaLimit", 4085);
+
 
 //define("ErrorUnionGetUser", 900);
 //define("ErrorUnionRegister", 901);
 //define("ErrorUnionBindCard", 902);
 //define("ErrorUnionUnbindCard", 903);
 //define("ErrorUnionDownloadCoupon", 904);
-
-
 
 
 function msg_with_error($error){
@@ -171,6 +171,10 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionDCouponLimt:
 			$msg = '银联优惠券下载张数超过单用户下载限制';
+		break;
+		
+		case ErrorSMSCaptchaLimit:
+			$msg = '今天已经发了太多的验证码了，明天再试试吧';
 		break;
 		default:
 		 $msg = '服务器未知错误';
