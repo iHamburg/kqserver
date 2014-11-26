@@ -208,107 +208,48 @@ class Kqtest extends CI_Controller{
 		
 	}
 	  
+	public function test_header(){
+	
+		
+		$url = 'http://61.153.100.241/kq/index.php/kqapi6/test';
+		
+//  	$url = 'http://61.153.100.241/kq/index.php/kqtest/testsuit';
+    
+//		$url = 'http://dev.umeng.com/analytics/ios/sdk-download';
+		
+//		$url = 'http://www.sina.com';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_HEADER, TRUE);    //表示需要response header
+//    curl_setopt($ch, CURLOPT_NOBODY, FALSE); //表示需要response body
+//    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+//    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, FALSE);
+    curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    
+    $result = curl_exec($ch);
+    $curl_errno = curl_errno($ch);  
+    $curl_error = curl_error($ch);
+	
+ 	if($curl_errno >0){  
+         echo "cURL Error ($curl_errno): $curl_error\n";  
+    }
+	
+	curl_close($ch);
+//    echo $result;
+    
+    list($header, $body) = explode("\r\n\r\n", response, 2);
+    
+    echo $header;
+    
+//  	echo get('http://bbs.umeng.com/thread-5458-1-1.html');
+	}
 	  
+//	public function 
 	public function test(){
-			header( 'Content-Type:text/html;charset=utf-8 ');
-			
-//			$result = $this->user->delete(21);
-//			
-//			echo $result;
-//			echo $this->db->affected_rows();
 
-//		$this->db->query("insert into downloadedcoupon (uid,couponId,transSeq,createdAt) values ('sdfsdf',1,1,null) ");
-//		
-//		echo $this->db->insert_id();
-
-		// 调用这个接口，echo 'sss'之后，调用api 或 lib？
-		
-		
-//	$fp = fsockopen("www.baidu.com",
-//     80, $errno, $errstr, 30);   
-//    if (!$fp) {   
-//    	echo "$errstr ($errno)<br />\n";   
-//    } else {   
-//	    $out = "GET / HTTP/1.1\r\n";   
-//	    $out .= "Host: www.baidu.com\r\n";   
-//	    $out .= "Connection: Close\r\n\r\n";   
-//     
-//   		 fwrite($fp, $out);   
-//    while (!feof($fp)) {   
-//   		 echo fgets($fp, 128);   
-//    }   
-//  		  fclose($fp);   
-//    }  
-		
-//		$str_bh='123456789';
-//		$abc=substr($str_bh,-4);
-//
-//		echo $abc;
-
-		
-//		if(1 == ErrorUnionInvalidParameter){
-//			// 如果参数不对错误
-//			echo 'invalid';
-////			return $this->output_error($response);
-//		}
-//		else{
-//			echo 'success';		
-//		}
-
-//		echo $this->coupon->get_complete_title(36);
-
-//			$this->load->library('umengpush');
-//			
-//			echo $this->umengpush->send_customized_notification(84,'hahah','lksldkfjsdkl');
-			
-//			echo $this->umengpush->sendAndroidCustomizedcast();
-			
-//			$demo = new Demo("5445cf0bfd98c5d70001d213", "bqalj5hvoltwhiy9gtmnthurulr8woxf");
-//$demo->sendAndroidCustomizedcast();
-
-//			$this->kqlibrary->test();
-
-//		$this->db->select('A.couponId,count(A.couponId) as number,B.title,B.endDate,C.avatarUrl,C.discountContent,B.isSellOut,B.isEvent, B.active');
-//		$this->db->from('downloadedcoupon as A');
-//		$this->db->where('uid',$uid);
-//		if($mode == 'unused'){
-//			$this->db->where('status','unused');
-//			$this->db->where('B.endDate <','now()');
-//		}
-//		else if($mode == 'used'){
-//			$this->db->where('status','used');
-//		}
-//		else if($mode == 'expired'){
-//			$this->db->where('status','unused');
-//			$this->db->where('B.endDate >','now()');
-//		}
-//		$this->db->join('coupon as B','A.couponId = B.id','left');
-//		$this->db->join('couponcontent as C','A.couponId = C.couponId','left');
-//		$this->db->group_by('A.couponId');
-//		$this->db->limit($limit,$skip);
-//		
-//		$query = $this->db->get();
-		
-//		$sql = "SELECT `A`.`couponId`, count(A.couponId) as number, `B`.`title`, `B`.`endDate`, `C`.`avatarUrl`, `C`.`discountContent`,B.isSellOut,B.isEvent,B.active
-//FROM (`downloadedcoupon` as A)
-//LEFT JOIN `coupon` as B ON `A`.`couponId` = `B`.`id`
-//LEFT JOIN `couponcontent` as C ON `A`.`couponId` = `C`.`couponId`";
-//		$sql.="
-//WHERE `uid` =  $uid
-//AND `status` =  'unused'
-//AND `B`.`endDate` > now()";
-//		$sql.="
-//GROUP BY `A`.`couponId`
-//LIMIT $skip,$limit";	
-//			
-//		$results = $query->result_array();
-//		
-//		
-//		print_r($results);
-//		$this->output->enable_profiler(TRUE);
-		
-			
-//			echo 'now '.now().'now string'.strtolower(now());
+		$headers = apache_request_headers();
+		print_r($headers);
 	}
 
 
