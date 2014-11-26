@@ -95,6 +95,42 @@ LIMIT $skip,$limit";
 	}
 	
 	
+	
+	public function can_user_dcoupon($uid,$couponId){
+		
+		
+		// 如果coupon是event，并且downloadedcoupon里有了，返回false
+		
+		$query = $this->db->query("select B.isEvent, B.unusedLimit
+from downloadedcoupon A
+left join coupon B
+on A.couponId=B.id
+where  A.uid=$uid
+and A.couponId=$couponId
+limit 1");
+		
+		$results = $query->result_array();
+		
+		// 查到记录了
+		if(!empty($results)){
+			$record = $results[0];
+			$isEvent = $record['isEvent'];
+			$unusedLimit = $record['unusedLimit'];
+			
+			if ($isEvent == 1){
+				return ErrorDownloadEventCouponLimit;
+			}
+			
+			if($unusedLimit > 0){
+				return ErrorDownloadCouponLimit;
+			}
+			
+		}
+		
+		
+		return true;
+	}
+	
 	/**
 	 * 
 	 * 如果coupon是event，并且用户已经下载过了返回no，
@@ -103,7 +139,7 @@ LIMIT $skip,$limit";
 	 * @param unknown_type $uid
 	 * @param unknown_type $couponId
 	 */
-	public function can_user_dcoupon($uid,$couponId){
+	public function can_user_dcoupon2($uid,$couponId){
 		
 		//TODO 活动快券的判定
 		

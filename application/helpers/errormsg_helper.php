@@ -24,7 +24,8 @@ define("ErrorDBInsert", 703);
 define("ErrorFailureSMS",    801);
 define("ErrorLimitDCoupon",  802);
 define("ErrorFailureDCoupon", 803);
-
+define("ErrorDownloadEventCouponLimit", 804);
+define("ErrorDownloadCouponLimit", 805);
 
 define("ErrorUsernameExists",   1001);
 define("ErrorCardExists",   1003);
@@ -40,14 +41,13 @@ define("ErrorUnionNoCardBunden", 500058);
 define("ErrorUnionBindCardToOften", 300521);
 define("ErrorUnionDCouponLimt", 500048);  
 
-define("ErrorSMSCaptchaLimit", 4085);
+//短信
+define("ErrorSMSUnknown", 99999);
+define("ErrorSMSCaptchaLimit", 94085);
+define("ErrorSMSZero", 90000);
 
 
-//define("ErrorUnionGetUser", 900);
-//define("ErrorUnionRegister", 901);
-//define("ErrorUnionBindCard", 902);
-//define("ErrorUnionUnbindCard", 903);
-//define("ErrorUnionDownloadCoupon", 904);
+//
 
 
 function msg_with_error($error){
@@ -106,6 +106,12 @@ function msg_with_error($error){
 		case ErrorFailureDCoupon:
 		  $msg = '用户下载快券失败';
 		break;
+		case ErrorDownloadCouponLimit:
+			$msg = '快券使用后才能重新下载';
+		break;
+		case ErrorDownloadEventCouponLimit:
+			$msg = '该快券只能下载一次';
+		break;
 		
 		case ErrorDBUpdate:
 		  $msg = '数据库更新错误';
@@ -139,21 +145,6 @@ function msg_with_error($error){
 		case ErrorUnionUnknown:
 		  $msg = '未知银联错误';
 		break;
-//		case ErrorUnionGetUser:
-//			$msg = '银联查询用户错误';
-//		break;
-//		case ErrorUnionRegister:
-//			$msg = '银联注册用户错误';
-//		break;
-//		case ErrorUnionBindCard:
-//			$msg = '银联绑卡错误';
-//		break;
-//		case ErrorUnionUnbindCard:
-//			$msg = '银联解卡错误';
-//		break;
-//		case ErrorUnionDownloadCoupon:
-//			$msg = '银联下载快券错误';
-//		break;
 		case ErrorUnionEmptyUID:
 			$msg = '没有银联用户id';
 		break;
@@ -173,8 +164,18 @@ function msg_with_error($error){
 			$msg = '银联优惠券下载张数超过单用户下载限制';
 		break;
 		
+		
+		
+		
+		// SMS
 		case ErrorSMSCaptchaLimit:
-			$msg = '今天已经发了太多的验证码了，明天再试试吧';
+			$msg = '今天不能再发送验证码了';
+		break;
+		case ErrorSMSZero:
+			$msg = '短信提交太频繁了';
+		break;
+		case ErrorSMSUnknown:
+			$msg = '短信发送失败';
 		break;
 		default:
 		 $msg = '服务器未知错误';

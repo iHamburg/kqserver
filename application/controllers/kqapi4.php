@@ -771,78 +771,7 @@ public function myCard_post(){
 		
 		
 	}
-	
 
-//   /**
-//	 * 
-//	 * 用户取消收藏快券
-//	 * 
-//	 * @return
-//	 * 正常： status:1
-//	 * 异常： status: -1, input 不全
-//	 */
-//	public function deleteMyCard2_post(){
-//		$uid = $this->post('uid');
-//		$card = $this->post('card');	
-//		$sessionToken = $this->post('sessionToken');
-//	
-//		
-//		$this->load->model('user2_m','user');
-//		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$user = $this->user->isSessionValid($uid,$sessionToken)){
-//
-//			return $this->output_error(ErrorInvalidSession);
-//		
-//		}
-//   		
-//		$data['userId'] = $uid;
-//		$data['title'] = $card;
-//		
-//		$this->load->model('card2_m','card');
-//
-////		$unionUid = $this->user->get_union_uid($uid);
-//		
-//		$unionUid = $user['unionId'];
-//		
-//		if (!empty($unionUid)){
-//			// 用户应该在银联注册过，能找到银联id
-//			$response = $this->unionpay->unbindCard($unionUid, $card); //13166361023				
-//		
-//			$response = json_decode($response,true);
-//			$respCd = $response['respCd'];
-//		
-//				/// 同一个账户可以多次绑定一张卡
-//			if($respCd == '000000' ){
-//				//success
-//				$result = $this->card->delete_by($data);
-//			
-//				return $this->output_success();
-//	
-//			}
-//			else{
-//				
-//	//			return $this->output_results($response);
-//				return $this->output_error(ErrorUnionUnbindCard);
-//	
-//			}
-//		}
-//		else{
-//			// 如果没有银联uid， 报出错
-//			
-//			return $this->output_error(ErrorUnionEmptyUID);
-//			
-//		}
-//		
-//
-//		
-//	
-//		
-//	}
 	/**
 	 * 
 	 * 获得用户所有downloadedcoupon信息, join Table: DownloadedCoupon
@@ -927,14 +856,13 @@ group by A.couponId
 		$data['uid'] = $uid;
 		$data['couponId'] = $couponId;
 		
-		
 		/// 数据库判断user是否能下载coupon
-		if (!$this->user->can_user_dcoupon($uid,$couponId)){
-			// 如果用户不能下载该快券, 就直接报错
-			
-			return $this->output_error(ErrorLimitDCoupon);
-	
+		$code = $this->user->can_user_dcoupon($uid,$couponId);
+		
+		if ($code !== true){
+			return $this->output_error($code);
 		}
+		// --- End of 判断用户能否下载
 		
 		/**
 		 * 如果unionUid不存在，只要存在本地数据库就行
@@ -2012,7 +1940,33 @@ and active=1");
 	
 	public function captchaforgetpwd_get(){
 		
-		$this->load->library('kqsms');
+//		$this->load->library('kqsms');
+//		
+//		$mobile = $this->get('mobile');
+//	
+//		$captcha = random_number();
+//	
+//		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
+//
+//		
+//		
+//		if ($response === true){
+//			$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
+//
+//			$captchaMd5 = md5($captcha);
+//		
+//			return $this->output_results(array('captcha'=>$captchaMd5));
+//		}
+//		else{
+//			
+////			echo 'failure';
+//
+//			log_message('error','SMS Forget error #'.$response.', mobiel # '.$mobile);
+//			
+//			return $this->output_error(ErrorFailureSMS);
+//		}
+
+			$this->load->library('kqsms');
 		
 		$mobile = $this->get('mobile');
 	
@@ -2020,8 +1974,6 @@ and active=1");
 	
 		$response = $this->kqsms->send_forgetpwd_sms($mobile,$captcha);
 
-		
-		
 		if ($response === true){
 			$query = $this->db->query("insert into s_sms (type,code,mobile) values ('forget',$response,$mobile)");
 
@@ -2032,10 +1984,18 @@ and active=1");
 		else{
 			
 //			echo 'failure';
-
-			log_message('error','SMS Forget error #'.$response.', mobiel # '.$mobile);
+	
+			log_message('error','SMS Forget error #'.$response.', mobile # '.$mobile);
 			
-			return $this->output_error(ErrorFailureSMS);
+			if ($response == ErrorSMSZero || $response == ErrorSMSCaptchaLimit){
+				return $this->output_error($response);
+			}
+			else{
+				return $this->output_error(ErrorSMSUnknown);
+			}
+		
+			
+			
 		}
 		
 	}

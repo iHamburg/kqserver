@@ -245,7 +245,9 @@ class Kqtest extends CI_Controller{
 //  	echo get('http://bbs.umeng.com/thread-5458-1-1.html');
 	}
 	  
-//	public function 
+	public function returnHeaders(){
+		
+	} 
 	public function test(){
 
 		$headers = apache_request_headers();

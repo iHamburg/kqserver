@@ -577,29 +577,6 @@ and id>$lastNewsId");
 		 // -- Copy 已下载的快券到银联
 		 if ($couponCopyUnion){
 		 	// 如果需要copy快券给银联
-		 	
-		 	// 用户下载并且没过期的优惠券
-//			$query = $this->db->query("select A.couponId as id, A.transSeq, B.username mobile, B.unionId, C.unionCouponId
-//		from downloadedcoupon A
-//		left join user B
-//		on A.uid=B.id
-//		left join coupon C
-//		on C.id=A.couponId
-//		where B.id=$uid
-//		AND `C`.`endDate` > now()");
-//		
-//			$coupons = $query->result_array();
-//			
-//			if (!empty($coupons)){
-//				$coupon = $coupons[0];
-//				$mobile = $coupon['mobile'];
-//				$unionUid = $coupon['unionId'];
-//				
-//				$response =$this->kqlibrary->download_batch_coupons($uid, $mobile, $unionUid, $coupons);	
-//			
-//				//记录批量下载的结果
-//				log_message('error',"Batch Download Coupon Response # $response");
-//			}
 
 		 	$url = site_url($this->apiName."/batchDownloadUnionCoupon/uid/".$uid);
 			// echo $url;
@@ -625,7 +602,8 @@ and id>$lastNewsId");
 		else{
 		//	echo 'failure';
 			
-			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$username);
+			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$username); 
+			
 		}
 		
 		///-----End of 发送短信
@@ -660,241 +638,6 @@ and id>$lastNewsId");
   		
    }
 
-	public function myCard2_post(){
-   	
-  		$uid = $this->post('uid');
-		$card = $this->post('card');	
-		$sessionToken = $this->post('sessionToken');
-		
-   		$this->load->model('user2_m','user');
-   		$this->load->model('card2_m','card');
-   		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$user = $this->user->isSessionValid($uid,$sessionToken)){
-//			
-//			return $this->output_error(ErrorInvalidSession);
-//		}
-   		
-
-		$data['userId'] = $uid;
-		$data['title'] = $card;
-		$cardNo = $card;
-
-		$card = $this->card->get_by($data);	
-		
-		
-//		if(!empty($card)){
-//			///如果数据库里已经绑定了这张卡,报错
-//			
-//			return $this->output_error(ErrorCardExists);
-//		
-//		}
-	
-		//如果本地数据库没有卡号记录，先判断用户是否已经银联注册
-
-		//获得unionUId
-		$unionUid = $user['unionId'];
-		$username = $user['username'];
-					
-//		return $this->output_results($unionUid);
-		//凡事数据库没有unionUid，说明没有绑定银联用户，如果成功注册或是登录，需要把之前下载的快券登记到银联中去
-//		if(empty($unionUid)){
-//			//如果用户没有unionId，先查询再注册, 获得unionUid
-//	
-//			
-//			$unionUser = $this->kqlibrary->get_union_user($username);
-//			
-////			return $this->output_results($unionUser);
-//
-//		 	if($unionUser == ErrorUnionEmptyUser){
-//			//如果银联没有该用户，说明需要注册 
-//			
-//		 		$response = $this->kqlibrary->register_union($username);
-//		 		
-//		 		if (!is_array($response)){
-//		 			// 如果注册没有成功，报错
-//		 			return $this->output_error($response);
-//		 		}
-//		
-//			}
-//			else if(!is_array($unionUser)){
-//			// 其他union查询的错误
-//
-//				return $this->output_error($unionUser);
-//			
-//			}
-//			else{
-//			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
-//				$unionUid = $unionUser['userId'];			
-//			}
-//
-//			
-//			//把银联的Uid更新到服务器中
-//			$this->user->update_unionid_by_uid($uid,$unionUid);
-//			
-//		
-//			// 绑定银联用户成功，异步调用下载优惠券
-////			$url = site_url($this->apiName."/batchDownloadUnionCoupon");
-////			echo $url;
-////			
-////  		 	asyn_get($url);
-//
-//			
-//			
-//		
-//			$query = $this->db->query("select A.couponId as id, A.transSeq, B.username mobile, B.unionId, C.unionCouponId
-//	from downloadedcoupon A
-//	left join user B
-//	on A.uid=B.id
-//	left join coupon C
-//	on C.id=A.couponId
-//	where B.id=$uid");
-//		
-//			$coupons = $query->result_array();
-//			
-//			if (!empty($coupons)){
-//				$coupon = $coupons[0];
-//				$mobile = $coupon['mobile'];
-//				$unionUid = $coupon['unionId'];
-//				
-//				$this->kqlibrary->download_batch_coupons($uid, $mobile, $unionUid, $coupons);	
-//			
-//			}
-//			
-//		}
-//
-//		//用户已经绑定银联帐号，绑卡
-//		
-////		echo "unionId $unionUid, cardno # $cardNo";
-//		
-//		$response = $this->kqlibrary->bind_union_card($unionUid,$cardNo);
-//		
-////		return $this->output_results('aaa');
-//		
-//		 if(!is_array($response)){
-//		//绑卡其他错误
-////			echo $response;
-//			return $this->output_error($response);
-//
-//		}
-
-		
-		///-------- Endof 银联绑卡成功
-		
-		//------ 获得发卡行信息
-//		$issuerName = $response['issuerName'];  // 银行名称
-//		
-//		//把issuerName加到bank数据库中, 获得银行logoUrl
-//		$this->load->model('bank2_m','bank');
-//		
-//		$bank = $this->bank->get_by('title',$issuerName);
-//
-//		
-////		return $this->output_results($card);
-//		
-//		if (!empty($bank)){
-//			//如果发卡行已经在bank中了， 获得发卡行的id和图片地址， 
-//			$logoUrl = $bank['logoUrl'];
-//			$bankId = $bank['id'];
-//		}
-//		else{
-//			// 如果发卡行不在bank中，bank新增一个record
-//			
-//			$this->bank->insert(array('title'=>$issuerName));
-//			$bankId = $this->db->insert_id();
-//			$logoUrl  = 'http://www.quickquan.com/images/banks/unknownbank.jpg';
-//			
-//		}
-		
-		//-----End of 获得发卡行信息
-		
-		// -- 服务器绑卡 -- 
-		
-//		var_dump($bankId);
-		
-//		 $this->db->query("insert into card (userId, title, bankTitle, bankId) values ($uid,'$cardNo','$issuerName',$bankId)"); // return 1
-	
-
-		 ///-----发送短信
-//	    $this->load->library('kqsms');
-//	    
-//	    $endCardNo =substr($cardNo,-4);
-//	    
-//		$smsResp = $this->kqsms->send_bind_card_sms($username, $endCardNo);
-//		 
-//		// 发送的结果
-// 		if ($smsResp === true){
-//		// 发送成功
-//			$this->db->query("insert into s_sms (type,code,mobile) values ('bindcard',1,$username)");
-//			
-//		}
-//		else{
-//		//	echo 'failure';
-//			
-//			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$username);
-//		}
-		
-		///-----End of 发送短信
-		 
-		/// --- 发送站内信
-		
-//   		unset($data);
-//   		$data['uid'] = $uid;
-//   		$data['title'] = '绑定银联卡';
-//   		$data['text'] = "阁下已成功添加尾号".$endCardNo."的银联卡！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
-//   		
-//   		$this->load->model('news2_m','news');
-//   		$newsId = $this->news->insert($data);
-//   		
-//   		if (empty($newsId)){
-//   		// 如果没有insert成功
-//   			log_message('error','bind card insert news error, uid #'.$uid);
-//   		}
-//		
-		/// --- Endof发送站内信
-		
-		// 返回银行卡的信息
-		
-//		$query = $this->db->query("select * from card where title = '$cardNo'");
-//		$results = $query->result_array();
-//		$response = $results[0];
-//		$response['logoUrl'] = $logoUrl;
-		
-		// 用户下载并且没过期的优惠券
-//		$query = $this->db->query("select A.couponId as id, A.transSeq, B.username mobile, B.unionId, C.unionCouponId
-//	from downloadedcoupon A
-//	left join user B
-//	on A.uid=B.id
-//	left join coupon C
-//	on C.id=A.couponId
-//	where B.id=$uid
-//	AND `C`.`endDate` > now()");
-//		
-//			$coupons = $query->result_array();
-//			
-//			if (!empty($coupons)){
-//				$coupon = $coupons[0];
-//				$mobile = $coupon['mobile'];
-//				$unionUid = $coupon['unionId'];
-//				
-//				$response =$this->kqlibrary->download_batch_coupons($uid, $mobile, $unionUid, $coupons);	
-//			
-//				//记录批量下载的结果
-//				log_message('error',"Batch Download Coupon Response # $response");
-//			}
-			
-		 $url = site_url($this->apiName."/batchDownloadUnionCoupon/uid/".$uid);
-		// echo $url;
-		 asyn_get($url);
-		
-		return $this->output_results($response);
-
-  		
-   }
    /**
 	 * 
 	 * 用户取消收藏快券
@@ -1061,12 +804,13 @@ and id>$lastNewsId");
 		
 		
 		/// 数据库判断user是否能下载coupon
-		if (!$this->user->can_user_dcoupon($uid,$couponId)){
-			// 如果用户不能下载该快券, 就直接报错
-			
-			return $this->output_error(ErrorLimitDCoupon);
-	
+		$code = $this->user->can_user_dcoupon($uid,$couponId);
+		
+		if ($code !== true){
+			return $this->output_error($code);
 		}
+		// --- End of 判断用户能否下载
+
 		
 		/**
 		 * 如果unionUid不存在，只要存在本地数据库就行
@@ -1894,7 +1638,6 @@ on A.districtId=B.id
 where shopId = $shopId
 and active=1");
 	  	
-	  	
 	  
   		$results = $query->result_array();	
 //  		
@@ -1931,9 +1674,14 @@ and active=1");
 		else{
 //			echo 'failure';
 			
-			log_message('error','SMS Register error #'.$response.', mobiel # '.$mobile);
+			log_message('error','SMS Register error #'.$response.', mobile # '.$mobile);
 			
-			return $this->output_error(ErrorFailureSMS);
+			if ($response == ErrorSMSZero || $response == ErrorSMSCaptchaLimit){
+				return $this->output_error($response);
+			}
+			else{
+				return $this->output_error(ErrorSMSUnknown);
+			}
 		}
 		
 	
@@ -1962,10 +1710,16 @@ and active=1");
 		else{
 			
 //			echo 'failure';
-
+	
 			log_message('error','SMS Forget error #'.$response.', mobile # '.$mobile);
 			
-			return $this->output_error(ErrorFailureSMS);
+			if ($response == ErrorSMSZero || $response == ErrorSMSCaptchaLimit){
+				return $this->output_error($response);
+			}
+			else{
+				return $this->output_error(ErrorSMSUnknown);
+			}
+		
 		}
 		
 	}
@@ -2114,10 +1868,14 @@ and active=1");
 //		
 //		$result = $this->get($url);
 //   	
-//		 	return $this->output_results($result);
    }
    
- 
+ 	public function test_headers_get(){
+ 		
+ 		$headers = apache_request_headers();
+ 		
+ 		$this->output_results($headers);
+ 	}
    
    public function test_post(){
    		$id = $this->post('id');
