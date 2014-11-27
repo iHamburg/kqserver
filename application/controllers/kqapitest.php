@@ -161,9 +161,11 @@ class Kqapitest extends CI_Controller{
 	
 		$host = get_host($servername);
 		
-		$url = $host.'/kq/index.php/kqapi6/mycard2';
+		$url = $host.'/kq/index.php/kqapi4/mycard';
 	
-		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'G9h1KDWQiZXg6p5YqIxy');
+		$post = array('uid'=>'108','card'=>'6221883330049988776','sessionToken'=>'b1TEgWXzku7vURG05r3Q');
+		
+//		$post = array('uid'=>'57','card'=>'6222021001128509533','sessionToken'=>'G9h1KDWQiZXg6p5YqIxy');
 		
 //		$post = array('uid'=>'56','sessionToken'=>'sHBecA9Vbw5CYSKg8GTE','card'=>'6222021001128509533');
 	

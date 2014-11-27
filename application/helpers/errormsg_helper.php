@@ -40,6 +40,7 @@ define("ErrorUnionEmptyUser", 300200);  // 查询结果
 define("ErrorUnionNoCardBunden", 500058);
 define("ErrorUnionBindCardToOften", 300521);
 define("ErrorUnionDCouponLimt", 500048);  
+define("ErrorUnionGetUserNoUser",500001);
 
 //短信
 define("ErrorSMSUnknown", 99999);
@@ -145,8 +146,11 @@ function msg_with_error($error){
 		case ErrorUnionUnknown:
 		  $msg = '未知银联错误';
 		break;
-		case ErrorUnionEmptyUID:
-			$msg = '没有银联用户id';
+//		case ErrorUnionEmptyUID:
+//			$msg = '没有银联用户id';
+//		break;
+		case ErrorUnionGetUserNoUser:
+		  $msg = '银联查询账户不存在';
 		break;
 		case ErrorUnionInvalidCoupon:
 			$msg = '银联优惠券无效';

@@ -439,52 +439,7 @@ and id>$lastNewsId");
     * 
     * 用户绑定银行卡
     */
-//   public function myCard_post(){
-//   	
-//  		$uid = $this->post('uid');
-//		$card = $this->post('card');	
-//		$sessionToken = $this->post('sessionToken');
-//		
-//   		$this->load->model('user2_m','user');
-//   		
-//		if(empty($uid) || empty($card) || empty($sessionToken)){
-//		
-//			return $this->output_error(ErrorEmptyParameter);
-//		}
-//		
-//		if(!$this->user->isSessionValid($uid,$sessionToken)){
-//			
-//			return $this->output_error(ErrorInvalidSession);
-//		}
-//   		
-//
-//		$data['userId'] = $uid;
-//		$data['title'] = $card;
-//		
-//		$this->load->model('card2_m','card');
-//
-//		$card = $this->card->get_by($data);
-//		
-//		//如果没有卡，加上一条记录
-//		if(empty($card)){
-//			$data['bankId'] = '2';
-//			$cardId = $this->card->insert($data);
-//		
-//		
-//		}
-//		else{
-//			$cardId = $card['id'];
-//		}
-//		
-//		
-//		
-//		
-//		$result = $this->card->get_id($cardId);
-//		return $this->output_results($result);
-//
-//  		
-//   }
-   
+
 public function myCard_post(){
    	
   		$uid = $this->post('uid');
@@ -526,11 +481,11 @@ public function myCard_post(){
 		$username = $user['username'];
 		$couponCopyUnion = false;
 				
-//		return $this->output_results($unionUid);
 		//凡事数据库没有unionUid，说明没有绑定银联用户，如果成功注册或是登录，需要把之前下载的快券登记到银联中去
 		if(empty($unionUid)){
 			//如果用户没有unionId，先查询再注册, 获得unionUid
 		
+			
 			// 把需要重新copy本地coupon到银联的flag设为true
 			$couponCopyUnion = true;
 			
@@ -538,39 +493,43 @@ public function myCard_post(){
 			
 //			return $this->output_results($unionUser);
 
-		 	if($unionUser == ErrorUnionEmptyUser){
-			//如果银联没有该用户，说明需要注册 
+		 	if($unionUser == ErrorUnionEmptyUser || $unionUser == ErrorUnionGetUserNoUser){
+			//如果银联查询用户时，没有找到该用户，需要进行用户注册
 			
 		 		$response = $this->kqlibrary->register_union($username);
 		 		
 		 		if (!is_array($response)){
 		 			// 如果注册没有成功，报错
+
+					log_message('error','绑卡-》get_union_user->register_union # '.$response);
 		 			return $this->output_error($response);
+		 		}
+		 		else{
+		 			// 如果注册成功，定义unionUid
+		 			$unionUid = $response['userId'];
 		 		}
 		
 			}
 			else if(!is_array($unionUser)){
-			// 其他union查询的错误
+			// 其他union查询用户的错误
 
+				log_message('error','绑卡-》get_union_user # '.$unionUser);
 				return $this->output_error($unionUser);
 			
 			}
 			else{
-			// 返回data，成功登录说明手机已经银联注册可以获得unionUid
+			// 查询用户返回data，成功登录说明手机已经银联注册可以获得unionUid
 				$unionUid = $unionUser['userId'];			
 			}
 
-			
-//			//把银联的Uid更新到服务器中
-//			$this->user->update_unionid_by_uid($uid,$unionUid);
-//			
 		
-			
 	
 		}
 
-		//用户已经绑定银联帐号，绑卡
+		// --- End of 用户已经绑定银联帐号， 获得$unionUid
 		
+		
+		// 开始绑卡
 //		echo "unionId $unionUid, cardno # $cardNo";
 		
 		$response = $this->kqlibrary->bind_union_card($unionUid,$cardNo);
@@ -579,7 +538,8 @@ public function myCard_post(){
 		
 		 if(!is_array($response)){
 		//绑卡其他错误
-//			echo $response;
+//			
+			log('error','绑卡-》bind_union_card'.$response);
 			return $this->output_error($response);
 
 		}

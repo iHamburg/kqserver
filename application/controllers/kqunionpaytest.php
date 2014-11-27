@@ -169,7 +169,7 @@ sp5Ykcw0iwSbUA==
 		if (empty($mobile)){
 //			$mobile = '13917368904';
 
-			$mobile = '13816773779';
+			$mobile = '1321710010';
 			
 //			$mobile = '13166361023';
 //			
@@ -180,31 +180,6 @@ sp5Ykcw0iwSbUA==
 
 	}
 	
-
-//	// 原始命令
-	function testGetUserByMobile2(){
-//		'https://120.204.69.183:8090/PreWallet/restlet/outer/getUserByMobile';
-		$url = $this->host.'getUserByMobile';
-		
-		$data = array('mobile'=>'15166412999');
-		
-		$data = json_encode($data);
-		
-		openssl_sign($data, $signToken, $this->private_key); //用私钥进行签名
-		
-		$signToken = bin2hex($signToken);
-		
-		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
-
-		$post = json_encode($post);
-		
-//		var_dump($url);
-//		var_dump($post);
-		
-		$response = $this->post($url, $post);
-		
-		echo $response;
-		}
 
 
 		
