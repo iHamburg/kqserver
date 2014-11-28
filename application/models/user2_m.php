@@ -101,13 +101,31 @@ LIMIT $skip,$limit";
 		
 		// 如果coupon是event，并且downloadedcoupon里有了，返回false
 		
-		$query = $this->db->query("select B.isEvent, B.unusedLimit
+		if ($couponId == 39){
+		// 如果是活动券
+			$query = $this->db->query("select B.isEvent, B.unusedLimit
 from downloadedcoupon A
 left join coupon B
 on A.couponId=B.id
 where  A.uid=$uid
 and A.couponId=$couponId
 limit 1");
+		
+			
+		}
+		else{
+			// 如果不是活动券， 就搜索未使用的优惠券的数量
+	$query = $this->db->query("select B.isEvent, B.unusedLimit
+from downloadedcoupon A
+left join coupon B
+on A.couponId=B.id
+where  A.uid=$uid
+and A.couponId=$couponId
+and A.status='unused'
+limit 1");
+		}
+		
+			
 		
 		$results = $query->result_array();
 		

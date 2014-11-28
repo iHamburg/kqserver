@@ -76,7 +76,7 @@ function msg_with_error($error){
 		  $msg = 'ShopId为空';
 		break;
 		case ErrorEmptyUnionCouponId:
-		  $msg = '优惠券的银联编号为空';
+		  $msg = '快券券的银联编号为空';
 		break;
 		case ErrorEmptyUnionUid:
 		  $msg = '用户的银联编号为空';
@@ -146,14 +146,11 @@ function msg_with_error($error){
 		case ErrorUnionUnknown:
 		  $msg = '未知银联错误';
 		break;
-//		case ErrorUnionEmptyUID:
-//			$msg = '没有银联用户id';
-//		break;
 		case ErrorUnionGetUserNoUser:
 		  $msg = '银联查询账户不存在';
 		break;
 		case ErrorUnionInvalidCoupon:
-			$msg = '银联优惠券无效';
+			$msg = '银联快券无效';
 		break;
 		case ErrorUnionInvalidParameter:
 			$msg = '银联参数值无效';
@@ -165,7 +162,7 @@ function msg_with_error($error){
 			$msg = '银联解绑卡过于频繁';
 		break;
 		case ErrorUnionDCouponLimt:
-			$msg = '银联优惠券下载张数超过单用户下载限制';
+			$msg = '银联快券下载张数达到上限';
 		break;
 		
 		
