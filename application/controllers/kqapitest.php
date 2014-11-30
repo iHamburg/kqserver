@@ -36,7 +36,7 @@ class Kqapitest extends CI_Controller{
 
 	function index() {
 
-		echo 'kqtest ';
+		echo 'kqtest dev ';
 		
 	}
 
