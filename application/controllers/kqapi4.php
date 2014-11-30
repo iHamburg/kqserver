@@ -1381,18 +1381,8 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
-// 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
-// 	  	$this->db->limit($limit,$skip);
-// 	  	$this->db->order_by('createdAt','desc');
-// 	  	$this->db->from('coupon');
-//		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
-// 	  	
-//		$query = $this->db->get();
-//		
-//		$results = $query->result_array();	
-//		
-//	  	return $this->output_results(array('coupons'=>$results));
-	  	
+ 	  	$this->db->cache_on();
+ 	  		
  	  	$query = $this->db->query("SELECT `A`.`id`, A.`title`,A.isEvent,A.isSellOut, A.`displayedDCount` as downloadedCount, B.`avatarUrl`, B.`discountContent`, B.slogan
 FROM (`coupon` A) 
 JOIN `couponcontent` B
@@ -1403,8 +1393,12 @@ LIMIT $skip,$limit");
 		
 		$results = $query->result_array();
 		
+		$this->output->cache(10);
+		
+//		$this->db->cache_delete('kqapi1_1','couponDetails');
 		
 //		$this->output->enable_profiler(TRUE);
+
 	  	return $this->output_results(array('coupons'=>$results));
 	 
 	  }

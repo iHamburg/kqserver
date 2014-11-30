@@ -1260,7 +1260,7 @@ LIMIT $skip,$limit");
 		
 		$results = $query->result_array();
 		
-//		$this->output->cache(10);
+		$this->output->cache(10);
 		
 //		$this->db->cache_delete('kqapi1_1','couponDetails');
 		
