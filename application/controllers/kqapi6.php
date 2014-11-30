@@ -49,8 +49,6 @@ class Kqapi6 extends REST_Controller
 	var $coupon;
 	
 	
-	
-	
 	function __construct(){
 		parent::__construct();
 		
@@ -69,8 +67,6 @@ class Kqapi6 extends REST_Controller
 	
 		
 	}
-	
-	
 	/**
 	 * 
 	 * 用户登录, 用的是login命令
@@ -411,7 +407,6 @@ and id>$lastNewsId");
      	
 		$uid = $this->get('uid');
 
-//		$sessionToken = $this->get('sessionToken');
 	
 		if(empty($uid)){
 		
@@ -1259,18 +1254,6 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
-// 	  	$this->db->select('coupon.id,title,downloadedCount,avatarUrl,discountContent');
-// 	  	$this->db->limit($limit,$skip);
-// 	  	$this->db->order_by('createdAt','desc');
-// 	  	$this->db->from('coupon');
-//		$this->db->join('couponcontent', 'coupon.id = couponcontent.couponId');
-// 	  	
-//		$query = $this->db->get();
-//		
-//		$results = $query->result_array();	
-//		
-//	  	return $this->output_results(array('coupons'=>$results));
-	  	
  	  	$query = $this->db->query("SELECT `A`.`id`, A.`title`,A.isEvent,A.isSellOut, A.`displayedDCount` as downloadedCount, B.`avatarUrl`, B.`discountContent`, B.slogan
 FROM (`coupon` A) 
 JOIN `couponcontent` B
@@ -1304,8 +1287,6 @@ LIMIT $skip,$limit");
  	  	
 		
 		$this->load->model('shopbranch2_m','shopBranch');
-		
-//		$results = $this->shopBranch->get_by('shopId',$shopId);
 		
 		$results = $this->shopBranch->get_shopbranches_from_shopId($shopId);
 		
@@ -1842,40 +1823,6 @@ and active=1");
    // --------------- TEST -----------------
    public function test_get(){
    		
-//   		$response = $this->user->can_user_dcoupon(57, 36);
-   	
-// 		$response = $this->kqlibrary->get_union_user('13166361023');
-   	
-//   	$url = site_url($this->apiName."/batchDownloadUnionCoupon");
-//   	asyn_get($url);
-////   	$url = "http://www.localhost";
-//   	$url = site_url();
-   	
-//   		$result = array('1'=>$this->kqlibrary->test());
-//   		$result = array('1'=>$url);
-//   		$this->user->g
-//   		$this->card->ge
-//   		$this->response($result);
-
-//   		$this->output_results($url);
-   		
-   		
-//   		$this->output_results($response);
-   
-//   	$this->output_success();
-
-//   	log_message('error','SMS Forget error #111, mobile # 111');
-   	
-   	
-   	
-//		$content = "尾号【".title."】的银联卡已在快券添加成功，您会同时收到来自银联的相关服务通知！精致生活怎能没有下午茶？我们向您呈上风靡全球的美味点心——价值18元摩提工房美味摩提！关注快券多一秒，更多优惠带给您！";
-		
-		
-//		echo 'content'.$content;
-		
-//		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
-//		
-//		$result = $this->get($url);
 //   	
    }
    
