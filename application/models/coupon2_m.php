@@ -21,10 +21,10 @@ class Coupon2_m extends MY_Model{
 	 * @param unknown_type $couponId
 	 */
 	public function dcount_increment($couponId){
-		
-		
-		
-		$this->db->query("update coupon set downloadedCount = downloadedCount+1, displayedDCount=displayedDCount+3 where id=$couponId");
+	
+		$dnum = rand(3,5);
+		$this->db->query("update coupon set downloadedCount = downloadedCount+1, displayedDCount=displayedDCount+$dnum where id=$couponId");
+
 		
 		if($this->db->affected_rows() > 0){
 			return true;
