@@ -1235,7 +1235,7 @@ and id>$lastNewsId");
     */
 	function hotestCoupons_get(){
 
-	  	
+	  	$this->output->cache(10);
 		$this->load->model('coupon2_m','coupon');
 		
 		$skip = intval($this->get('skip'));
@@ -1248,7 +1248,7 @@ and id>$lastNewsId");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
- 	  	$this->db->cache_on();
+// 	  	$this->db->cache_on();
  	  		
  	  	$query = $this->db->query("SELECT `A`.`id`, A.`title`,A.isEvent,A.isSellOut, A.`displayedDCount` as downloadedCount, B.`avatarUrl`, B.`discountContent`, B.slogan
 FROM (`coupon` A) 

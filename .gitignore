@@ -1,3 +1,5 @@
 logs/
+cache/
 application/logs/*
+application/cache/*
 #application/logs/log-2014-09-10.php

@@ -158,8 +158,9 @@ class Kqtest extends CI_Controller{
 		echo $this->kqsms->send_bind_card_sms('13166361023', '99999999');
 	}
 	
-	function test_user(){
-		
+	function test_coupon(){
+
+		$this->coupon->dcount_increment(38);
 	}
 	
 	 public function message($to = 'World')
@@ -250,8 +251,11 @@ class Kqtest extends CI_Controller{
 	} 
 	public function test(){
 
-		$headers = apache_request_headers();
-		print_r($headers);
+//		$headers = apache_request_headers();
+//		print_r($headers);
+
+		$num = rand(3,5);
+		echo $num;
 	}
 
 
