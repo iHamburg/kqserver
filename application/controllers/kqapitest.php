@@ -36,7 +36,7 @@ class Kqapitest extends CI_Controller{
 
 	function index() {
 
-		echo 'kqtest ';
+		echo 'kqtest dev ';
 		
 	}
 
@@ -52,7 +52,7 @@ class Kqapitest extends CI_Controller{
 		$host = get_host($servername);
 		
 		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
-//		$linkPrepend = $host.'/kq/index.php/kqapitest/';
+
 		
 		$apiLink = array('test_coupon_accepted','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
 			'test_captcha_register','test_mynews','test_search','test_aroundShopBranches','test_batch_union_dcoupon','test_my_downloadedCoupons');

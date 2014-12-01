@@ -192,7 +192,6 @@ class Kqlibrary{
 //				
 				//调用内部服务器的数据库更新
 				
-			
 				$id =  $CI->db->insert_id();
 
 				if($this->coupon->dcount_increment($couponId) != true){
