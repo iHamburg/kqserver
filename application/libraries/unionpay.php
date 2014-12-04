@@ -24,9 +24,10 @@ class Unionpay{
      	
      	switch (ENVIRONMENT) {
      		case 'testing':   	// localhost
-	  		case 'rtesting':  	// aliyun 测试服务器
+//	  		case 'rtesting':  	// aliyun 测试服务器
   //   		case 'production':	// ucloud 生产服务器
-     			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';
+  				//银联测试服务器
+     			$this->host = 'https://120.204.69.183:8090/PreWallet/restlet/outer/';  
      			$this->appId = 'ALLPERM';
      			$this->appSecret = '1aabac6d068eef6a7bad3fdf50a05cc8';
      			$this->infSource = 'ALLPERM';
@@ -49,11 +50,12 @@ sp5Ykcw0iwSbUA==
 -----END PRIVATE KEY-----';
      			
      		break;
-     		case 'production':
 //     		case 'testing':
-//     		case 'rtesting':
+     		case 'rtesting':
+     		case 'production':
 //     		case 'xxx':
-     			$this->host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';
+				// 银联生产服务器
+     			$this->host = 'https://esb.unionpay.com/cardholder/PREWALLET/PREWALLETOuterService/PREWALLETOuterServiceProxy/';  
      			$this->appId = 'C0000048';
      			$this->appSecret = '12345678998765432111111100000099';
      			$this->infSource = 'C0000048';
@@ -155,7 +157,6 @@ NVuI+eXtaUQW
 	 */
 	public function regByMobile($mobile){
 		
-		//https://120.204.69.183:8090/PreWallet/restlet/outer/regByMobile
 		
 		$url = $this->host.'regByMobile';
 		
@@ -214,7 +215,6 @@ NVuI+eXtaUQW
 	 */
 	function bindCard($userId,$cardNo){
 	
-//	    'https://120.204.69.183:8090/PreWallet/restlet/outer/bindCard';
 		$url = $this->host.'bindCard';
 
 		$cardNo = strlen($cardNo).$cardNo; //卡号前带两位长度位
@@ -244,14 +244,14 @@ NVuI+eXtaUQW
 		
 		
 		$response = $this->post($url, $post);
+		
 		return $response;
-//		
+
 	}
 	
 	
 	function unbindCard($userId,$cardNo){
 	
-//	    'https://120.204.69.183:8090/PreWallet/restlet/outer/unBindCard';
 		$url = $this->host.'unBindCard';
 
 		$cardNo = strlen($cardNo).$cardNo; //卡号前带两位长度位
@@ -281,11 +281,6 @@ NVuI+eXtaUQW
 
 		$post = json_encode($post);
 		
-//		echo $dataJson;
-//		echo $post;
-		
-//		var_dump($url);
-//		var_dump($post);
 		
 		$response = $this->post($url, $post);
 		
@@ -419,11 +414,11 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		$md5 = md5($key,TRUE);
 		$result = base64_encode($md5);
 		
-		while (strlen($result)<16) {
+		while (strlen($result)<16) { // 不满16位的用%来填充
 			$result.='%';
 		}
 		
-		if(strlen($result)>16){
+		if(strlen($result)>16){  // 超过16位的从中截取16位子串
 		
 			$nbegin = (strlen($result) - 16) / 2;
 			$result = substr($result,$nbegin,16);
@@ -432,16 +427,14 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		return $result;
 	}
 	
+	// 根据 data生成 post
 	private function generate_post_json($data){
 	
-		
-		
 		$dataJson = json_encode($data);
 
-//		echo 'data '.$data;
 		openssl_sign($dataJson, $signToken, $this->private_key); //用私钥进行签名
 		
-		$signToken = bin2hex($signToken);
+		$signToken = bin2hex($signToken);  //转成hex 字符串
 
 		$post = array('appId'=>$this->appId,'version'=>$this->version,'data'=>$data,'signToken'=>$signToken);
 

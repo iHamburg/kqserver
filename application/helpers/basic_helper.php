@@ -24,13 +24,13 @@ function random_number(){
 
 
  function get_host($servername){
-		$host = 'http://localhost';
+		$host = 'http://localhost/kq/index.php';
 		
-		if($servername == 'ali'){
-			$host = aliHost;
+		if($servername == 't'){
+			$host = 'http://61.153.100.241/kqapitest/index.php';;
 		}
-		else if($servername == 'ucloud'){
-			$host = ucloudHost;
+		else if($servername == 'p'){
+			$host = 'http://61.153.100.241/kq/index.php';;
 		}
 		
 		return $host;

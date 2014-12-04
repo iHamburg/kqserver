@@ -62,11 +62,15 @@ class Kqlibrary{
 		
 		$response = $this->unionpay->getUserByMobile($mobile);
 		
-
 		$response = json_decode($response,true);
+		
+		
 		$respCd = $response['respCd'];
 		
-		if ($respCd == '000000'){
+		if($respCd == NULL){
+			return ErrorUnionNotAuthorized;
+		}
+		else if ($respCd == '000000'){
 			return $response['data'];
 		}
 		else {
@@ -98,7 +102,10 @@ class Kqlibrary{
 		
 		$respCd = $response['respCd'];
 		
-		if ($respCd == '000000'){
+		if($respCd == NULL){
+			return ErrorUnionNotAuthorized;
+		}
+		else if ($respCd == '000000'){
 			return $response['data'];
 		}
 		else {
@@ -121,7 +128,10 @@ class Kqlibrary{
 		
 		$respCd = $response['respCd'];
 		
-		if ($respCd == '000000'){
+		if($respCd == NULL){
+			return ErrorUnionNotAuthorized;
+		}
+		else if ($respCd == '000000'){
 			return true;
 		}
 		else {
@@ -146,6 +156,7 @@ class Kqlibrary{
 		$data['chnlUsrId'] = $uid;
 		$data['chnlUsrMobile'] = $mobile;
 		$data['couponId'] = $unionCouponId;
+//		$data['couponId'] = 'D00000000008332';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = $transSeq;
@@ -155,15 +166,22 @@ class Kqlibrary{
 		
 		$response = $this->unionpay->couponDwnById($data);
 	
+//		var_dump($response);
+		
 		$response = json_decode($response,true);
 		$respCd = $response['respCd'];
-		
-		if ($respCd == '000000'){
+
+//		echo 'respCd'.var_dump($respCd);
+		if($respCd == NULL){
+			return ErrorUnionNotAuthorized;
+		}
+		else if ($respCd == '000000'){
 			return $response['data'];
 		}
 		else {
 			return $respCd;
 		}
+		
 		
 	}
 	

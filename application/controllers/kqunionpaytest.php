@@ -169,11 +169,12 @@ sp5Ykcw0iwSbUA==
 		if (empty($mobile)){
 //			$mobile = '13917368904';
 
-			$mobile = '1321710010';
+//			$mobile = '1321710010';
 			
-//			$mobile = '13166361023';
+			$mobile = '13166361023';
 //			
 		}
+		
 		$response = $this->unionpay->getUserByMobile($mobile);
 
 		echo $response;
@@ -264,24 +265,25 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 	
-//		$transSeq = '123456789900';
-//		$userId = 'c00050001985';
-//		$couponId = 'Z00000000010074';
-//		$couponNum = '1';
-//		$chnlUsrId = '111';
-//		$chnlUsrMobile = '13166361023';
-//		$couponSceneId = '000';
 		
-		$data['chnlUsrId'] = '57';
-		$data['chnlUsrMobile'] = '13166361023';
-		$data['couponId'] = 'Z00000000008039';//巴斯克75折
+//		$data['chnlUsrId'] = '57';
+//		$data['chnlUsrMobile'] = '13166361023';
+//		$data['couponId'] = 'Z00000000008039';//巴斯克75折
+////		$data['couponId'] = 'D00000000008931';
+//		$data['couponNum'] = '1';
+//		$data['couponSceneId'] = '000';
+//		$data['transSeq'] = 'C57D36T1424473970';
+//		$data['userId'] = 'c00055685346';
+	
+		
+		$data['chnlUsrId'] = '84';
+		$data['chnlUsrMobile'] = '13917368904';
+		$data['couponId'] = 'D00000000008334';
 //		$data['couponId'] = 'D00000000008931';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = 'C57D36T1424473970';
-		$data['userId'] = 'c00055685346';
-	
-		
+		$data['userId'] = 'c00058863074';
 		print_r($data);
 		
 		$response = $this->unionpay->couponDwnById($data);		

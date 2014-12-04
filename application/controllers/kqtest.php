@@ -44,13 +44,38 @@ class Kqtest extends CI_Controller{
 		$this->load->model('user2_m','user');
 		$this->load->model('coupon2_m', 'coupon');
 		$this->load->library('kqlibrary');
-//		$this->load->library('kqsms');
+
 	}
 	
 
 	function index() {
+	
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		
+		
+		$this->load->helper('html');
+		
+		
+		echo 'baseurl #'.current_url();
+		
+//		$linkPrepend = 'http://localhost/kq/index.php/kqtest/';
 
-		echo 'kqtest ';
+		
+		$apiLink = array('test','test_dcoupon','test_error_log','test_remote_coupon_accepted','test_coupon_dincrement','test_acoupon_increment','test_accept_coupon','test_bind_card_sms');
+		$apiTitle = $apiLink;
+		
+		
+		foreach ($apiLink as $link) {
+			$newApiLink[] = current_url().'/'.$link;
+		}
+		
+		$data['title'] = '系统内部测试套装';
+		
+		$data['titles'] = $apiTitle;
+		$data['links'] = $newApiLink;
+		
+		$this->load->view('vtestsuit', $data);
+		
 		
 	}
 
@@ -85,7 +110,7 @@ class Kqtest extends CI_Controller{
 		
 	}
 	
-	function test_dcoupon($servername){
+	function test_dcoupon(){
 		
 		echo $this->user->download_coupon(32,36, '222222');
 		
@@ -153,9 +178,11 @@ class Kqtest extends CI_Controller{
 	}
 	
 	function test_bind_card_sms(){
+		
 		header( 'Content-Type:text/html;charset=utf-8 ');
 		$this->load->library('kqsms');
 		echo $this->kqsms->send_bind_card_sms('13166361023', '99999999');
+	
 	}
 	
 	function test_coupon(){

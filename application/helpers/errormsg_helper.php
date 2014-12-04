@@ -30,17 +30,19 @@ define("ErrorDownloadCouponLimit", 805);
 define("ErrorUsernameExists",   1001);
 define("ErrorCardExists",   1003);
 
+define("ErrorUnionNotAuthorized", -30000);
 define("ErrorUnionInvalidCard", 300500);
 define("ErrorUnionExistCard", 300519);
 define("ErrorUnionLimitCardNumber", 300520);
 define("ErrorUnionUnknown", 300000);
-define("ErrorUnionInvalidCoupon", 500046);
+define("ErrorUnionInvalidCoupon", 500046);  //票券不存在
 define("ErrorUnionInvalidParameter", 300002);
-define("ErrorUnionEmptyUser", 300200);  // 查询结果
+define("ErrorUnionEmptyUser", 300200);  // 查询结果，没有注册
 define("ErrorUnionNoCardBunden", 500058);
 define("ErrorUnionBindCardToOften", 300521);
 define("ErrorUnionDCouponLimt", 500048);  
-define("ErrorUnionGetUserNoUser",500001);
+define("ErrorUnionGetUserNoUser",500001); //查询结果，银联注册但没有开通银联钱包
+
 
 //短信
 define("ErrorSMSUnknown", 99999);
@@ -163,6 +165,65 @@ function msg_with_error($error){
 		break;
 		case ErrorUnionDCouponLimt:
 			$msg = '银联快券下载张数达到上限';
+		break;
+		case ErrorUnionNotAuthorized:
+			$msg = '连接银联服务器审核未通过';
+		break;
+		
+		//
+		case 300500:
+			$msg = '银联卡号无效';
+		break;
+		case 300501:
+			$msg = '银联卡过期';
+		break;
+		case 300502:
+			$msg = '银联卡有效期不正确';
+		break;
+		case 300505:
+			$msg = '银联卡已被绑定';
+		break;
+		case 300510:
+			$msg = '银联开通银行卡服务异常';
+		break;
+		case 300512:
+			$msg = '请到柜台开通服务';
+		break;
+		case 300513:
+			$msg = '银联用户解绑卡次数超限';
+		break;
+		case 300515:
+			$msg = '银联发卡行暂不支持';
+		break;
+		case 300516:
+			$msg = '银联卡不符合指定规则';
+		break;
+		case 300520:
+			$msg = '银联请到柜台开通服务';
+		break;
+		case 500032:
+			$msg = '银联快券不存在或者已过期，无法下载';
+		break;
+		case 500036:
+			$msg = '持卡人未开通银联钱包账户或账户状态异常';
+		break;
+		case 500037:
+			$msg = '银联票券张数不足';
+		break;
+		case 500039:
+			$msg = '银联票券账户入账出错';
+		break;
+		case 500040:
+			$msg = '银联票券下载接口参数错误';
+		break;
+		case 500051:
+			$msg = '银联票券删除接口参数错误';
+		break;
+		case 500053:
+			$msg = '银联票券删除张数错误';
+		break;
+		case 300508:
+			$msg = '银联卡号不存在';
 		break;
 		
 		

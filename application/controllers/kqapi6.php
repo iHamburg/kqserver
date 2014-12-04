@@ -859,8 +859,6 @@ and id>$lastNewsId");
 			
 		}
 	
-		//
-		
 		// 服务器下载快券
 
 		$couponId = $this->kqlibrary->download_coupon($uid,$couponId, $transSeq);

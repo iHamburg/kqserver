@@ -4,7 +4,7 @@
  *
  */
 
-
+define("testAPI","kqapi1_1");
 
 class Kqapitest extends CI_Controller{
 
@@ -24,9 +24,7 @@ class Kqapitest extends CI_Controller{
 	var $user;
 	
 	
-//	var $host = 'http://localhost';
-	//
-	//
+	
 	function __construct(){
 		parent::__construct();
 		
@@ -34,27 +32,21 @@ class Kqapitest extends CI_Controller{
 	}
 	
 
-	function index() {
+	function index($servername='l') {
 
-		echo 'kqtest dev ';
-		
-	}
-
-	// 其实不用连remote的test函数
-		
-	function testsuit($servername='localhost'){
 		
 		header( 'Content-Type:text/html;charset=utf-8 ');
-		
+		echo 'kqapitest  ';
 		
 		$this->load->helper('html');
 		
 		$host = get_host($servername);
 		
+		//localhost肯定是kq，
 		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
 
 		
-		$apiLink = array('test_coupon_accepted','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
+		$apiLink = array('hotestcoupons','test_coupon_accepted','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
 			'test_captcha_register','test_mynews','test_search','test_aroundShopBranches','test_batch_union_dcoupon','test_my_downloadedCoupons');
 		$apiTitle = $apiLink;
 		
@@ -71,30 +63,27 @@ class Kqapitest extends CI_Controller{
 		
 		$this->load->view('vtestsuit', $data);
 		
-	}
-	
-	function test_coupon_accepted($servername){
 		
+	}
+
+	function hotestcoupons($servername){
 		$host = get_host($servername);
 		
-		$url = $host.'/kq/index.php/kqunionapi/couponAccepted';
-		
+		$url = $host.'/'.testAPI.'/hotestCoupons';
 //		echo $url;
-//		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
-		
-//		$post = array('username'=>'3222222','password'=>'ddd');
-		$post = '{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"Z00000000008039","cdhdUsrId":"c00000000000","chnlUsrId":"57","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}';
-		
-		$response = post($url,$post);
+		echo $url.'<br><br>';
+		$response = get($url);
 		
 		echo $response;
 	}
+	
+	
 	
 	function test_register($servername){
 		
 		$host = get_host($servername);
 		
-		$url = $host.'/kq/index.php/kqapi4/user';
+		$url = $host.'/'.testAPI.'/user';
 	
 		
 //		echo $url;
@@ -140,17 +129,7 @@ class Kqapitest extends CI_Controller{
 		echo $response;
 	}
 	
-	function testregister($servername){
-	
-		$host = get_host($servername);
-		
-		$url = $host.'/kq/index.php/kqapi4/user';
-		$data = array('username'=>'13111233','password'=>'222');
-		
-		$response = post($url,$data);
-		echo $response;
-	}
-	
+
 	/**
 	 * 
 	 * 成功绑卡
@@ -197,10 +176,14 @@ class Kqapitest extends CI_Controller{
 
 	function test_get_download_coupon($servername){
 		$host = get_host($servername);
+		
+		$url = $host.'/'.testAPI.'/myDownloadedCoupon';
+		
 //		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57';
 //		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/mode/expired';
-		$url = $host.'/kq/index.php/kqapi4/myDownloadedCoupon/uid/57/';
+		$url = $url.'/uid/57/';
 		
+		echo $url.'<br><br>';
 		$response = get($url);
 		echo $response;
 	}
@@ -208,12 +191,14 @@ class Kqapitest extends CI_Controller{
 	// 回去银联接口下载
 	function test_download_coupon($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi6/myDownloadedCoupon/';
-		
-		$data = array('uid'=>'57','sessionToken'=>'d08JfHsUPekhVRtYZEza','couponId'=>'41');
+//		$url = $host.'/kqapitest/index.php/kqapi1_1/myDownloadedCoupon/';
+		$url = $host.'/'.testAPI.'/myDownloadedCoupon';
+//		$data = array('uid'=>'57','sessionToken'=>'d08JfHsUPekhVRtYZEza','couponId'=>'41');
 //		$data = array('uid'=>'79','sessionToken'=>'jzDICdGEqfatgAv89ycY','couponId'=>'36');
 //		$data = array('uid'=>'73','sessionToken'=>'YrEvIXp7HjVUuT6bQaex','couponId'=>'36');
+		$data = array('uid'=>'84','sessionToken'=>'1YyRBrDGzAkW0F4giXsH','couponId'=>'41');
 		
+		echo $url.'<br><br>';
 		$response = post($url,$data);
 
 		echo $response;
@@ -284,11 +269,17 @@ class Kqapitest extends CI_Controller{
 	
 	function test_aroundShopBranches($servername){
 		$host = get_host($servername);
-		$url = $host.'/kq/index.php/kqapi4/aroundShopbranches';
+
 		
-//		$url.='/districtId/13';
-//		$url.='/shopTypeId/1';
+		
+			
+		
+		$url = $host.'/'.testAPI.'/aroundShopbranches';
+//		echo $url;
+		echo $url.'<br><br>';
+		
 		$url.='/longitude/121.4/latitude/31.2';
+		$url.='/order/preisdown';
 		
 		$response = get($url);
 		
@@ -313,140 +304,140 @@ class Kqapitest extends CI_Controller{
 		
 	}
 	
-	
-	function testFavoriteCoupon(){
-		$url = 'localhost/kq/index.php/kqapi4/myFavoritedCoupon';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	function testDeleteFavoriteCoupon(){
-		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedCoupon';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	
-	function testFavoriteShop(){
-		$url = 'localhost/kq/index.php/kqapi4/myFavoritedShop';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	function testDeleteFavoriteShop(){
-		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedShop';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	function testMyCard(){
-		$url = 'localhost/kq/index.php/kqapi4/myCard/uid/32/sessionToken/ptHKUzWr17FwxVQqjube';
-
-		
-		$response = get($url);
-		
-		echo $response;
-	
-	}
-	
-	function testAddCard(){
-		$url = 'localhost/kq/index.php/kqapi4/myCard';
-		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-
-	
-	function testResetPassword(){
-		$url = 'localhost/kq/index.php/kqapi4/resetPassword';
-		$data = array('username'=>'131112','password'=>'333');
-		
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	function testCouponDetails(){
-		$url = 'localhost/kq/index.php/kqapi4/couponDetails/id/26/longitude/122';
+//	
+//	function testFavoriteCoupon(){
+//		$url = 'localhost/kq/index.php/kqapi4/myFavoritedCoupon';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	function testDeleteFavoriteCoupon(){
+//		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedCoupon';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','couponId'=>'27');
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	
+//	function testFavoriteShop(){
+//		$url = 'localhost/kq/index.php/kqapi4/myFavoritedShop';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	function testDeleteFavoriteShop(){
+//		$url = 'localhost/kq/index.php/kqapi4/deleteMyFavoritedShop';
+//		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','shopId'=>'8');
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	function testMyCard(){
+//		$url = 'localhost/kq/index.php/kqapi4/myCard/uid/32/sessionToken/ptHKUzWr17FwxVQqjube';
+//
+//		
+//		$response = get($url);
+//		
+//		echo $response;
+//	
+//	}
+//	
+//	function testAddCard(){
+//		$url = 'localhost/kq/index.php/kqapi4/myCard';
 //		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
-		
-		$response = get($url);
-		
-		echo $response;
-	
-	}
-	
-	function testAroundShopBranches(){
-		$url = 'localhost/kq/index.php/kqapi4/aroundShopbranches';
-		
-		$url.='/districtId/13';
-		$url.='/shopTypeId/1';
-		$url.='/longitude/121.4/latitude/31.2';
-		
-		$response = get($url);
-		
-		echo $response;
-		
-		
-	}
-	
-
-	
-	function testCouponAccepted(){
-		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted';
-
-//		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
-		
-//		$data = array('mchntId'=>'32','couponId'=>'999999');
-
-		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
-		$data = json_encode($data);
-		$response = post($url,$data);
-		
-		echo $response;
-	}
-	
-	function testCouponAccepted2(){
-		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted2';
-
-//		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
-		
-//		$data = array('mchntId'=>'32','couponId'=>'999999');
-
-		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
-		$data = json_encode($data);
-		$data2 = array('params'=>$data);
-		$response = post($url,$data2);
-		
-		echo $response;
-	}
-
-	
-
-	function testCaptcha(){
-		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
-//		$post = array('username'=>'1111','password'=>'2222');
-		
-		$response = get($url);
-		echo $response;
-	
-	
-	}
-	
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//
+//	
+//	function testResetPassword(){
+//		$url = 'localhost/kq/index.php/kqapi4/resetPassword';
+//		$data = array('username'=>'131112','password'=>'333');
+//		
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	function testCouponDetails(){
+//		$url = 'localhost/kq/index.php/kqapi4/couponDetails/id/26/longitude/122';
+////		$data = array('uid'=>'32','sessionToken'=>'ptHKUzWr17FwxVQqjube','card'=>'999999');
+//		
+//		$response = get($url);
+//		
+//		echo $response;
+//	
+//	}
+//	
+//	function testAroundShopBranches(){
+//		$url = 'localhost/kq/index.php/kqapi4/aroundShopbranches';
+//		
+//		$url.='/districtId/13';
+//		$url.='/shopTypeId/1';
+//		$url.='/longitude/121.4/latitude/31.2';
+//		
+//		$response = get($url);
+//		
+//		echo $response;
+//		
+//		
+//	}
+//	
+//
+//	
+//	function testCouponAccepted(){
+//		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted';
+//
+////		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
+//		
+////		$data = array('mchntId'=>'32','couponId'=>'999999');
+//
+//		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
+//		$data = json_encode($data);
+//		$response = post($url,$data);
+//		
+//		echo $response;
+//	}
+//	
+//	function testCouponAccepted2(){
+//		$url = 'http://115.29.148.47/kq/index.php/kqunionapi/couponAccepted2';
+//
+////		$url = 'localhost/kq/index.php/kqunionapi/couponAccepted';
+//		
+////		$data = array('mchntId'=>'32','couponId'=>'999999');
+//
+//		$data = array('data'=>array('mchntId'=>'32','couponId'=>'999999'));
+//		$data = json_encode($data);
+//		$data2 = array('params'=>$data);
+//		$response = post($url,$data2);
+//		
+//		echo $response;
+//	}
+//
+//	
+//
+//	function testCaptcha(){
+//		$url = 'http://localhost/kq/index.php/kqapi4/captcharegister/mobile/13166361023';
+////		$post = array('username'=>'1111','password'=>'2222');
+//		
+//		$response = get($url);
+//		echo $response;
+//	
+//	
+//	}
+//	
 
 	
 function test_send_email(){
@@ -469,53 +460,45 @@ echo "Mail Sent.".mail($to,$subject,$message,$headers);
 	
 	}
 	
-	function test_add_favoriteshop(){
-
-		$url = 'http://localhost/kq/index.php/kqapi4/myFavoritedShopbranch';
-	
-		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
-		
-//		$post = json_encode($post);
-		
-		$response = post($url,$post);
-		echo $response;
-	}
-	
-	function test_delete_favoritedshop(){
-	
-		$url = 'http://localhost/kq/index.php/kqapi4/deleteMyFavoritedShopbranch';
-	
-		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
-		
-		$response = post($url,$post);
-		echo $response;
-	}
-	
-
-	
-	function test_union(){
-		
-		$this->load->library('unionpay');
-		
-//		$mobile = '13166361023';
-//		$response = $this->unionpay->getUserByMobile($mobile);
+//	function test_add_favoriteshop(){
 //
+//		$url = 'http://localhost/kq/index.php/kqapi4/myFavoritedShopbranch';
+//	
+//		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
+//		
+////		$post = json_encode($post);
+//		
+//		$response = post($url,$post);
 //		echo $response;
+//	}
+//	
+//	function test_delete_favoritedshop(){
+//	
+//		$url = 'http://localhost/kq/index.php/kqapi4/deleteMyFavoritedShopbranch';
+//	
+//		$post = array('uid'=>'32','shopbranchId'=>'1','sessionToken'=>"ptHKUzWr17FwxVQqjube");
+//		
+//		$response = post($url,$post);
+//		echo $response;
+//	}
+//	
 
-//		echo 'before';
-//		$response = $this->unionpay->getUserByMobile('111');
-//
-//		echo 'after';
-//		echo 'ass'.$response;
 	
-		$response = $this->unionpay->getUserByMobile('13166361023');
-   		
-   		echo 'resp'.$response;
-   		
-//   		$response = json_decode($response,true);
-//   		
-//   		echo 'sss';
-	
+function test_coupon_accepted($servername){
+		
+		$host = get_host($servername);
+		
+		$url = $host.'/kq/index.php/kqunionapi/couponAccepted';
+		
+//		echo $url;
+//		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
+		
+//		$post = array('username'=>'3222222','password'=>'ddd');
+		$post = '{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"Z00000000008039","cdhdUsrId":"c00000000000","chnlUsrId":"57","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}';
+		
+		$response = post($url,$post);
+		
+		echo $response;
 	}
 	
 	function test_direct_union(){

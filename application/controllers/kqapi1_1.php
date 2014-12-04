@@ -59,8 +59,6 @@ class Kqapi1_1 extends REST_Controller
 		$this->load->model('card2_m','card');
 		$this->load->model('coupon2_m','coupon');
 	
-		
-		
 	}
 	
 	function index(){
@@ -151,10 +149,6 @@ class Kqapi1_1 extends REST_Controller
 
  	  	$username = $this->post('username');
    		$password = $this->post('password');
-   		
-   		 
-//		$this->load->model('user2_m','user');
-		
    		
    		if(empty($username) ||empty($password)){
 	   		
@@ -483,9 +477,9 @@ and id>$lastNewsId");
 			// 把需要重新copy本地coupon到银联的flag设为true
 			$couponCopyUnion = true;
 			
-			$unionUser = $this->kqlibrary->get_union_user($username);
 			
-//			return $this->output_results($unionUser);
+			$unionUser = $this->kqlibrary->get_union_user($username); //获得用户的银联 id
+			
 
 		 	if($unionUser == ErrorUnionEmptyUser || $unionUser == ErrorUnionGetUserNoUser){
 			//如果银联查询用户时，没有找到该用户，需要进行用户注册
@@ -495,11 +489,12 @@ and id>$lastNewsId");
 		 		if (!is_array($response)){
 		 			// 如果注册没有成功，报错
 
-					log_message('error','绑卡-》get_union_user->register_union # '.$response);
+					log_message('error','绑卡-》get_union_user->register_union # '.$response.'; uid # '.$uid);
+					
 		 			return $this->output_error($response);
 		 		}
 		 		else{
-		 			// 如果注册成功，定义unionUid
+		 			// 如果注册成功，赋值unionUid
 		 			$unionUid = $response['userId'];
 		 		}
 		
@@ -507,7 +502,7 @@ and id>$lastNewsId");
 			else if(!is_array($unionUser)){
 			// 其他union查询用户的错误
 
-				log_message('error','绑卡-》get_union_user # '.$unionUser);
+				log_message('error','绑卡-》get_union_user # '.$unionUser.'; uid # '.$uid);
 				return $this->output_error($unionUser);
 			
 			}
@@ -533,7 +528,7 @@ and id>$lastNewsId");
 		 if(!is_array($response)){
 		//绑卡其他错误
 //			
-			log('error','绑卡-》bind_union_card'.$response);
+			log('error','绑卡-》bind_union_card'.$response.'; uid # '.$uid);
 			return $this->output_error($response);
 
 		}
@@ -661,7 +656,7 @@ and id>$lastNewsId");
 		
 			return $this->output_error(ErrorEmptyParameter);
 		}
-//		$this->load->model('user2_m','user');
+
 		if(!$user = $this->user->isSessionValid($uid,$sessionToken)){
 
 			return $this->output_error(ErrorInvalidSession);
@@ -679,7 +674,7 @@ and id>$lastNewsId");
 		
 		
 		if(empty($card)){
-			///如果数据库里已经绑定了这张卡,报错
+			///如果数据库里没有这张卡,报错
 			return $this->output_error(ErrorEmptyCard);
 			
 		}
@@ -689,25 +684,16 @@ and id>$lastNewsId");
 		
 		
 		if (empty($unionUid)){
-			// 如果用户没有银联帐号
+			// 如果用户没有银联帐号却有银行卡
 			return  $this->output_error(ErrorEmptyUnionUid);
 		}
 		
-//		return $this->output_results($unionUid);
-
 		
 		// 银联解绑
-//		$response = $this->user->unbind_union_card($unionUid, $cardNo);
-		
-//		return $this->output_results($user);
+
 		
 		$response = $this->kqlibrary->unbind_union_card($unionUid, $cardNo);
-//		return $this->output_results('银联解绑成功');
-		
 
-//		echo 'resposne '.$response;
-		
-//		var_dump($response);
 		if($response === true){
 			// 银联解绑成功
 //			echo '解绑成功';
@@ -724,7 +710,8 @@ and id>$lastNewsId");
 		}
 		else {
 			// 如果其他未知错误
-//			echo 'not true';
+
+			log_message('error','银联解绑银行卡 error #'.$response.', uid # '.$uid.', card #'.$cardNo);
 			return $this->output_error($response);
 		}
 		
@@ -785,13 +772,11 @@ and id>$lastNewsId");
 	 * 
 	 */
 	public function myDownloadedCoupon_post(){
+		
 		$uid = $this->post('uid');
 		$couponId = $this->post('couponId');	
 		$sessionToken = $this->post('sessionToken');
-	
-		
-		$this->load->model('user2_m','user');
-		$this->load->model('coupon2_m','coupon');
+		$debug = $this->post('debug');
 
 		if(empty($uid) || empty($couponId) || empty($sessionToken)){
 		
@@ -807,15 +792,20 @@ and id>$lastNewsId");
 		$data['couponId'] = $couponId;
 		
 		
-		/// 数据库判断user是否能下载coupon
-		$code = $this->user->can_user_dcoupon($uid,$couponId);
-		
-		if ($code !== true){
-			return $this->output_error($code);
+		//如果不是 debug 模式就本地判断是否能下载
+		if (empty($debug)){
+					
+			/// 数据库判断user是否能下载coupon
+			$code = $this->user->can_user_dcoupon($uid,$couponId);
+			
+			if ($code !== true){
+				
+				return $this->output_error($code);
+			}
+			// --- End of 判断用户能否下载
 		}
-		// --- End of 判断用户能否下载
 
-		
+//		
 		/**
 		 * 如果unionUid不存在，只要存在本地数据库就行
 		 * 如果unionUid存在，那么必须要先存在银联数据库，再存在本地。
@@ -833,20 +823,26 @@ and id>$lastNewsId");
 			$unionCouponId = $coupon['unionCouponId'];
 		
 			if(empty($unionCouponId)){
+				log_message('error','下载快券 数据库没有unionCouponId, uid #'.$uid.' couponId #',$couponId);
 				return $this->output_error(ErrorEmptyUnionCouponId);
 			}
 		
 			// 从银联下载优惠券
 			$result = $this->kqlibrary->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
 			
-			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
+			
+//			var_dump($result);
+//			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
+//
+//				//处理无效的uionUid和unionCouponId, 用户没有绑卡错误
+//				log_message('error','下载快券 从银联下载失败: code #'.$result.', uid #'.$uid.' couponId #',$couponId);
+//				return $this->output_error($result);
+//			}
+//			else
 
-				//处理无效的uionUid和unionCouponId, 用户没有绑卡错误
-				return $this->output_error($result);
-			}
-			else if(!is_array($result)){
+			if(!is_array($result)){
 				// 其他union下载的错误
-
+				log_message('error','下载快券 从银联下载失败: code #'.$result.', uid #'.$uid.' couponId #',$couponId);
 				return $this->output_error($result);
 			}
 			
@@ -878,7 +874,6 @@ and id>$lastNewsId");
 		   		// 要获得优惠券的完整title
 		   		$completeTitle = $this->coupon->get_complete_title($couponId);
 		   		
-		   		
 		   		$data['text'] = "您已成功下载".$completeTitle."快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
 		   		
 		   		$this->load->model('news2_m','news');
@@ -894,8 +889,6 @@ and id>$lastNewsId");
 			
 			return $this->output_success();
 		}
-	
-		
 	
 	}
 	
@@ -1313,6 +1306,7 @@ LIMIT $skip,$limit");
 		
 	}
 	
+	
 	public function aroundShopbranches_get(){
 
 		$shopTypeId = $this->get('shopTypeId');
@@ -1320,8 +1314,8 @@ LIMIT $skip,$limit");
 		$longitude = $this->get('longitude');
 		$latitude =  $this->get('latitude');
 		$order =  $this->get('order');
-
-		if(empty($order)){
+		
+		if(empty($order)){ // 默认排序是距离
 			$order = 'distance';
 		}
 		
@@ -1360,10 +1354,16 @@ LIMIT $skip,$limit");
 		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
 
 			$this->db->order_by('distance');
-//			$this->db->order_by('rand()');
+
 		}
-		else{
-				$this->db->order_by('rand()');
+		else if($order == 'ai'){
+			$this->db->order_by('rand()');
+		}
+		else if($order == 'preisup'){
+			$this->db->order_by('A.averagePreis');
+		}
+		else if($order == 'preisdown'){
+			$this->db->order_by('A.averagePreis','desc');
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -1449,7 +1449,6 @@ LIMIT $skip,$limit");
 //		$this->output->enable_profiler(TRUE);
 
 		   
-		
 		
 		return $this->output_results(array('coupons'=>$results));
 	}
