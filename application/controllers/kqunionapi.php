@@ -77,7 +77,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 		}
 		
 		
-		if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){
+		if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 如果是测试的话，不写入正式正式的表中
 			
 			$query = $this->db->insert('u_coupon_accepted2',$data);
 			
@@ -96,7 +96,10 @@ transFwdInsId 	string 	可选 	交易发送机构
 				log_message('error', 'Union CouponAccepted DBInsert #'.$post);
 			
 			}
+			else{
 			
+				log_message('error', '银联成功承兑 #'.$post);
+			}
 			
 			// TODO 票券承兑如果成功写入数据库，除了写log_message,我还要有其他的预警手段，比如友盟
 			// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
@@ -104,7 +107,8 @@ transFwdInsId 	string 	可选 	交易发送机构
 			$unionCouponId = $data['couponId'];
 			
 			$this->kqlibrary->accept_coupon($uid, $unionCouponId);
-				
+
+			
 		}
 		
 		

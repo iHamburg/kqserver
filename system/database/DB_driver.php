@@ -70,6 +70,8 @@ class CI_DB_driver {
 	var $curs_id;
 	var $limit_used;
 
+	//自己加的
+	var $cache_expire_time = 0;
 
 
 	/**
@@ -1048,8 +1050,9 @@ class CI_DB_driver {
 	 * @access	public
 	 * @return	void
 	 */
-	function cache_on()
+	function cache_on($expire_time=0)
 	{
+		$this->cache_expire_time = $expire_time;
 		$this->cache_on = TRUE;
 		return TRUE;
 	}

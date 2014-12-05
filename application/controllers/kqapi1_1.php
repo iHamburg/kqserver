@@ -381,7 +381,7 @@ and id>$lastNewsId");
    		$results = $query->result_array();
    		$count = $results[0]['num'];
    		
-   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by id desc limit $skip,$limit");
+   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by createdAt desc limit $skip,$limit");
    		
    		$results = $query->result_array();
    		
@@ -1228,8 +1228,7 @@ and id>$lastNewsId");
     */
 	function hotestCoupons_get(){
 
-	  	$this->output->cache(10);
-		$this->load->model('coupon2_m','coupon');
+
 		
 		$skip = intval($this->get('skip'));
 	  	$limit = intval($this->get('limit'));
@@ -1241,7 +1240,7 @@ and id>$lastNewsId");
  	  	if (empty($limit))
  	  		$limit = 30;
 	  	
-// 	  	$this->db->cache_on();
+ 	  	$this->db->cache_on(60*10); // 10分钟缓存
  	  		
  	  	$query = $this->db->query("SELECT `A`.`id`, A.`title`,A.isEvent,A.isSellOut, A.`displayedDCount` as downloadedCount, B.`avatarUrl`, B.`discountContent`, B.slogan
 FROM (`coupon` A) 
@@ -1253,10 +1252,6 @@ LIMIT $skip,$limit");
 		
 		$results = $query->result_array();
 		
-//		$this->output->cache(10);
-		
-//		$this->db->cache_delete('kqapi1_1','couponDetails');
-		
 //		$this->output->enable_profiler(TRUE);
 
 	  	return $this->output_results(array('coupons'=>$results));
@@ -1264,32 +1259,38 @@ LIMIT $skip,$limit");
 	  }
   
 	
-	/**
-	 * 
-	 * 返回总店的所有分店信息
-	 * param: parentId
-	 */
-	public function shopbranch_get(){
-		
-		$shopId = $this->get('id');
-		
-	 	if(empty($shopId)){
- 	  		
-	   		return $this->output_error(ErrorEmptyShopId);
- 	  	}
- 	  	
-		
-		$this->load->model('shopbranch2_m','shopBranch');
-		
-		$results = $this->shopBranch->get_shopbranches_from_shopId($shopId);
-		
-		return $this->output_results(array('shopbranches'=>$results));
-	}
+//	/**
+//	 * 
+//	 * 返回总店的所有分店信息
+//	 * param: parentId
+//	 */
+//	public function shopbranch_get(){
+//		
+//		$shopId = $this->get('id');
+//		$longitude = $this->get('longitude');
+//		$latitude =  $this->get('latitude');
+//		
+//		
+//	 	if(empty($shopId)){
+// 	  		
+//	   		return $this->output_error(ErrorEmptyShopId);
+// 	  	}
+// 	  	
+//		
+//		$this->load->model('shopbranch2_m','shopBranch');
+//		
+//		$results = $this->shopBranch->get_shopbranches_from_shopId($shopId, $longitude,$latitude);
+//		
+//		return $this->output_results(array('shopbranches'=>$results));
+//	}
 	
 	public function shopType_get(){
 	
 		$this->load->model('shoptype2_m','shopType');
 
+		
+		$this->db->cache_on(60*10); // 10分钟缓存
+		
 		$results = $this->shopType->get_all();
 		
 		return $this->output_results(array('types'=>$results));
@@ -1299,7 +1300,11 @@ LIMIT $skip,$limit");
 	public function district_get(){
 	
 		$this->load->model('district2_m','district');
+		
+		$this->db->cache_on(60*10); // 10分钟缓存
+		
 		$this->db->select('id,title');
+
 		$results = $this->district->get_all();
 		
 		return $this->output_results(array('districts'=>$results));
@@ -1309,6 +1314,8 @@ LIMIT $skip,$limit");
 	
 	public function aroundShopbranches_get(){
 
+//		$this->output->cache(10);
+		
 		$shopTypeId = $this->get('shopTypeId');
 		$districtId = $this->get('districtId');
 		$longitude = $this->get('longitude');
@@ -1328,13 +1335,14 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
  	  		
-	  	
+ 	  	$this->db->cache_on(60*10); // 10分钟缓存
+ 	  		
 		if(empty($latitude) || empty($longitude)){
 			$this->db->select('A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.phone,A.averagePreis,latitude,longitude,districtId,typeId, C.title as district');
 		}
 		else{
 			$this->db->select("A.id,shopId,A.address,A.openTime,A.logoUrl,A.title,A.logoUrl,A.phone,A.averagePreis,latitude,longitude,districtId,typeId,  C.title as district,
-			ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) +COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
+			ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) + COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380 as distance");
 		}
 		
 		
@@ -1379,6 +1387,8 @@ LIMIT $skip,$limit");
 
 	public function searchCoupons_get(){
 	
+//		$this->output->cache(10);
+		
   	 	$shopTypeId = $this->get('shopTypeId');
 		$districtId = $this->get('districtId');
 		$longitude = $this->get('longitude');
@@ -1400,6 +1410,9 @@ LIMIT $skip,$limit");
  	  	if (empty($limit))
  	  		$limit = 30;
    	
+ 	  		
+ 	  	$this->db->cache_on(60*10); // 10分钟缓存
+ 	  		
  	  	$query = "A.id,A.shopId,A.title,D.discountContent,D.avatarUrl,A.displayedDCount as downloadedCount,C.address, A.isSellOut, A.isEvent, C.title as shopbranchTitle, C.longitude, C.latitude"; 	  		
 
  	  	if(!empty($latitude) && !empty($longitude)){
@@ -1436,9 +1449,9 @@ LIMIT $skip,$limit");
 			$this->db->order_by('A.displayedDCount','desc');
 			
 		}
-//		else{
-//			$this->db->order_by('rand()');  // 随机排序
-//		}
+		else{
+			$this->db->order_by('rand()');  // 随机排序
+		}
 		
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -1471,7 +1484,7 @@ LIMIT $skip,$limit");
 			return $this->output_error(ErrorEmptyCouponId);
 		}
 		
-		$this->db->cache_on();
+		$this->db->cache_on(60*10); // 10分钟缓存
 		
  	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.displayedDCount as downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message,B.slogan, B.usage');
  	  	$this->db->from('coupon as A');
@@ -1516,7 +1529,7 @@ limit 3");
 		$coupon['otherCoupons'] = $results;
 
 		
-		
+			$this->db->cache_off();
 		///----------------nearestShop
 		if(empty($longitude) || empty($latitude)){
 		
@@ -1548,14 +1561,17 @@ limit 3");
 	  
 	  
 	  public function shopbranchDetails_get(){
-	  
-//	  		$this->load->model('shop2_m','shop');
-	  		
+	 
+//	  		$this->output->cache(10);
+	  	
 	  		$shopbranchId = $this->get('id');
 		
 	  		if(empty($shopbranchId)){
 	  			return $this->output_error(ErrorEmptyShopId);
 	  		}
+	  		
+	  		
+	  			$this->db->cache_on(60*10); // 10分钟缓存
 	  		
 	  		$query = $this->db->query("select id,shopId,title,openTime,phone,address,longitude,latitude,logoUrl,districtId, active,averagePreis
 from shopbranch
@@ -1602,7 +1618,7 @@ Where A.active = 1
 AND A.shopId = $shopId "
 );
 		
-	$response['shopCoupons'] =  $query->result_array();;
+			$response['shopCoupons'] =  $query->result_array();;
 
 	  		
 	  		return $this->output_results($response);
@@ -1613,33 +1629,42 @@ AND A.shopId = $shopId "
 	  public function allShopbranches_get(){
 	  
 	  	$shopId = $this->get('id');
+		$longitude = $this->get('longitude');
+		$latitude =  $this->get('latitude');
 	  	
 	  	if(empty($shopId)){
 	  		return $this->output_error(ErrorEmptyShopId);
 	  	}
 	  	
 	  	
-	  	$this->load->model('shopbranch2_m','shopbranch');
+	  	$this->db->cache_on(60*10); // 10分钟缓存
 	  	
-	  	
-	  	$query = $this->db->query("select A.id,shopId,A.title,openTime,phone,address,longitude,latitude,logoUrl,averagePreis,B.title as district
+	  	$sql = "select A.id,shopId,A.title,openTime,phone,address,longitude,latitude,logoUrl,averagePreis,B.title as district
 from shopbranch A
 left join district B
 on A.districtId=B.id
 where shopId = $shopId
-and active=1");
+and active=1";
+	  	
+	  	if (!empty($longitude) && !empty($latitude)){
+	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+	  	}
+//	  	
+	  	$query = $this->db->query($sql);
+
 	  	
 	  
   		$results = $query->result_array();	
-//  		
+
   		
   		$response['shopbranches'] = $results;
   	
   		
+//  		$this->output->cache(10);
+  		
   		return $this->output_results($response);
 	  	
 	  }
-	
 	
 	///---------- Capcha -------------
 	
@@ -1648,9 +1673,10 @@ and active=1");
 		$this->load->library('kqsms');
 		
 		$mobile = $this->get('mobile');
-		
+
 		$captcha = random_number();
 
+		
 		$response = $this->kqsms->send_register_sms($mobile,$captcha);
 		
 		if ($response === true){

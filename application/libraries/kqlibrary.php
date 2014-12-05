@@ -354,7 +354,6 @@ limit 1");
 			
 			log_message('error','iOS SMS CouponAccepted #'.$response.', mobile # '.$mobile);
 			
-//			echo $response;
 			
 		}
 		else {

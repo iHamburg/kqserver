@@ -92,7 +92,17 @@ class Kqsms{
 		
 		$url = "http://106.ihuyi.cn/webservice/sms.php?method=Submit&account=$this->account&password=$this->password&mobile=$mobile&content=$content";
 		
-		return $this->get($url);
+		$response = $this->get($url);
+		
+		$xml = simplexml_load_string($response);
+		
+		$code = $xml->code;
+		
+		if ($code == 2)
+			return true;
+		else 
+			return $code + 90000;
+		
 	}
 	
 	

@@ -17,7 +17,9 @@ class Test extends CI_Controller {
 		echo 'base:'.base_url();
 		echo 'test';
 		echo 'ssssss';
-		$this->load->view('welcome_message');
+//		$this->load->view('welcome_message');
+
+		echo time();
 	}
 	
 
