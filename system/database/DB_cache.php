@@ -101,13 +101,27 @@ class CI_DB_Cache {
 		$filepath = $this->db->cachedir.$segment_one.'+'.$segment_two.'/'.md5($sql);
 
 
-	//判断是否过期 // cache_expire_time
-	if ( !file_exists($filepath) ) {
-		return false;
-	}
-if ( $this->db->cache_expire_time > 0 && time() - filemtime($filepath) > $this->db->cache_expire_time) {
-	return false;
-}
+		//判断是否过期 // cache_expire_time
+		if ( !file_exists($filepath) ) {
+			return false;
+		}
+		
+		
+		if ( $this->db->cache_expire_time > 0 && (time() - filemtime($filepath) > $this->db->cache_expire_time)) {
+			
+//			echo 'cache false';
+			
+			return false;
+		}
+		else{
+//			echo 'cache_expire_time'.$this->db->cache_expire_time;
+//			echo 'time #'.time(). 'filemTime # '. filemtime($filepath);
+//			
+//			echo 'cache true';
+		}
+		
+		
+		
 		if (FALSE === ($cachedata = read_file($filepath)))
 		{
 			return FALSE;
