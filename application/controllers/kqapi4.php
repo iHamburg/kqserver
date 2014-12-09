@@ -539,7 +539,7 @@ public function myCard_post(){
 		 if(!is_array($response)){
 		//绑卡其他错误
 //			
-			log('error','绑卡-》bind_union_card'.$response);
+			log_message('error','绑卡-》bind_union_card'.$response);
 			return $this->output_error($response);
 
 		}

@@ -528,7 +528,7 @@ and id>$lastNewsId");
 		 if(!is_array($response)){
 		//绑卡其他错误
 //			
-			log('error','绑卡-》bind_union_card'.$response.'; uid # '.$uid);
+			log_message('error','绑卡-》bind_union_card'.$response.'; uid # '.$uid);
 			return $this->output_error($response);
 
 		}
@@ -601,8 +601,8 @@ and id>$lastNewsId");
 			
 		}
 		else{
-		//	echo 'failure';
-			
+		//	echo 'failure'; 
+		
 			log_message('error','SMS Bindcard error #'.$response.', mobile # '.$username);
 		}
 		
@@ -829,16 +829,7 @@ and id>$lastNewsId");
 		
 			// 从银联下载优惠券
 			$result = $this->kqlibrary->download_union_coupon($uid,$user['username'],$unionUid, $unionCouponId, $transSeq);
-			
-			
-//			var_dump($result);
-//			if($result == ErrorUnionInvalidCoupon || $result == ErrorUnionInvalidParameter || $result == ErrorUnionNoCardBunden){
-//
-//				//处理无效的uionUid和unionCouponId, 用户没有绑卡错误
-//				log_message('error','下载快券 从银联下载失败: code #'.$result.', uid #'.$uid.' couponId #',$couponId);
-//				return $this->output_error($result);
-//			}
-//			else
+
 
 			if(!is_array($result)){
 				// 其他union下载的错误
@@ -1115,8 +1106,7 @@ and id>$lastNewsId");
 		
 		///如果还没有收藏的门店
 		if (empty($results)){
-			$data['userId'] = $uid;
-			$data['shopbranchId'] = $shopId;
+	
 		
 			$query = $this->db->query("insert into favoritedshopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
 			

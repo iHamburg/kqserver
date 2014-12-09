@@ -538,7 +538,7 @@ and id>$lastNewsId");
 		 if(!is_array($response)){
 		//绑卡其他错误
 //			
-			log('error','绑卡-》bind_union_card'.$response);
+			log_message('error','绑卡-》bind_union_card'.$response);
 			return $this->output_error($response);
 
 		}
@@ -1121,9 +1121,9 @@ and id>$lastNewsId");
 		
 		///如果还没有收藏的门店
 		if (empty($results)){
-			$data['userId'] = $uid;
-			$data['shopbranchId'] = $shopId;
-		
+//			$data['userId'] = $uid;
+//			$data['shopbranchId'] = $shopId;
+//		
 			$query = $this->db->query("insert into favoritedshopbranch (userId,shopbranchId) values ($uid,$shopbranchId)");
 			
 		}
