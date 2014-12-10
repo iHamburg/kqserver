@@ -165,8 +165,7 @@ class Kqapi1_1 extends REST_Controller
    			return $this->output_error(ErrorUsernameExists);
    		
    		}
-   		
-   		
+  		
 		$data['username'] = $username;
 		$data['password'] = $password;
 		$data['sessionToken'] = randomCharacter(20);
@@ -215,7 +214,30 @@ class Kqapi1_1 extends REST_Controller
    			return $this->output_error(ErrorEmptyUid);
    		}
 
-   		
+   			$query = $this->db->query(" SELECT * FROM (`user`)
+WHERE `id` =  $uid
+AND `expireDate` > now()");
+			
+   		$results = $query->result_array();
+		
+//		return $this->output_results($results);
+		
+		if (empty($results)){
+				
+			return $this->output_results(array('result'=>'0'));
+		}
+		else{
+			$user = $results[0];
+			
+			//TODO: 更新sessionToken
+			
+			unset($user['password']);
+			return $this->output_results(array('result'=>$user));
+			
+			
+		}
+		
+		
 	}
 
    public function userInfo_get(){
@@ -1653,7 +1675,8 @@ where shopId = $shopId
 and active=1";
 	  	
 	  	if (!empty($longitude) && !empty($latitude)){
-	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+//	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+	  		$sql.=" order by ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) + COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380";
 	  	}
 //	  	
 	  	$query = $this->db->query($sql);
