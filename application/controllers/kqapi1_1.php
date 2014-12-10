@@ -65,6 +65,8 @@ class Kqapi1_1 extends REST_Controller
 	
 		
 	}
+	
+	
 	/**
 	 * 
 	 * 用户登录, 用的是login命令
@@ -201,6 +203,20 @@ class Kqapi1_1 extends REST_Controller
 		
    }
    
+   /**
+    * 
+    * 每次客户端启动时调用，判断用户是否依然有效
+    * 如果uid的session没有过期就自动延长session的时间，返回如果过期，
+    */
+	public function verifyUser_post(){
+	
+		$uid = $this->post('uid');
+		if(empty($uid)){
+   			return $this->output_error(ErrorEmptyUid);
+   		}
+
+   		
+	}
 
    public function userInfo_get(){
    
@@ -608,8 +624,8 @@ and id>$lastNewsId");
 		
 		///-----End of 发送短信
 		 
-		/// --- 发送站内信
 		
+		/// --- 发送站内信
    		unset($data);
    		$data['uid'] = $uid;
    		$data['title'] = '绑定银联卡';
