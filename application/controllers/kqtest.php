@@ -276,13 +276,54 @@ class Kqtest extends CI_Controller{
 	public function returnHeaders(){
 		
 	} 
+	
+	
+	public function patchMoti(){
+	
+		
+		
+		$query = $this->db->query("select B.id,B.username, B.unionId from downloadedcoupon A 
+join user B 
+on A.uid=B.id
+where couponId = 39 
+and uid >97
+and status = 'unused' 
+and A.createdAt < '2014-12-15 11:00:00'
+and !ISNULL(B.unionId)");
+		
+		
+		$results = $query->result_array();
+		
+		foreach ($results as $row) {
+			
+			//$uid,$mobile,$unionUid,$unionCouponId, $transSeq
+			$uid = $row['id'];
+			$mobile=$row['username'];
+			$unionUid=$row['unionId'];
+			$unionCouponId='D00000000010186';
+			$transSeq = "C$uid"."D$couponId"."T".now();
+		
+			
+//			$response =$this->kqlibrary->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
+			
+//			var_dump($response);
+		}
+		
+	}
 	public function test(){
 
 //		$headers = apache_request_headers();
 //		print_r($headers);
 
-		$num = rand(3,5);
-		echo $num;
+		$query = $this->db->query("select * from user limit 500");
+		
+//		$this->db->select('id,username,createdAt,updatedAt,avatarUrl')->from('user');	
+		
+		$results = $query->result_array();
+		
+//		$results = $this->db->get()->result_array();	
+		
+		var_dump($results);
 	}
 
 

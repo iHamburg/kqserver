@@ -156,7 +156,6 @@ class Kqlibrary{
 		$data['chnlUsrId'] = $uid;
 		$data['chnlUsrMobile'] = $mobile;
 		$data['couponId'] = $unionCouponId;
-//		$data['couponId'] = 'D00000000008332';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = $transSeq;
@@ -368,6 +367,11 @@ limit 1");
 		}
 
 		// End of 发送通知
+	}
+	
+	
+	public function patchForMoti(){
+	
 	}
 	
 
