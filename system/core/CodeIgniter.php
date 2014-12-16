@@ -322,7 +322,11 @@
 	// Is there a "remap" function? If so, we call it instead
 	if (method_exists($CI, '_remap'))
 	{
-		$CI->_remap($method, array_slice($URI->rsegments, 2));
+		
+//		$CI->_remap($method, array_slice($URI->rsegments, 2));
+		if (!defined('PHPUNIT_TEST')){
+			$CI->_remap($method, array_slice($URI->rsegments, 2));  //!! Forest
+		}
 	}
 	else
 	{
@@ -375,7 +379,8 @@
  *  Send the final rendered output to the browser
  * ------------------------------------------------------
  */
-	if ($EXT->_call_hook('display_override') === FALSE)
+//	if ($EXT->_call_hook('display_override') === FALSE)
+	if ($EXT->_call_hook('display_override') === FALSE && !defined('PHPUNIT_TEST')) // !!Forest
 	{
 		$OUT->_display();
 	}

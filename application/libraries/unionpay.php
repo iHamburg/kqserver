@@ -232,7 +232,7 @@ NVuI+eXtaUQW
 	
 		$data = array('cardNo'=>$encrypted, 'needAuth'=>$needAuth,'userId'=>$userId);
 		$dataJson = json_encode($data);
-		$dataJson2 = str_replace('\\','',$dataJson);
+		$dataJson2 = str_replace('\\','',$dataJson); 
 		
 		
 		openssl_sign($dataJson2, $signToken, $this->private_key); //用私钥进行签名
@@ -371,7 +371,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8') );  // 要求用json格式传递参数	
-//		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json') );  // 要求用json格式传递参数
+
 		
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $objJson);	
 		$output = curl_exec($ch);
@@ -406,7 +406,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	
 	/**
 	 * 
-	 * 把secret 转成16位的密码
+	 * 把private secret 转成16位的密码
 	 * @param unknown_type $key
 	 */
 	private function  generateAESKey($key){

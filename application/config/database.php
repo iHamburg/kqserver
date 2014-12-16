@@ -48,7 +48,8 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-$db['default']['hostname'] = '115.29.148.47'; //测试数据库
+
+$db['default']['hostname'] = '115.29.148.47'; //生产HOST
 $db['default']['username'] = 'kq';
 $db['default']['password'] = 'kq';
 //$db['default']['hostname'] = 'localhost'; //测试数据库

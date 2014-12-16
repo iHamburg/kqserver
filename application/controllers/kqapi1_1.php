@@ -65,6 +65,8 @@ class Kqapi1_1 extends REST_Controller
 	
 		
 	}
+	
+	
 	/**
 	 * 
 	 * 用户登录, 用的是login命令
@@ -163,8 +165,7 @@ class Kqapi1_1 extends REST_Controller
    			return $this->output_error(ErrorUsernameExists);
    		
    		}
-   		
-   		
+  		
 		$data['username'] = $username;
 		$data['password'] = $password;
 		$data['sessionToken'] = randomCharacter(20);
@@ -201,6 +202,43 @@ class Kqapi1_1 extends REST_Controller
 		
    }
    
+   /**
+    * 
+    * 每次客户端启动时调用，判断用户是否依然有效
+    * 如果uid的session没有过期就自动延长session的时间，返回如果过期，
+    */
+	public function verifyUser_post(){
+	
+		$uid = $this->post('uid');
+		if(empty($uid)){
+   			return $this->output_error(ErrorEmptyUid);
+   		}
+
+   			$query = $this->db->query(" SELECT * FROM (`user`)
+WHERE `id` =  $uid
+AND `expireDate` > now()");
+			
+   		$results = $query->result_array();
+		
+//		return $this->output_results($results);
+		
+		if (empty($results)){
+				
+			return $this->output_results(array('result'=>'0'));
+		}
+		else{
+			$user = $results[0];
+			
+			//TODO: 更新sessionToken
+			
+			unset($user['password']);
+			return $this->output_results(array('result'=>$user));
+			
+			
+		}
+		
+		
+	}
 
    public function userInfo_get(){
    
@@ -608,8 +646,8 @@ and id>$lastNewsId");
 		
 		///-----End of 发送短信
 		 
-		/// --- 发送站内信
 		
+		/// --- 发送站内信
    		unset($data);
    		$data['uid'] = $uid;
    		$data['title'] = '绑定银联卡';
@@ -1637,7 +1675,8 @@ where shopId = $shopId
 and active=1";
 	  	
 	  	if (!empty($longitude) && !empty($latitude)){
-	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+//	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+	  		$sql.=" order by ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) + COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380";
 	  	}
 //	  	
 	  	$query = $this->db->query($sql);

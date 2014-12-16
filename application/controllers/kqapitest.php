@@ -46,7 +46,7 @@ class Kqapitest extends CI_Controller{
 		$linkPrepend = 'http://localhost/kq/index.php/kqapitest/';
 
 		
-		$apiLink = array('hotestcoupons','test_coupon_accepted','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
+		$apiLink = array('hotestcoupons','test_coupon_accepted','verifyUser','test_register','test_userinfo','test_edit','test_bind_card','test_unbind_card','test_get_download_coupon','test_download_coupon',
 			'test_captcha_register','test_mynews','test_search','test_aroundShopBranches','test_batch_union_dcoupon','test_my_downloadedCoupons');
 		$apiTitle = $apiLink;
 		
@@ -96,7 +96,21 @@ class Kqapitest extends CI_Controller{
 		echo $response;
 	}
 	
+	function verifyUser($servername){
+		$host = get_host($servername);
+		
+		$url = $host.'/'.testAPI.'/verifyUser';
 	
+		
+//		echo $url;
+//		$password = array('oldPassword'=>'abc','newPassword'=>'abcdef');
+		
+		$post = array('uid'=>'57');
+		
+		$response = post($url,$post);
+		
+		echo $response;
+	}
 	function test_userinfo($servername){
 		
 		$host = get_host($servername);
@@ -545,6 +559,9 @@ function test_coupon_accepted($servername){
 		echo $output;
 		
 	}
+	
+	
+	
 	
 	function test(){
 			
