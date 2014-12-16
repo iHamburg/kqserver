@@ -226,7 +226,7 @@ class Kqlibrary{
 
 	/**
 	 * 
-	 * 批量从银联下载coupons， 参数coupons应该包括 id，unionCouponId，transSeq
+	 * 同一用户批量从银联下载coupons， 参数coupons应该包括 id，unionCouponId，transSeq
 	 * @param unknown_type $uid
 	 */
 	public function download_batch_coupons($uid, $mobile, $unionUid, $coupons){
@@ -279,6 +279,27 @@ class Kqlibrary{
 		}
 		
 		return $msg;
+	}
+	
+	/**
+	 * 
+	 * 多个用户批量从银联下载一张快券
+	 * @param unknown_type $mobiles
+	 * @param unknown_type $couponUnionId
+	 */
+	public function download_union_coupon_with_users($mobiles,$couponUnionId){
+	
+		$CI =& get_instance();
+		
+		foreach ($mobiles as $mobile) {
+			
+			$query = $CI->db->query("select id, unionId from user where username='$mobile'");
+			$results = $query->result_array();
+			$user = $results[0];
+			var_dump($user);
+			
+		}
+		
 	}
 	
 	/**
@@ -362,7 +383,7 @@ limit 1");
 			$title = '优惠券承兑完成';
 			$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
 	
-			 $umengpush->send_customized_notification($uid,$title, $text);
+			$umengpush->send_customized_notification($uid,$title, $text);
 		
 		}
 

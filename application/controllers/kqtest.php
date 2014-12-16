@@ -306,10 +306,12 @@ and !ISNULL(B.unionId)");
 			
 //			$response =$this->kqlibrary->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
 			
-//			var_dump($response);
 		}
 		
 	}
+	
+	
+	
 	public function test(){
 
 //		$headers = apache_request_headers();
