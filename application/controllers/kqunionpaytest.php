@@ -96,7 +96,7 @@ sp5Ykcw0iwSbUA==
 		$host = get_host($servername);
 		
 		//因为不是api的调用，所以host是要远程的
-		$linkPrepend = $host.'/kq/index.php/kqunionpaytest/';
+		$linkPrepend = $host.'/kqunionpaytest/';
 		
 //		$apiTitle = array('re','用户信息查询','银行卡开通服务','银行卡关闭服务');
 
@@ -278,8 +278,8 @@ sp5Ykcw0iwSbUA==
 		
 		$data['chnlUsrId'] = '84';
 		$data['chnlUsrMobile'] = '13917368904';
-		$data['couponId'] = 'D00000000008334';
-//		$data['couponId'] = 'D00000000008931';
+//		$data['couponId'] = 'D00000000008334';
+		$data['couponId'] = 'D00000000010186';
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = 'C57D36T1424473970';

@@ -48,14 +48,14 @@
 $active_group = 'default';
 $active_record = TRUE;
 
-//$db['default']['hostname'] = '115.29.148.47'; //测试数据库
-//$db['default']['username'] = 'kq';
-//$db['default']['password'] = 'kq';
-$db['default']['hostname'] = 'localhost'; //测试数据库
-$db['default']['username'] = 'root';
-$db['default']['password'] = '123456';
+$db['default']['hostname'] = '115.29.148.47'; //测试数据库
+$db['default']['username'] = 'kq';
+$db['default']['password'] = 'kq';
+//$db['default']['hostname'] = 'localhost'; //测试数据库
+//$db['default']['username'] = 'root';
+//$db['default']['password'] = '123456';
 $db['default']['database'] = 'kq_test';
-$db['default']['dbdriver'] = 'mysqli';
+$db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;
 $db['default']['db_debug'] = TRUE;
