@@ -1771,6 +1771,31 @@ and active=1";
 	}
 	
 	
+	public function event_get(){
+		
+		
+		$event['id'] = '39';
+		$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+		$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
+		$event['type']='coupon';
+	
+		
+		$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
+		
+		$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
+		
+		$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
+		
+		
+		$response['updatedAt'] = '2014-12-17 14:37:21';
+		$response['event'] = $event;
+		$response['banners'] = $banners;
+		
+		$this->output_results($response);
+		
+		
+	}
+	
 	/**
 	 * 
 	 * 批量从银联下载优惠券，只有第一次和银联绑定成功（绑卡后）才会异步调用一次
