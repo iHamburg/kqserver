@@ -248,10 +248,10 @@ class Kqlibrary{
 			}
 //			echo 'begin download union';
 			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
-//			$json = json_encode($response);
+
 			
 			if (is_array($response)){
-//				$str = implode(",", $response);
+
 				$str = json_encode($response);	
 			}
 			else{
@@ -287,18 +287,35 @@ class Kqlibrary{
 	 * @param unknown_type $mobiles
 	 * @param unknown_type $couponUnionId
 	 */
-	public function download_union_coupon_with_users($mobiles,$couponUnionId){
+	public function download_union_coupon_with_users($mobiles,$unionCouponId){
 	
-		$CI =& get_instance();
-		
+		$CI = &get_instance();
+//		echo 'begin';
 		foreach ($mobiles as $mobile) {
-			
+			$msg.= 'mobile #'.$mobile;
 			$query = $CI->db->query("select id, unionId from user where username='$mobile'");
 			$results = $query->result_array();
 			$user = $results[0];
-			var_dump($user);
+//			var_dump($user);
+//			download_union_coupon($uid,$mobile,$unionUid,$unionCouponId, $transSeq)
+			$uid=$user['id'];
+			$unionUid = $user['unionId'];
+			$transSeq  = "C$uid"."T".now();
+			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
+			if (is_array($response)){
+
+				$str = json_encode($response);	
+			}
+			else{
+				$str = $response;
+			}
+
+			$msg = $msg.$str;
+			$msg .= '<br>';
 			
 		}
+		
+		echo $msg;
 		
 	}
 	
