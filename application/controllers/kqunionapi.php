@@ -77,7 +77,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 		}
 		
 		
-		if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 如果是测试的话，不写入正式正式的表中
+		if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 如果是测试的话，不写入正式正式的表中，一般不会出这个情况
 			
 			$query = $this->db->insert('u_coupon_accepted2',$data);
 			

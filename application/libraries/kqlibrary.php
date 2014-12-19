@@ -405,6 +405,21 @@ limit 1");
 		}
 
 		// End of 发送通知
+		
+		// --  发送站内信
+		$data['uid'] = $uid;
+   		$data['title'] = '承兑快券';
+   		$data['text'] ="您的".$completeTitle."快券已使用,更多优惠在等着你哦！";	
+   		
+   		$this->load->model('news2_m','news');
+   		$newsId = $this->news->insert($data);
+   		
+   		if (empty($newsId)){
+   		// 如果没有insert成功
+   			log_message('error','站内信发送错误：kqlibrary - accept_coupon, uid #'.$uid);
+   		}
+		
+		// End of 发送站内信
 	}
 	
 	

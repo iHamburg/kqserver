@@ -259,7 +259,13 @@ AND `expireDate` > now()");
 		}	
    		
    		
-		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
+//		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
+		$query = $this->db->query("select count(*) as num
+from `downloadedcoupon` A 
+left join coupon B on A.couponId=B.id 
+where uid = $uid
+and status='unused'
+AND B.`endDate` > now()");
 		$results = $query->result_array();	
 		
 		$response['dCouponNum'] = $results[0]['num'];
@@ -394,6 +400,7 @@ AND `expireDate` > now()");
    	
    		$uid = $this->get('uid');
    		$lastNewsId = $this->get('lastNewsId');
+   		
    		if (empty($lastNewsId))
    			$lastNewsId = 0;
    
@@ -419,7 +426,8 @@ and id>$lastNewsId");
    		$results = $query->result_array();
    		$count = $results[0]['num'];
    		
-   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by createdAt desc limit $skip,$limit");
+   		// 只能根据id进行排序， 发出的news不应该改变
+   		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by id desc limit $skip,$limit");
    		
    		$results = $query->result_array();
    		
@@ -787,6 +795,7 @@ and id>$lastNewsId");
 		if(empty($uid)){
 		
 			return $this->output_error(ErrorEmptyUid);
+		
 		}
 	
 		
@@ -826,6 +835,7 @@ and id>$lastNewsId");
 			return $this->output_error(ErrorInvalidSession);
 		}
 
+		
 		$data['uid'] = $uid;
 		$data['couponId'] = $couponId;
 		
@@ -879,48 +889,86 @@ and id>$lastNewsId");
 			
 		}
 	
-		//
 		
-		// 服务器下载快券
+		// 服务器下载快券, 如果银联下载快券失败，就不会调用本地下载
 
-		$couponId = $this->kqlibrary->download_coupon($uid,$couponId, $transSeq);
+		$dCouponId = $this->kqlibrary->download_coupon($uid,$couponId, $transSeq);
 		
 
-		// 是否应该在这里做download的increment工作？
-		
-		if($couponId === false){
+		if($dCouponId === false){
 			
 			return $this->output_error(ErrorDBInsert);
 		}
-		else{
-			//如果没有绑定银联用户，发送站内信
-			if(empty($unionUid)){
-				
-				// 发送站内信
-		   		unset($data);
-		   		$data['uid'] = $uid;
-		   		$data['title'] = '下载快券';
-		   		// 要获得优惠券的完整title
-		   		$completeTitle = $this->coupon->get_complete_title($couponId);
-		   		
-		   		$data['text'] = "您已成功下载".$completeTitle."快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
-		   		
-		   		$this->load->model('news2_m','news');
-		   		$newsId = $this->news->insert($data);
-		   		
-		   		if (empty($newsId)){
-		   		// 如果没有insert成功
-		   			log_message('error','download coupon insert news error, uid #'.$uid);
-		   		}
 	
-				/// --- Endof发送站内信
-			}
+		// 发送站内信和短信
+	
+		
+   		
+		if(empty($unionUid)){ //如果未绑定银联账户， 发送站内信
 			
-			return $this->output_success();
+			// 发送站内信
+	   		unset($data);
+	   		$data['uid'] = $uid;
+	   		$data['title'] = '下载快券';
+	   		// 要获得优惠券的完整title
+	   		$completeTitle = $this->coupon->get_complete_title($couponId);
+	   		
+	   		$data['text'] = "您已成功下载".$completeTitle."快券，添加任意一张银联卡就可以开始享受快券的优惠咯！";
+	   		
+	   		$this->load->model('news2_m','news');
+	   		$newsId = $this->news->insert($data);
+	   		
+	   		if (empty($newsId)){
+	   		// 如果没有insert成功
+	   			log_message('error','download coupon insert news error, uid #'.$uid);
+	   		}
+
 		}
+		else{ //已经绑定银联，发送站内信和短信
+
+			unset($data);
+	   		$data['uid'] = $uid;
+	   		$data['title'] = '下载快券';
+	   		// 要获得优惠券的完整title
+	   		$completeTitle = $this->coupon->get_complete_title($couponId);
+	   		//您已成功下载xxx(摩提工房满30立减5元)快券，前往最近的门店刷任意一张绑定的银联卡消费即可享受快券的服务咯！
+	   		$data['text'] = "您已成功下载".$completeTitle."快券，前往最近的门店刷任意一张绑定的银联卡消费即可享受快券咯！";
+	   		
+	   		$this->load->model('news2_m','news');
+	   		$newsId = $this->news->insert($data);
+	   		
+	   		if (empty($newsId)){
+	   		// 如果没有insert成功
+	   			log_message('error','download coupon insert news error, uid #'.$uid);
+	   		}
+	   		
+	   		
+	   		
+	   		// 短信： 您已成功下载【变量】快券，前往最近的门店刷任意一张绑定的银联卡消费即可享受快券的服务咯！
+	   	    $this->load->library('kqsms');
+    
+ 			$username = $user['username'];
+ 			
+			$smsResp = $this->kqsms->send_downloadcoupon_sms($username,$completeTitle);
+			 
+			// 发送的结果
+	 		if ($smsResp === true){
+			// 发送成功
+				$this->db->query("insert into s_sms (type,code,mobile) values ('downloadcoupon',$smsResp,$username)");
+			}
+			else{
+			//	echo 'failure'; 
+				
+				log_message('error','发送短信错误: '.$apiName.' - myDownloadedCoupon error #'.$smsResp.', mobile # '.$username);
+			}
+		
+		///-----End of 发送短信
+	   		
+		}		
+		return $this->output_success();
+	
 	
 	}
-	
 	
 	/**
 	 * 
@@ -1286,31 +1334,7 @@ LIMIT $skip,$limit");
 	 
 	  }
   
-	
-//	/**
-//	 * 
-//	 * 返回总店的所有分店信息
-//	 * param: parentId
-//	 */
-//	public function shopbranch_get(){
-//		
-//		$shopId = $this->get('id');
-//		$longitude = $this->get('longitude');
-//		$latitude =  $this->get('latitude');
-//		
-//		
-//	 	if(empty($shopId)){
-// 	  		
-//	   		return $this->output_error(ErrorEmptyShopId);
-// 	  	}
-// 	  	
-//		
-//		$this->load->model('shopbranch2_m','shopBranch');
-//		
-//		$results = $this->shopBranch->get_shopbranches_from_shopId($shopId, $longitude,$latitude);
-//		
-//		return $this->output_results(array('shopbranches'=>$results));
-//	}
+
 	
 	public function shopType_get(){
 	
@@ -1514,6 +1538,7 @@ LIMIT $skip,$limit");
 		
 		$this->db->cache_on(60*10); // 10分钟缓存
 		
+		
  	  	$this->db->select('A.id,A.title,A.shopId, A.startDate, A.endDate, A.displayedDCount as downloadedCount,A.isEvent,A.isSellOut,A.active,B.avatarUrl, B.discountContent, B.short_desc, B.description, B.message,B.slogan, B.usage');
  	  	$this->db->from('coupon as A');
 		$this->db->join('couponcontent as B', 'A.id = B.couponId');
@@ -1689,8 +1714,6 @@ and active=1";
   		$response['shopbranches'] = $results;
   	
   		
-//  		$this->output->cache(10);
-  		
   		return $this->output_results($response);
 	  	
 	  }
@@ -1705,7 +1728,6 @@ and active=1";
 
 		$captcha = random_number();
 
-		
 		$response = $this->kqsms->send_register_sms($mobile,$captcha);
 		
 		if ($response === true){

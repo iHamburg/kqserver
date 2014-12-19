@@ -110,10 +110,10 @@ function msg_with_error($error){
 		  $msg = '用户下载快券失败';
 		break;
 		case ErrorDownloadCouponLimit:
-			$msg = '快券使用后才能重新下载';
+			$msg = '使用后才能再次下载哦！';
 		break;
 		case ErrorDownloadEventCouponLimit:
-			$msg = '该快券只能下载一次';
+			$msg = '每位用户限下载一张哦！';
 		break;
 		
 		case ErrorDBUpdate:

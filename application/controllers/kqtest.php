@@ -324,15 +324,20 @@ and !ISNULL(B.unionId)");
 //		$headers = apache_request_headers();
 //		print_r($headers);
 
-		$query = $this->db->query("select * from user limit 500");
+//		$query = $this->db->query("select * from user limit 500");
 		
 //		$this->db->select('id,username,createdAt,updatedAt,avatarUrl')->from('user');	
 		
-		$results = $query->result_array();
+//		$query = $this->db->query();
 		
-//		$results = $this->db->get()->result_array();	
-		
-		var_dump($results);
+//		$results = $query->result_array();
+//		
+////		$results = $this->db->get()->result_array();	
+//		
+//		var_dump($results);
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		$result = $this->coupon->get_complete_title(39);
+		echo 'title '.$result;
 	}
 
 
