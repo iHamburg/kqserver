@@ -1416,14 +1416,14 @@ LIMIT $skip,$limit");
 			$this->db->order_by('distance');
 
 		}
-		else if($order == 'preisup'){ //
+		else if($order == 'ai'){ // 智能
+			$this->db->order_by('rand()');
+		}
+		else if($order == 'preisup'){ //人均最高
 			$this->db->order_by('A.averagePreis');
 		}
 		else if($order == 'preisdown'){
 			$this->db->order_by('A.averagePreis','desc');
-		}
-		else{
-			$this->db->order_by('rand()');
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
