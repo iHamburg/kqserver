@@ -1411,19 +1411,19 @@ LIMIT $skip,$limit");
 	
 		$this->db->where('A.active','1');
 		$this->db->where('B.active','1');
-		if(!empty($longitude) && !empty($latitude) && $order=='distance'){
+		if(!empty($longitude) && !empty($latitude) && $order=='distance'){ 
 
 			$this->db->order_by('distance');
 
 		}
-		else if($order == 'ai'){
-			$this->db->order_by('rand()');
-		}
-		else if($order == 'preisup'){
+		else if($order == 'preisup'){ //
 			$this->db->order_by('A.averagePreis');
 		}
 		else if($order == 'preisdown'){
 			$this->db->order_by('A.averagePreis','desc');
+		}
+		else{
+			$this->db->order_by('rand()');
 		}
  	  	$this->db->limit($limit,$skip);
  	  	
@@ -1796,16 +1796,17 @@ and active=1";
 	public function event_get(){
 		
 		
-		$event['id'] = '39';
+		$event['id'] = '60';
 		$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+//		$event['imgUrl'] = 'http://www.quickquan.com/app/image/banner_coupon_39.jpg';
 		$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
 		$event['type']='coupon';
+		$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦';
+		$event['registerSuccessText']='前往领取免费美味摩提快券';
 	
 		
 		$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
-		
 		$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
-		
 		$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
 		
 		

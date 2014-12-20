@@ -138,22 +138,9 @@ class Kqtest extends CI_Controller{
 	}
 	
 	function test_remote_coupon_accepted(){
-			
-//		$query = $this->db->query('select * from user where id>10');
-//		var_dump($query);
-//		
-//		echo '<br>';
-//		
-//		$query->free_result();
-//		var_dump($query);
-
-//		$query = $this->db->query("insert into bank (title) values ('浦发银行')");
 	
-//		var_dump($query);
-//		
-//		echo 'aaa';
 
-		$postJson = '{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"D00000000000002","cdhdUsrId":"c00000000000","chnlUsrId":"qq382677505","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}';
+		$postJson = '{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"D00000000008333","cdhdUsrId":"c00055685346","chnlUsrId":"57","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}';
 		$post = json_decode($postJson,true);
 		
 		$params = array('mchntId','couponId','cdhdUsrId','chnlUsrId','cardNo','origTransAt','transAt','transDateTime','sysTraNo','transAcptInsId','transFwdInsId');
@@ -162,15 +149,19 @@ class Kqtest extends CI_Controller{
 			$data[$key] = $post['data'][$key];
 		}
 		
-		$data['originRequest'] = $postJson;
-		
-		
-		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-		
-		// 把数据存入数据库中
-		$this->uCouponAccepted->insert($data);
+//		$data['originRequest'] = $postJson;
+//		
+//		
+//		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
+//		
+//		// 把数据存入数据库中
+//		$this->uCouponAccepted->insert($data);
+	
+		echo $postJson;
+		echo 'begin post'.'<br>';
+		echo post('http://61.153.100.241/kq/index.php/kqunionapi/couponAccepted',$postJson);
 	}
-		
+	
 	function test_accept_coupon(){
 		
 		echo $this->kqlibrary->accept_coupon(57, 'Z00000000008039');

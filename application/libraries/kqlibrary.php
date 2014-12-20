@@ -47,6 +47,8 @@ class Kqlibrary{
      	
      	$this->user = new User2_m();
      	
+     	$this->news = new News2_m();
+     	
 	}
 
 
@@ -296,8 +298,7 @@ class Kqlibrary{
 			$query = $CI->db->query("select id, unionId from user where username='$mobile'");
 			$results = $query->result_array();
 			$user = $results[0];
-//			var_dump($user);
-//			download_union_coupon($uid,$mobile,$unionUid,$unionCouponId, $transSeq)
+
 			$uid=$user['id'];
 			$unionUid = $user['unionId'];
 			$transSeq  = "C$uid"."T".now();
@@ -305,9 +306,12 @@ class Kqlibrary{
 			if (is_array($response)){
 
 				$str = json_encode($response);	
+			
 			}
 			else{
+
 				$str = $response;
+			
 			}
 
 			$msg = $msg.$str;
@@ -329,8 +333,7 @@ class Kqlibrary{
 	public function accept_coupon($uid, $unionCouponId){
 		
 		$CI =& get_instance();
-		
-		
+	
 		// 改变downloadedcoupon中的记录,吧unused变成used
 		//先获得couponId
 		$query = $CI->db->query("select id from coupon where unionCouponId='$unionCouponId' limit 1");
@@ -365,16 +368,7 @@ limit 1");
 //			echo 'increment sucess';
 		}
 		
-//		echo 'after increment acount';
-		
-		//发送通知： 如果是安卓就push，如果是ios就发短信		
-		
-//		$umengpush = new UmengPush();
-//		$completeTitle = $this->coupon->get_complete_title($couponId);
-//		$title = '快券承兑完成';
-//		$text = "您的".$completeTitle."快券已使用,更多优惠在等着你哦！";		
-//
-//		$umengpush->send_customized_notification($uid,$title, $text);
+
 		
 		// -- 发送通知
 		$user = $this->user->get($uid);
@@ -411,7 +405,7 @@ limit 1");
    		$data['title'] = '承兑快券';
    		$data['text'] ="您的".$completeTitle."快券已使用,更多优惠在等着你哦！";	
    		
-   		$this->load->model('news2_m','news');
+//   		$CI->load->model('news2_m','news');
    		$newsId = $this->news->insert($data);
    		
    		if (empty($newsId)){
