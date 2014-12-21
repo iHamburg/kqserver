@@ -101,8 +101,8 @@ LIMIT $skip,$limit";
 		
 		// 如果coupon是event，并且downloadedcoupon里有了，返回false
 		
-		if ($couponId == 39){
-		// 如果是活动券
+		if ($couponId == 39 || $couponId == 60){
+		// 如果是活动券（牛奶棚和摩提）
 			$query = $this->db->query("select B.isEvent, B.unusedLimit
 from downloadedcoupon A
 left join coupon B

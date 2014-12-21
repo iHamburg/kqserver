@@ -1796,7 +1796,7 @@ and active=1";
 	public function event_get(){
 		
 		
-		$event['id'] = '60';
+		$event['id'] = '39';
 		$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
 //		$event['imgUrl'] = 'http://www.quickquan.com/app/image/banner_coupon_39.jpg';
 		$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
