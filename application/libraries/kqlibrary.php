@@ -284,10 +284,11 @@ class Kqlibrary{
 	}
 	
 	/**
+	 * 是不经过本地平台的
 	 * 
 	 * 多个用户批量从银联下载一张快券
-	 * @param unknown_type $mobiles
-	 * @param unknown_type $couponUnionId
+	 * @param array $mobiles
+	 * @param string $couponUnionId
 	 */
 	public function download_union_coupon_with_users($mobiles,$unionCouponId){
 	
@@ -305,8 +306,7 @@ class Kqlibrary{
 			$response = $this->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
 			if (is_array($response)){
 
-				$str = json_encode($response);	
-			
+				$str = json_encode($response);		
 			}
 			else{
 

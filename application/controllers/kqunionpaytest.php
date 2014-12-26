@@ -266,19 +266,17 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8 ');
 	
-//13524248066， 13776531037， 13816773779， 15821731330		
-// 73   , 79, 77, 104
 		$data['chnlUsrId'] = '84';
+		
 		$data['chnlUsrMobile'] = '13917368904';
-//		$data['couponId'] = 'D00000000008334';
-
-//		$data['couponId'] = 'D00000000008931';
+		
 		$data['couponId'] = 'D00000000010397';
 
 		$data['couponNum'] = '1';
 		$data['couponSceneId'] = '000';
 		$data['transSeq'] = 'C57D36T1424473970';
 		$data['userId'] = 'c00058863074';
+		
 		print_r($data);
 		
 		$response = $this->unionpay->couponDwnById($data);		
@@ -312,7 +310,7 @@ sp5Ykcw0iwSbUA==
 
 //		echo decodeUnicode($this->coupon_m->addInShop('539d8cd9e4b0a98c8733f8dc', '539d8817e4b0a98c8733f287'));
 
-			header( 'Content-Type:text/html;charset=utf-8');
+		header( 'Content-Type:text/html;charset=utf-8');
 //		header( 'Content-Type:application/json;charset=utf-8');
 		
 //		$mobile = '15166412996';

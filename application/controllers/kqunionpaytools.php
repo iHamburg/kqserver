@@ -18,7 +18,12 @@ class Kqunionpaytools extends CI_Controller{
 	 */
 	var $unionpay;
 	
-
+	/**
+	 * 
+	 * Enter description here ...
+	 * @var Kqlibrary
+	 */
+	var $kqlibrary;
 	
 	function __construct(){
 		parent::__construct();
@@ -28,6 +33,7 @@ class Kqunionpaytools extends CI_Controller{
 		
 		$this->load->library('unionpay');
 		$this->load->helper('html');
+//		$this->load->library('kqlibrary');
 	}
 	
 
@@ -66,6 +72,43 @@ class Kqunionpaytools extends CI_Controller{
 		$this->load->view('vtestsuit', $data);
 		
 	}
+
+	
+	// 查询银联快券ID是否有效的接口
+	function verifyCouponID($unionCouponId){
+		
+		
+		header( 'Content-Type:text/html;charset=utf-8 ');
+	
+		$data['chnlUsrId'] = '57';
+		$data['chnlUsrMobile'] = '13166361023';
+//		$data['couponId'] = 'D00000000010397';
+		$data['couponId'] = $unionCouponId;
+		
+		$data['couponNum'] = '1';
+		$data['couponSceneId'] = '000';
+		$data['transSeq'] = 'C57D36T1424473970';
+		$data['userId'] = 'c00055685346';
+//		print_r($data);
+		
+		$response = $this->unionpay->couponDwnById($data);		
+//		
+//		echo $response;
+		
+		$response = json_decode($response,true);
+		$respCd = $response['respCd'];
+		
+		if($respCd == NULL){
+			echo ErrorUnionNotAuthorized;
+		}
+		else if ($respCd == '000000'){
+			echo '银联快券有效';
+		}
+		else {
+			echo $respCd;
+		}
+	}
+	
 
 	
 //	function 
@@ -248,7 +291,7 @@ class Kqunionpaytools extends CI_Controller{
 //			echo '服务器出状况了';
 //		}
 	
-		var_dump( $this->unionpay->is_server_alive());
+//		var_dump( $this->unionpay->is_server_alive());
 	
 		
 //		var_dump($this->unionpay->is_server_alive());

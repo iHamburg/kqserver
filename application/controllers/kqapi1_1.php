@@ -1795,24 +1795,51 @@ and active=1";
 	
 	public function event_get(){
 		
-		
-		$event['id'] = '39';
-		$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
-//		$event['imgUrl'] = 'http://www.quickquan.com/app/image/banner_coupon_39.jpg';
-		$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
-		$event['type']='coupon';
-		$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦';
-		$event['registerSuccessText']='前往领取免费美味摩提快券';
+			if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 测试情况
+				// 测试服务器
+				$event['id'] = '60';
 	
+				$event['imgUrl'] = 'http://www.quickquan.com/app/image/guide_350_04.png';
+				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/guide_finish.png';
+				$event['type']='coupon';
+				
+		//		$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦！';
+		//		$event['registerSuccessText']='前往领取免费美味摩提快券';
+				
+				$event['registerBannerText']='哈哈哈哈哈啊只要注册快券，就可以1元获得原价18元的美味摩提哦！';
+				$event['registerSuccessText']='哈哈哈哈哈哈前往领取免费美味摩提快券';
+			
+				
+				$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
+				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
+				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
+				
+				$response['updatedAt'] = '2014-12-25 14:37:21';
+				$response['event'] = $event;
+				$response['banners'] = $banners;
+			}
 		
-		$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
-		$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
-		$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
+			else{
+				// 正式服务器
+				$event['id'] = '39';
+				$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
+				$event['type']='coupon';
+				$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦！';
+				$event['registerSuccessText']='前往领取免费美味摩提快券';
+
+				
+				$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
+				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
+				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
+				
 		
-		
-		$response['updatedAt'] = '2014-12-17 14:37:21';
-		$response['event'] = $event;
-		$response['banners'] = $banners;
+				
+				$response['updatedAt'] = '2014-12-17 14:37:21';
+				$response['event'] = $event;
+				$response['banners'] = $banners;
+			}
+	
 		
 		$this->output_results($response);
 		

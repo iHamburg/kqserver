@@ -209,7 +209,9 @@ class Kqapitest extends CI_Controller{
 	
 	// 回去银联接口下载
 	function test_download_coupon($servername){
+		
 		$host = get_host($servername);
+		
 //		$url = $host.'/kqapitest/index.php/kqapi1_1/myDownloadedCoupon/';
 		$url = $host.'/'.testAPI.'/myDownloadedCoupon';
 		$data = array('uid'=>'57','sessionToken'=>'UFZw1P30ERseCgqk7QVc','couponId'=>'41');
