@@ -22,7 +22,7 @@ class Coupon2_m extends MY_Model{
 	 */
 	public function dcount_increment($couponId){
 	
-		$dnum = rand(3,5);
+		$dnum = rand(1,3);
 		$this->db->query("update coupon set downloadedCount = downloadedCount+1, displayedDCount=displayedDCount+$dnum where id=$couponId");
 
 		
