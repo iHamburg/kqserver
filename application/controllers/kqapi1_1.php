@@ -342,9 +342,7 @@ AND B.`endDate` > now()");
 		
 		$timestamp = now();
 		$filePath = "public/uploads/avatar_".$uid."_".$timestamp.".jpg";
-//		echo 'filepath '.$filePath;
-//		echo $filePath;
-//		$filePath = "public/uploads/avatar_".$uid.".jpg";
+
 		$data = file_put_contents($filePath, $img);
 		
 		
@@ -1792,6 +1790,21 @@ and active=1";
 		
 	}
 	
+	public function feedback_post(){
+	
+		$uid = $this->post('uid');
+		$sessionToken = $this->post('sessionToken');
+		$cardNumber = $this->post('cardNumber');
+		$text = $this->post('text');	
+		$photo = $this->post('photo'); 
+		
+	 	if (empty($uid) || empty($sessionToken)){
+   			return $this->output_error(ErrorEmptyParameter);
+   		}
+	
+   	
+		
+	}
 	
 	public function event_get(){
 		
@@ -1802,9 +1815,6 @@ and active=1";
 				$event['imgUrl'] = 'http://www.quickquan.com/app/image/guide_350_04.png';
 				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/guide_finish.png';
 				$event['type']='coupon';
-				
-		//		$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦！';
-		//		$event['registerSuccessText']='前往领取免费美味摩提快券';
 				
 				$event['registerBannerText']='哈哈哈哈哈啊只要注册快券，就可以1元获得原价18元的美味摩提哦！';
 				$event['registerSuccessText']='哈哈哈哈哈哈前往领取免费美味摩提快券';
@@ -1845,6 +1855,9 @@ and active=1";
 		
 		
 	}
+	
+	
+	
 	
 	/**
 	 * 
