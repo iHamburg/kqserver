@@ -322,8 +322,7 @@ join user B
 on A.uid=B.id
 where couponId=39
 and status='unused'
-and A.createdAt>'2014-12-26'
-and A.createdAt<'2014-12-28'
+and A.createdAt>'2014-12-30'
 and B.`unionId`!=''");
 		
 		$results = $query->result_array();
@@ -332,7 +331,7 @@ and B.`unionId`!=''");
 			$mobiles[]=$row['username'];
 		}
 		
-		var_dump($users);
+//		var_dump($users);
 //		$response = $this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
 		echo $response;
