@@ -301,6 +301,7 @@ and !ISNULL(B.unionId)");
 		
 	}
 	
+	// 
 	public function down_users(){
 		
 		$couponUnionId = 'D00000000010186';
@@ -308,6 +309,33 @@ and !ISNULL(B.unionId)");
 		$mobiles = array('13816773779');
 		$this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
+	}
+	
+	public function download_unioncoupon_for_users(){
+	
+		$couponUnionId='D00000000010952';
+		
+		//先处理到27号，下个从28开始
+		$query = $this->db->query("select B.username
+from downloadedcoupon A
+join user B
+on A.uid=B.id
+where couponId=39
+and status='unused'
+and A.createdAt>'2014-12-26'
+and A.createdAt<'2014-12-28'
+and B.`unionId`!=''");
+		
+		$results = $query->result_array();
+		
+		foreach ($results as $row) {
+			$mobiles[]=$row['username'];
+		}
+		
+		var_dump($users);
+//		$response = $this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
+		
+		echo $response;
 	}
 	
 	public function test(){
@@ -326,9 +354,9 @@ and !ISNULL(B.unionId)");
 ////		$results = $this->db->get()->result_array();	
 //		
 //		var_dump($results);
-		header( 'Content-Type:text/html;charset=utf-8 ');
-		$result = $this->coupon->get_complete_title(39);
-		echo 'title '.$result;
+//		header( 'Content-Type:text/html;charset=utf-8 ');
+//		$result = $this->coupon->get_complete_title(39);
+//		echo 'title '.$result;
 	}
 
 
