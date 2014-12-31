@@ -265,7 +265,7 @@ from `downloadedcoupon` A
 left join coupon B on A.couponId=B.id 
 where uid = $uid
 and status='unused'
-AND B.`endDate` > now()");
+AND B.`endDate` >= curdate()");
 		$results = $query->result_array();	
 		
 		$response['dCouponNum'] = $results[0]['num'];

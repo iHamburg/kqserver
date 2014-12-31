@@ -70,7 +70,7 @@ WHERE `uid` =  $uid";
 			if($mode=="unused"){
 				$sql.="
 AND `status` =  'unused'
-AND `B`.`endDate` > now()";
+AND `B`.`endDate` >= curdate()";
 			}
 			else if($mode == "used"){
 				$sql.="
@@ -79,7 +79,7 @@ AND `status` =  'used'";
 			else if($mode == "expired"){
 		$sql.="
 AND `status` =  'unused'
-AND `B`.`endDate` < now()";		
+AND `B`.`endDate` < curdate()";		
 			}
 		
 		$sql.="
