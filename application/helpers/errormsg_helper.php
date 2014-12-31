@@ -38,7 +38,7 @@ define("ErrorUnionUnknown", 300000);
 define("ErrorUnionInvalidCoupon", 500046);  //票券不存在
 define("ErrorUnionInvalidParameter", 300002);
 define("ErrorUnionEmptyUser", 300200);  // 查询结果，没有注册
-define("ErrorUnionNoCardBunden", 500058);
+define("ErrorUnionNoCardBunden", 500058); //没有绑卡
 define("ErrorUnionBindCardToOften", 300521);
 define("ErrorUnionDCouponLimt", 500048);  
 define("ErrorUnionGetUserNoUser",500001); //查询结果，银联注册但没有开通银联钱包
