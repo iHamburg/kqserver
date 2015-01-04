@@ -284,7 +284,7 @@ class Kqlibrary{
 	}
 	
 	/**
-	 * 是不经过本地平台的
+	 * 是不经过本地数据库的
 	 * 
 	 * 多个用户批量从银联下载一张快券
 	 * @param array $mobiles
@@ -293,9 +293,9 @@ class Kqlibrary{
 	public function download_union_coupon_with_users($mobiles,$unionCouponId){
 	
 		$CI = &get_instance();
-//		echo 'begin';
+
 		foreach ($mobiles as $mobile) {
-			$msg.= 'mobile #'.$mobile;
+			$msg.= 'mobile #'.$mobile.':';
 			$query = $CI->db->query("select id, unionId from user where username='$mobile'");
 			$results = $query->result_array();
 			$user = $results[0];
@@ -320,7 +320,7 @@ class Kqlibrary{
 		}
 		
 		echo $msg;
-		
+		return $msg;
 	}
 	
 	/**

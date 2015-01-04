@@ -513,6 +513,7 @@ function test_coupon_accepted($servername){
 	
 		
 //		$post = array('username'=>'3222222','password'=>'ddd');
+		
 		$post = '{"appId":"unionpay","version":"1.0","data":{"mchntId":"937320293990001","couponId":"Z00000000008039","cdhdUsrId":"c00000000000","chnlUsrId":"57","cardNo":"6214***********0025","origTransAt":"000000018000","transAt":"000000010000","transDateTime":"1021165328","sysTraNo":"012088","transAcptInsId":"00001021111","transFwdInsId":"00001020000"}}';
 		
 		$response = post($url,$post);

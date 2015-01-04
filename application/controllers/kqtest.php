@@ -303,9 +303,10 @@ and !ISNULL(B.unionId)");
 	// 
 	public function down_users(){
 		
-		$couponUnionId = 'D00000000010186';
+		$couponUnionId = 'D00000000011149';
 
-		$mobiles = array('13816773779');
+		$mobiles = array('13524248066');
+		
 		$this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
 	}

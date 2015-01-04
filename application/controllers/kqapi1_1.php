@@ -1,9 +1,6 @@
 <?php
 require(APPPATH.'libraries/REST_Controller.php'); 
 
-
-
-
 /**
  * 
  * 从测试服务器中获取数据, iOS
@@ -1790,22 +1787,7 @@ and active=1";
 		
 	}
 	
-	public function feedback_post(){
-	
-		$uid = $this->post('uid');
-		$sessionToken = $this->post('sessionToken');
-		$cardNumber = $this->post('cardNumber');
-		$text = $this->post('text');	
-		$photo = $this->post('photo'); 
-		
-	 	if (empty($uid) || empty($sessionToken)){
-   			return $this->output_error(ErrorEmptyParameter);
-   		}
-	
-   		
-   	
-		
-	}
+
 	
 	public function event_get(){
 		
@@ -1897,14 +1879,14 @@ and active=1";
 	
 //	public function 
 	
-	public function sleep_dcoupon_get(){
-		
-		sleep(5);
-		
-		$this->coupon->dcount_increment(36);
-		
-		return $this->output_results('10s后的返回');
-	}
+//	public function sleep_dcoupon_get(){
+//		
+//		sleep(5);
+//		
+//		$this->coupon->dcount_increment(36);
+//		
+//		return $this->output_results('10s后的返回');
+//	}
 	
 	
 	
