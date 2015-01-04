@@ -92,13 +92,10 @@ function echobr($str=''){
 
 function exportFile($fileName, $contents){
 	
-//	header("Content-type: text/html; charset=utf-8");
-	
 		$fp = fopen($fileName, 'w');
 
 		foreach ($contents as $fields) {
-			
-			
+					
 		    fputcsv($fp, $fields);
 
 		}
