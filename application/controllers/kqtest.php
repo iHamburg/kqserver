@@ -294,7 +294,6 @@ and !ISNULL(B.unionId)");
 			$unionCouponId='D00000000010186';
 			$transSeq = "C$uid"."D$couponId"."T".now();
 		
-			
 //			$response =$this->kqlibrary->download_union_coupon($uid, $mobile, $unionUid, $unionCouponId, $transSeq);
 			
 		}
@@ -313,7 +312,7 @@ and !ISNULL(B.unionId)");
 	
 	public function download_unioncoupon_for_users(){
 	
-		$couponUnionId='D00000000010952';
+		$couponUnionId='D00000000010952'; // 摩提新券
 		
 		//先处理到27号，下个从28开始
 		$query = $this->db->query("select B.username

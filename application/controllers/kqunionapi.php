@@ -52,7 +52,7 @@ transFwdInsId 	string 	可选 	交易发送机构
 	
 		$post = file_get_contents("php://input");
 
-		$data['originRequest'] = $post;
+//		$data['originRequest'] = $post;
 		
 //		var_dump($post);
 		if(empty($post)){
