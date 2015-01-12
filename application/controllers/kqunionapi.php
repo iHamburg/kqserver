@@ -51,7 +51,8 @@ transFwdInsId 	string 	可选 	交易发送机构
 	function couponAccepted(){
 	
 		$post = file_get_contents("php://input");
-
+		
+		log_message('error', '银联收到承兑通知 #'.$post);
 //		$data['originRequest'] = $post;
 		
 //		var_dump($post);
@@ -90,19 +91,20 @@ transFwdInsId 	string 	可选 	交易发送机构
 			$this->uCouponAccepted->insert($data);
 			
 			
-			if($this->db->affected_rows() == 0){
-				//如果数据库没有登记成功，登记在logo中
-				
-				log_message('error', 'Union CouponAccepted DBInsert #'.$post);
-			
-			}
-			else{
-			
-				log_message('error', '银联成功承兑 #'.$post);
-			}
+//			if($this->db->affected_rows() == 0){
+//				//如果数据库没有登记成功，登记在logo中
+//				
+//				log_message('error', 'Union CouponAccepted DBInsert #'.$post);
+//			
+//			}
+//			else{
+//			
+//				log_message('error', '银联成功承兑 #'.$post);
+//			}
 			
 			// TODO 票券承兑如果成功写入数据库，除了写log_message,我还要有其他的预警手段，比如友盟
 			// 从unionUid或是uid中定位user，然后从unionCouponId中定位coupon，然后从downloadedcoupon的unused的coupon，选一张，update成used
+
 			$uid = $data['chnlUsrId'];
 			$unionCouponId = $data['couponId'];
 			

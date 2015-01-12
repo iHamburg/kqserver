@@ -46,8 +46,8 @@ class Wx_msg_repsonseTest extends CIUnit_TestCase
 		
 		*/
 
-		$this->CI->load->model('wx_msg_response_m','msg_response');
-		$this->msg_response = $this->CI->msg_response;
+//		$this->CI->load->model('wx_msg_response_m','msg_response');
+//		$this->msg_response = $this->CI->msg_response;
 		
 	}
 
@@ -56,12 +56,12 @@ class Wx_msg_repsonseTest extends CIUnit_TestCase
 		$this->asserttrue(true);
 	}
 	
-	function testGetResponseByMsgKey(){
-		
-		$response = $this->msg_response->getResponseByMsgKey(1, 'EK_1');
-		
-//		var_dump($response);
-		$this->assertSame('4',$response['responseid']);
-	}
+//	function testGetResponseByMsgKey(){
+//		
+//		$response = $this->msg_response->getResponseByMsgKey(1, 'EK_1');
+//		
+////		var_dump($response);
+//		$this->assertSame('4',$response['responseid']);
+//	}
 
 }

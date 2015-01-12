@@ -108,7 +108,7 @@ class Kqapi1_1 extends REST_Controller
 		//重设session和expireDate
 		$id = $results['id'];
 		$sessionToken = randomCharacter(20);
-		$expireDate = date('Y-m-d H:i:s',strtotime('+2 week')); // session有效期2周
+		$expireDate = date('Y-m-d H:i:s',strtotime('+4 week')); // session有效期2周
 	
 		$data = array('sessionToken'=>$sessionToken,'expireDate'=>$expireDate);
 		$alt_device = $results['device'];
@@ -256,13 +256,13 @@ AND `expireDate` > now()");
 		}	
    		
    		
-//		$query = $this->db->query("select count(*) as num from `downloadedcoupon` where uid = $uid");
 		$query = $this->db->query("select count(*) as num
 from `downloadedcoupon` A 
 left join coupon B on A.couponId=B.id 
 where uid = $uid
 and status='unused'
 AND B.`endDate` >= curdate()");
+		
 		$results = $query->result_array();	
 		
 		$response['dCouponNum'] = $results[0]['num'];
@@ -415,11 +415,12 @@ AND B.`endDate` >= curdate()");
    			
    			
    		$query = $this->db->query("select count(*) as num from news 
-where  (uid=$uid or uid is null or uid ='')
+where  (uid=$uid or uid ='')
 and id>$lastNewsId");	
    		
    		$results = $query->result_array();
    		$count = $results[0]['num'];
+   		
    		
    		// 只能根据id进行排序， 发出的news不应该改变
    		$query = $this->db->query("select * from news where (uid=$uid or uid is null or uid ='') order by id desc limit $skip,$limit");
@@ -794,7 +795,6 @@ and id>$lastNewsId");
 		}
 	
 		
-//		echo 'mode'.$mode;
 		$results = $this->user->get_dcoupons($uid,$mode,$limit,$skip);
 		
 //		$this->output->enable_profiler(TRUE);
@@ -835,7 +835,7 @@ and id>$lastNewsId");
 		$data['couponId'] = $couponId;
 		
 		
-		//如果不是 debug 模式就本地判断是否能下载
+		//如果不是 debug 模式就 判断服务器看是否能下载
 		if (empty($debug)){
 					
 			/// 数据库判断user是否能下载coupon
@@ -896,9 +896,7 @@ and id>$lastNewsId");
 		}
 	
 		// 发送站内信和短信
-	
-		
-   		
+  		
 		if(empty($unionUid)){ //如果未绑定银联账户， 发送站内信
 			
 			// 发送站内信
@@ -1005,7 +1003,6 @@ and id>$lastNewsId");
 	  	
 //		$this->output->enable_profiler(TRUE);
 		
-//		$this->output->cache(10);
 		
 	  	return $this->output_results(array('coupons'=>$results));
 	
@@ -1101,7 +1098,6 @@ and id>$lastNewsId");
 		$uid = $this->get('uid');
 		$couponId = $this->get('couponId');
 	
-		
 	
 		if(empty($uid) || empty($couponId)){
 		
@@ -1251,47 +1247,42 @@ and id>$lastNewsId");
 
 	
 	}
-  
-//   
-//   /**
-//    * 
-//    * 返回最新的快券
-//    * @param skip
-//    * @param limit optional
-//    */
-//	function newestCoupons_get(){
-//
-//	  	
-//		$this->load->model('coupon2_m','coupon');
-//		
-//		$skip = intval($this->get('skip'));
-//	  	$limit = intval($this->get('limit'));
-//	  	
-//	  	if (empty($skip))
-// 	  		$skip = 0;
-//	  	
-// 	  	if (empty($limit))
-// 	  		$limit = 30;
-//	  	
-//		
-//		$query = $this->db->query("SELECT `A`.`id`, A.`title`, A.`downloadedCount`, B.`avatarUrl`, B.`discountContent`
-//FROM (`coupon` A) 
-//JOIN `couponcontent` B
-//ON `A`.`id` = `B`.`couponId`
-//Where A.active = 1
-//ORDER BY A.`createdAt` desc
-//LIMIT $skip,$limit");
-//		
-//		$results = $query->result_array();
-//		
-//		
-////		$this->output->enable_profiler(TRUE);
-//	  	return $this->output_results(array('coupons'=>$results));
-//	  	
-//	 
-//	  }
+	
+	public function feedback_get(){
+		$uid = $this->get('uid');
+		
+		if(empty($uid)){
+		
+			return $this->output_error(ErrorEmptyParameter);
+			
+		}
+		
+		$query = $this->db->query("select * from feedback where uid = $uid");
+		
+		$results = $query->result_array();
+		
+		
+		
+		return $this->output_results(array('feedbacks'=>$results));
+	}
+	
+	public function feedback_post(){
+		
+		$uid = $this->post("uid");
+		$content = $this->post("content");
+		
+		$this->db->query("insert into feedback (uid,type,content) values($uid,'user_reply','$content')");
+		
+		$query = $this->db->query("select * from feedback where uid = $uid");
+		
+		$results = $query->result_array();
+		
+		return $this->output_results(array('feedbacks'=>$results));
+		
+	}
+	
 	  
- /**
+ 	/**
     * 
     * 返回最新的快券
     * @param skip
@@ -1695,14 +1686,13 @@ where shopId = $shopId
 and active=1";
 	  	
 	  	if (!empty($longitude) && !empty($latitude)){
-//	  		$sql.=" order by ((latitude-$latitude) * (latitude-$latitude) + (longitude-$longitude) * (longitude-$longitude))";
+
 	  		$sql.=" order by ACOS(SIN((latitude * 3.1415) / 180 ) *SIN(($latitude * 3.1415) / 180 ) + COS((latitude * 3.1415) / 180 ) * COS(($latitude * 3.1415) / 180 ) *COS((longitude * 3.1415) / 180 - ($longitude * 3.1415) / 180 ) ) * 6380";
 	  	}
 //	  	
 	  	$query = $this->db->query($sql);
 
-	  	
-	  
+	
   		$results = $query->result_array();	
 
   		
@@ -1791,31 +1781,31 @@ and active=1";
 	
 	public function event_get(){
 		
-			if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 测试情况
-				// 测试服务器
-				$event['id'] = '60';
-	
-				$event['imgUrl'] = 'http://www.quickquan.com/app/image/guide_350_04.png';
-				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/guide_finish.png';
-				$event['type']='coupon';
+			if(ENVIRONMENT == 'rtesting' || ENVIRONMENT == 'testing'){ // 测试服务器
 				
-				$event['registerBannerText']='哈哈哈哈哈啊只要注册快券，就可以1元获得原价18元的美味摩提哦！';
-				$event['registerSuccessText']='哈哈哈哈哈哈前往领取免费美味摩提快券';
+//				$event['id'] = '60';
+//	
+//				$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_60.jpg';
+//				$event['imgUrl_iphone4'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+//				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/button_60.png';
+//				$event['type']='coupon';
+//				
+//				$event['registerBannerText']='只要注册快券，就可以获得牛奶棚立减10元哦！';
+//				$event['registerSuccessText']='前往领取牛奶棚快券';
+//			
+//				
+//				$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
+//				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
+//				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
+//				
+//				$response['updatedAt'] = '2015-01-05 14:37:21';
+//				$response['event'] = $event;
+//				$response['banners'] = $banners;
+
 			
-				
-				$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
-				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
-				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
-				
-				$response['updatedAt'] = '2014-12-25 14:37:21';
-				$response['event'] = $event;
-				$response['banners'] = $banners;
-			}
-		
-			else{
-				// 正式服务器
 				$event['id'] = '39';
 				$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+				$event['imgUrl_iphone4'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
 				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
 				$event['type']='coupon';
 				$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦！';
@@ -1826,7 +1816,25 @@ and active=1";
 				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
 				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
 				
+				$response['updatedAt'] = '2014-12-17 14:37:21';
+				$response['event'] = $event;
+				$response['banners'] = $banners;
+			}
 		
+			else{
+				// 正式服务器
+				$event['id'] = '39';
+				$event['imgUrl'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+				$event['imgUrl_iphone4'] = 'http://www.quickquan.com/app/image/event_bg.jpg';
+				$event['buttonUrl'] = 'http://www.quickquan.com/app/image/eventBtn.png';
+				$event['type']='coupon';
+				$event['registerBannerText']='只要注册快券，就可以1元获得原价18元的美味摩提哦！';
+				$event['registerSuccessText']='前往领取免费美味摩提快券';
+
+				
+				$banners[0] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_tutorial_2.jpg','type'=>'tutorial');
+				$banners[1] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_39.jpg','type'=>'coupon','id'=>'39');
+				$banners[2] = array('imgUrl'=>'http://www.quickquan.com/app/image/banner_coupon_60_2.jpg','type'=>'coupon','id'=>'60');
 				
 				$response['updatedAt'] = '2014-12-17 14:37:21';
 				$response['event'] = $event;

@@ -148,15 +148,7 @@ class Kqtest extends CI_Controller{
 		foreach ($params as $key) {
 			$data[$key] = $post['data'][$key];
 		}
-		
-//		$data['originRequest'] = $postJson;
-//		
-//		
-//		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-//		
-//		// 把数据存入数据库中
-//		$this->uCouponAccepted->insert($data);
-	
+
 		echo $postJson;
 		echo 'begin post'.'<br>';
 		echo post('http://61.153.100.241/kq/index.php/kqunionapi/couponAccepted',$postJson);
@@ -303,14 +295,16 @@ and !ISNULL(B.unionId)");
 	// 
 	public function down_users(){
 		
-		$couponUnionId = 'D00000000011149';
+		$couponUnionId = 'D00000000010397';
 
-		$mobiles = array('13524248066');
+		$mobiles = array('13916664532','15000278920');
 		
 		$this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
 	}
 	
+	
+	//批量处理摩提的延长的券
 	public function download_unioncoupon_for_users(){
 	
 		$couponUnionId='D00000000010952'; // 摩提新券
@@ -328,8 +322,11 @@ and B.`unionId`!=''");
 		$results = $query->result_array();
 		
 		foreach ($results as $row) {
+
 			$mobiles[]=$row['username'];
+		
 		}
+		
 		
 //		var_dump($users);
 //		$response = $this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);

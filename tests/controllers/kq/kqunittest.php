@@ -15,7 +15,8 @@ class Kqunittest extends CIUnit_TestCase
 		// Set the tested controller
 	
 		
-		$this->CI = set_controller('kqavos');
+		$this->CI = set_controller('kqapi1_1');
+		
 		
 	}
 	
@@ -25,10 +26,13 @@ class Kqunittest extends CIUnit_TestCase
 	
 	public function test(){
 		$this->assertSame(1,1);
+//				$this->assertSame(1,2);
 	}
 	
-//	public function testLoginSuccessful(){
-//		
+	
+	
+	public function testLoginSuccessful(){
+		
 //		$json = $this->CI->login('1358965658','111');
 //
 //		$response = json_decode($json,true);
@@ -36,8 +40,8 @@ class Kqunittest extends CIUnit_TestCase
 ////		
 ////		
 //		$this->assertSame($status,'1');
-//	}
-//	
+	}
+	
 //	public function testRegister(){
 //	
 //	}
