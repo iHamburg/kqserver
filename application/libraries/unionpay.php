@@ -18,7 +18,6 @@ class Unionpay{
 	
     public function __construct(){
 		
-//		echo 'unionpay construct';
 
 //     	echo 'ENVIRONMENT'.ENVIRONMENT;
      	

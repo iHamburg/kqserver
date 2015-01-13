@@ -42,6 +42,8 @@ class DashboardTest extends CIUnit_TestCase
 		
 		$this->assertSame(1, preg_match('/(登陆)/i', $out));
 		
+		
+//		$this->assertSame(1,2);
 	}
 	
 	

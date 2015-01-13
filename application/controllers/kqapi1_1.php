@@ -57,12 +57,7 @@ class Kqapi1_1 extends REST_Controller
 		$this->load->model('coupon2_m','coupon');
 	
 	}
-	
-	function index(){
-	
-		
-	}
-	
+
 	
 	/**
 	 * 
@@ -1881,9 +1876,8 @@ and active=1";
 				log_message('error',"Batch Download Coupon Response # $response");
 			}
 		 	
-		
 	}
-	
+
 	
 //	public function 
 	
