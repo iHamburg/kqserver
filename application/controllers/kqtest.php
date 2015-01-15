@@ -303,7 +303,7 @@ and !ISNULL(B.unionId)");
 	// 
 	public function down_users(){
 		
-		$couponUnionId = 'D00000000011149';
+		$couponUnionId = 'D00000000011424'; //五芳斋
 
 		$mobiles = array('13524248066');
 		
@@ -335,6 +335,27 @@ and B.`unionId`!=''");
 //		$response = $this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
 		echo $response;
+	}
+	
+	public function test_news(){
+	
+		$query = $this->db->query("select distinct uid
+from downloadedcoupon
+where couponId=39
+and status='unused'
+");
+		
+		$uids = $query->result_array();
+		
+		$title = "快券到期提醒";
+		$text = "您的【摩提工房特价1元】快券还有2天就要到期啦，赶紧前往最近的门店享用快券吧！现在还有牛奶棚满20立减10元的超值优惠，全市129家门店都通用哦！关注快券多一秒，更多优惠带给您！";
+		foreach ($uids as $row) {
+			$uid = $row['uid'];
+			echo 'uid #'.$uid;
+			
+//			$this->db->query("insert into news (uid,title,text) values($uid,'$title','$text')");
+		}
+		
 	}
 	
 	public function test(){
