@@ -173,10 +173,10 @@ class Kqtest extends CI_Controller{
 		$this->coupon->dcount_increment(38);
 	}
 	
-	 public function message($to = 'World')
-	 {
-	    echo "Hello {$to}!".PHP_EOL;
-	  }
+//	 public function message($to = 'World')
+//	 {
+//	    echo "Hello {$to}!".PHP_EOL;
+//	  }
 
 	public function testmail(){
 	
@@ -334,85 +334,32 @@ and B.`unionId`!=''");
 		echo $response;
 	}
 	
-	public function testSign(){
 	
-		$rsa_private_key="-----BEGIN RSA PRIVATE KEY-----
-MIICXQIBAAKBgQDE+bUdCKNOHEMG4CHyBdLdRTxSJo77ltQU+Fil0HZEGnKbHczn
-6Z4P1RoWAVGgycDH5zD1YuES/W4inbL2bLn9zqnImK3NGvQP+wc1Hmq9zbE6B7RG
-HfYpdxpEb72/9PdGaJowbTArmhjtCBs9n7GGsDtw67IlYCp/KJC/KgwMsQIDAQAB
-AoGAe+hAwBTQ9a/dkhOoBuEW9k45VcwfobANlWtsCFKMMucYNO+YGELjRT5efH0z
-5htEA/ww1gvvXczCXVAqZc2baSwgFz48GmGDUzCMvOjx6x70ugVnj4PyjCDsAGUe
-Tye5OTyNCc43b66F9tZQqkyuCvIi6mUq6nQDPm1p89RkTmECQQDydJ+4mTGAtQFh
-5oapLTmhEvFsEhDStZ+tLxwb2WNFL8b1oJhjXsEEao8O3ZzpA95hpFaMKrCmrJco
-OXQdtmPVAkEAz/qrIJ2Qht+78rvTyuEEP+ThrPLkFj7149lweibUJewUS+CN5Xin
-6WPEniXdonHyktXd+jQ2IBPXoOiKyDnfbQJBAOuveM/+gwOFcKmVaROtddbhTjPq
-v9XEXksAf4eG45wO3I5LJbd7FZBQcW5W+T/91b/++27X1M7A+VNNvlVfxl0CQQCh
-rnlCjbtBXsU52pK3cV5gXYqjbN+r+54kV3F9RJpAMNtGcXdeIQJICetcFovKMVMm
-m2RJkjVRkpta1+yr43GxAkBut9dnBafCML7EWeVRvsLpJMPU/E5YHNmNISunSxpD
-/sguB2OtD3ol+T0O6Z38zBfTCy7uE53PVJiTIllrtYyf
------END RSA PRIVATE KEY-----";
-		
-		$private_key="----BEGIN PRIVATE KEY-----
-MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAJ69kBvGvVU8zLfE
-0SfbzXwgsnWmGzbbPoAWxfVNAl0wUAPi7xjffWMByyzu2XkuDzHhL7dKaogDd6Hg
-iACtWdXOcxSBM5yYna4Fy77idX3eENjY65IIth0PUGUfDa07ymZdtnrf0ZJDEXAK
-Xz4RxMGQA9K2ZlEN8zfxTx9VXLjVAgMBAAECgYAsLrTqlkFidR7B030nq+0grHUf
-e9E9Tn6x5iTJJtsOlwDeZA6KjMH4iapEYmKTcPd3uaavTH4kR1rH6pfQIG/NO3nu
-RN9DwlO7RLmuE/mRe3SvDmfn3/sBVykpL+1rg8XNwv87upzJfgWs9dHlVEk9oQu1
-oab8NZWsKu6Owb9cjQJBAM+W25RVOy4rb5Ag7SDTJuDE6Zxlb3/bvgOoyrC9Wuph
-YnMZe0DCRbclLj5t1EafqhkYRgmnuLCR5homTdEJN8MCQQDDwmq1L+ILyrxs3lP8
-VKOvyGI35KbvmZWYNyQwx15UJHbVDn92S/73sKdMx7N/zPirUctG3FmRNeam4p+F
-uluHAkEAu+wVW3LM4D7x/8fO4qhDybZ4xNwO0/BZU3a6BsVkSElgllG7AiTcd69w
-7ZL/V++yTIVs4dCzoSRy6blDOLjfgQJAHp9vKeDPr6CLUUyGPtbOtFTYaH3wT1Lr
-P+CAXNETRH5fyHx4G/1PaVfNFAm5XqilzccB0ZfuuvR/nGOfKMA6SQJBAJosKW3d
-B/GSic9MBIrtIymgLaAjLeaOwyk95vCgvqEp7BtjRpKXWyk8rcg3m3ybTSwpeUCQ
-QBD09MmaCZE35V8=
------END PRIVATE KEY-----";
-		
-		$rsa_public_key="-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDE+bUdCKNOHEMG4CHyBdLdRTxS
-Jo77ltQU+Fil0HZEGnKbHczn6Z4P1RoWAVGgycDH5zD1YuES/W4inbL2bLn9zqnI
-mK3NGvQP+wc1Hmq9zbE6B7RGHfYpdxpEb72/9PdGaJowbTArmhjtCBs9n7GGsDtw
-67IlYCp/KJC/KgwMsQIDAQAB
------END PUBLIC KEY-----";
-		
-		
-		$plain = json_encode(array(1,2,3));  // plain是纯文字
-		echo 'plain : '.$plain;
-		echo '<br>';
-		
-		openssl_sign($plain, $privated, $rsa_private_key); //用私钥进行签名， 是rsa密钥
-		
-		$privatedHex = bin2hex($privated);  //转成hex 字符串   
-		
-		echo 'privated #'.$privatedHex;
-		echo '<br>';
-		
-		$verify = openssl_verify($plain, hex2bin($privatedHex), $rsa_public_key); // 比较原文和签名，看是否一致）
-		
-//		$signature = bin2hex($signature);  //转成hex 字符串
-		
-	
-		
-		echo 'verify #'.$verify;
-		echo '<br>';
-		
-	}
-	
-	
-	public function ip_test($ip,$iprule){  
-	   $ipruleregexp=str_replace('.*','ph',$iprule);  
-	   $ipruleregexp=preg_quote($ipruleregexp,'/');  
-	   $ipruleregexp=str_replace('ph','\.[0-9]{1,3}',$ipruleregexp);  
-	  
-	   if(preg_match('/^'.$ipruleregexp.'$/',$ip)) return true;  
-	   else return false;  
-     
-	}  
 	
 	public function dev(){
 		echo 'dev';
 	}
+	
+	public function testSMS(){
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		header("Cache-Control: no-cache, must-revalidate");
+		header("Pragma: no-cache");
+		
+		echo 'sss';
+		
+		$this->load->library("kqucloud");
+		
+		
+//		$this->kqucloud->sendTestSMS();
+		
+		echo 'ddd';
+	}
+	
+	public function message($to = 'World',$dd='bbb')
+	  {
+	    echo "Hello {$to} and {$dd}!".PHP_EOL;
+	  }
+	
 	public function test(){
 
 //		dev();
@@ -461,6 +408,8 @@ mK3NGvQP+wc1Hmq9zbE6B7RGHfYpdxpEb72/9PdGaJowbTArmhjtCBs9n7GGsDtw
 //		   }  
 //}  
 
+		
 	}
+
 
 }

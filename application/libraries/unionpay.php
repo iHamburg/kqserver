@@ -222,11 +222,14 @@ NVuI+eXtaUQW
 
 		$key = $this->generateAESKey($this->appSecret);
 		
-		$content = $this->pad2Length($cardNo, 16);  //把明文padding
+		$content = $this->pad2Length($cardNo, 16);  //把明文padding，拼满16位
+		
 		$cipher = mcrypt_module_open(MCRYPT_RIJNDAEL_128, '', MCRYPT_MODE_ECB, '');      
 		$iv_size = mcrypt_enc_get_iv_size($cipher);      
 		$iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);//ECB模式，iv不同最后的结果也是一样的
-		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv); 
+		
+		$cipherText = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$content,MCRYPT_MODE_ECB,$iv); // 生成密文
+		
 		$encrypted = base64_encode($cipherText);
 	
 		$data = array('cardNo'=>$encrypted, 'needAuth'=>$needAuth,'userId'=>$userId);
@@ -388,6 +391,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	/**
 	 * 
 	 * 给明文加padding， PKCS5Padding
+	 * 
 	 * @param unknown_type $text
 	 * @param unknown_type $padlen
 	 */
@@ -405,7 +409,7 @@ couponSceneId 	string 	必填 	票券场景标识，目前仅支持如下两种�
 	
 	/**
 	 * 
-	 * 把private secret 转成16位的密码
+	 * 把public secret 转成16位的密码，
 	 * @param unknown_type $key
 	 */
 	private function  generateAESKey($key){

@@ -162,7 +162,6 @@ sp5Ykcw0iwSbUA==
 	
 		header( 'Content-Type:text/html;charset=utf-8');
 		
-//		header( 'Content-Type:application/json;charset=utf-8');
 		
 //		$mobile = '15166412996';
 		
@@ -173,7 +172,7 @@ sp5Ykcw0iwSbUA==
 			
 //			$mobile = '13166361023';
 //			
-			$mobile = '18001690172';
+			$mobile = '15851810703';
 		}
 		
 		$response = $this->unionpay->getUserByMobile($mobile);

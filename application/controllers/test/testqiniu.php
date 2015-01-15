@@ -1,23 +1,21 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+<?php 
 
 class Testqiniu extends CI_Controller {
 
 	
 
 
-	function __construct(){
-		parent::__construct();
-		
-		//$this->load->helpers(array('rs','http','auth_digest','conf','utils','resumable_io_helper'));
-	}
-	
-	public function index()
-	{
-		echo 'tushare';
-		
-		//
-	}
+//	function __construct(){
+//		parent::__construct();
+//		
+//		//$this->load->helpers(array('rs','http','auth_digest','conf','utils','resumable_io_helper'));
+//	}
+//	
+//	public function index()
+//	{
+//		echo 'tushare';
+//	
+//	}
 	
  	public function message($to = 'World')
 	  {
