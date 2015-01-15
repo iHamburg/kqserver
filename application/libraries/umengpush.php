@@ -16,12 +16,7 @@ class UmengPush {
 	protected $timestamp        = NULL;
 	protected $validation_token = NULL;
 
-//	function __construct($key, $secret) {
-//		$this->appkey = $key;
-//		$this->masterSecret = $secret;
-//		$this->timestamp = strval(time());
-//		$this->validation_token = md5(strtolower($this->appkey) . strtolower($this->masterSecret) . strtolower($this->timestamp));
-//	}
+
 
 	function __construct() {
 		$this->appkey = '5445cf0bfd98c5d70001d213';
@@ -317,8 +312,8 @@ class UmengPush {
 			$customizedcast->setPredefinedKeyValue("text",             $text);
 			$customizedcast->setPredefinedKeyValue("after_open",       "go_app");
 
-//			print("Sending customizedcast notification, please wait...\r\n");
 			$customizedcast->send();
+
 //			print("Sent SUCCESS\r\n");
 		} catch (Exception $e) {
 //			print("Caught exception: " . $e->getMessage());

@@ -148,15 +148,7 @@ class Kqtest extends CI_Controller{
 		foreach ($params as $key) {
 			$data[$key] = $post['data'][$key];
 		}
-		
-//		$data['originRequest'] = $postJson;
-//		
-//		
-//		$this->load->model('u_coupon_accepted_m','uCouponAccepted');
-//		
-//		// 把数据存入数据库中
-//		$this->uCouponAccepted->insert($data);
-	
+
 		echo $postJson;
 		echo 'begin post'.'<br>';
 		echo post('http://61.153.100.241/kq/index.php/kqunionapi/couponAccepted',$postJson);
@@ -181,10 +173,10 @@ class Kqtest extends CI_Controller{
 		$this->coupon->dcount_increment(38);
 	}
 	
-	 public function message($to = 'World')
-	 {
-	    echo "Hello {$to}!".PHP_EOL;
-	  }
+//	 public function message($to = 'World')
+//	 {
+//	    echo "Hello {$to}!".PHP_EOL;
+//	  }
 
 	public function testmail(){
 	
@@ -303,14 +295,17 @@ and !ISNULL(B.unionId)");
 	// 
 	public function down_users(){
 		
-		$couponUnionId = 'D00000000011424'; //五芳斋
+		$couponUnionId = 'D00000000010397';
 
-		$mobiles = array('13524248066');
+
+		$mobiles = array('13916664532','15000278920');
 		
 		$this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
 		
 	}
 	
+	
+	//批量处理摩提的延长的券
 	public function download_unioncoupon_for_users(){
 	
 		$couponUnionId='D00000000010952'; // 摩提新券
@@ -328,8 +323,11 @@ and B.`unionId`!=''");
 		$results = $query->result_array();
 		
 		foreach ($results as $row) {
+
 			$mobiles[]=$row['username'];
+		
 		}
+		
 		
 //		var_dump($users);
 //		$response = $this->kqlibrary->download_union_coupon_with_users($mobiles, $couponUnionId);
@@ -358,8 +356,38 @@ and status='unused'
 		
 	}
 	
+	
+	public function dev(){
+		echo 'dev';
+	}
+	
+	public function testSMS(){
+		header( 'Content-Type:text/html;charset=utf-8 ');
+		header("Cache-Control: no-cache, must-revalidate");
+		header("Pragma: no-cache");
+		
+		echo 'sss';
+		
+		$this->load->library("kqucloud");
+		
+		
+//		$this->kqucloud->sendTestSMS();
+		
+		echo 'ddd';
+	}
+	
+	public function message($to = 'World',$dd='bbb')
+	  {
+	    echo "Hello {$to} and {$dd}!".PHP_EOL;
+	  }
+	
 	public function test(){
 
+//		dev();
+		
+		
+//		echo ip_test('')
+		
 //		$headers = apache_request_headers();
 //		print_r($headers);
 
@@ -377,6 +405,31 @@ and status='unused'
 //		header( 'Content-Type:text/html;charset=utf-8 ');
 //		$result = $this->coupon->get_complete_title(39);
 //		echo 'title '.$result;
+	
+		
+//		    $curr_ip=$_SERVER['REMOTE_ADDR'];  //  获得对方ip地址
+////		    echo $curr_ip;
+//		    
+//		    $white_list=array('127.0.0.*'); //白名单规则  
+//		    $test_success=false;  
+//		    foreach($white_list as $iprule){  
+//		    	
+//		       if($this->ip_test($curr_ip,$iprule)){  
+//		          $test_success=true;  
+//		          break;  
+//		       }  
+//		    
+//		    }  
+//		    
+//		    if(!$test_success) exit('IP not in white list');  
+//			$black_list=array(); //黑名单规则
+//		    foreach($black_list as $iprule){  
+//		   if($this->ip_test($curr_ip,$iprule)){  
+//		      exit('IP in black list');  
+//		   }  
+//}  
+
+		
 	}
 
 

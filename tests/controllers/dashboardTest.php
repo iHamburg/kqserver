@@ -26,6 +26,7 @@ class DashboardTest extends CIUnit_TestCase
 	
 	public function testLogin()
 	{
+//		$this->assertSame(1,2);
 		
 //		echo 'show me the money';
 //		var_dump($this->CI);
@@ -41,6 +42,8 @@ class DashboardTest extends CIUnit_TestCase
 		
 		$this->assertSame(1, preg_match('/(登陆)/i', $out));
 		
+		
+//		$this->assertSame(1,2);
 	}
 	
 	

@@ -540,6 +540,18 @@ function test_coupon_accepted($servername){
 		echo $response;
 	}
 	
+	function test_feedback(){
+		
+		$url = 'http://localhost/kq/index.php/kqapi1_1/feedback/';
+		
+		
+		$post = array('uid'=>'57','content'=>'hahaha');
+		
+		$response = post($url,$post);
+		
+		echo $response;
+		
+	}
 	function test_sms(){
 		$this->load->library('kqsms');
 		

@@ -55,6 +55,7 @@ abstract class UmengNotification {
 		}
 	}
 
+	
 	// Set key/value for $data array, for the keys which can be set please see $DATA_KEYS, $PAYLOAD_KEYS, $BODY_KEYS, $POLICY_KEYS
 	abstract function setPredefinedKeyValue($key, $value);
 

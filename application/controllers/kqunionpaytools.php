@@ -110,17 +110,27 @@ class Kqunionpaytools extends CI_Controller{
 	
 	
 	/**
-	 * api, 可以不经过数据库直接下载银联快券
+	 * api, 可以不经过数据库直接下载银联快券，提供给内部员工
 	 * 
 	 * @param str $mobile = 13166361111
 	 * @param unknown_type $unionCouponId
 	 */
 	function downloadCouponFromUnion($mobile=0,$unionCouponId=0){
+		
+		header("Cache-Control:   no-cache,   must-revalidate");  
+ 		header("Pragma:   no-cache");  
+		
 		$this->load->library('kqlibrary');
+		
+//		if ($mobile == 0 || $unionCouponId == 0){
+//			echo 'Empty mobile or unionCouponId';
+//			return; 
+//		}
 		
 //		$couponUnionId = 'D00000000011149';
 
 		$mobiles = array($mobile);
+		echo 'unionCouponId # '.$unionCouponId.'<br>';
 		
 		return $this->kqlibrary->download_union_coupon_with_users($mobiles, $unionCouponId);
 	}
