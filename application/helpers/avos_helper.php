@@ -1,11 +1,5 @@
 <?php
 
-class A{
-
-	function display(){
-		return 'aaa';
-	}
-}
 
 function avosHelper(){
 	echo 'avos helper';

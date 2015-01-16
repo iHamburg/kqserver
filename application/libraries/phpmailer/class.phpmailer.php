@@ -17,6 +17,10 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+//include_once 'class.config.php';
+require_once 'class.config.php';
+
+
 /**
  * PHPMailer - PHP email creation and transport class.
  * @package PHPMailer
@@ -158,7 +162,7 @@ class PHPMailer
      * Options: "mail", "sendmail", or "smtp".
      * @type string
      */
-    public $Mailer = 'mail';
+    public $Mailer = 'smtp';
 
     /**
      * The path to the sendmail program.
@@ -221,14 +225,15 @@ class PHPMailer
      * Hosts will be tried in order.
      * @type string
      */
-    public $Host = 'localhost';
+    public $Host = 'smtp.exmail.qq.com';
+//	  public $Host = HOST;
 
     /**
      * The default SMTP server port.
-     * @type integer
+     * @type integer default: 25
      * 
      */
-    public $Port = 25;
+    public $Port = 465;
 
     /**
      * The SMTP HELO of the message.
@@ -243,7 +248,7 @@ class PHPMailer
      * Options: "", "ssl" or "tls"
      * @type string
      */
-    public $SMTPSecure = '';
+    public $SMTPSecure = 'ssl';
 
     /**
      * Whether to use SMTP authentication.
@@ -252,19 +257,19 @@ class PHPMailer
      * @see PHPMailer::$Username
      * @see PHPMailer::$Password
      */
-    public $SMTPAuth = false;
+    public $SMTPAuth = true;
 
     /**
      * SMTP username.
      * @type string
      */
-    public $Username = '';
+    public $Username = 'forest.zhang@quickquan.com';
 
     /**
      * SMTP password.
      * @type string
      */
-    public $Password = '';
+    public $Password = 'Fr4de3sw2aq1';
 
     /**
      * SMTP auth type.
@@ -577,6 +582,8 @@ class PHPMailer
     public function __construct($exceptions = false)
     {
         $this->exceptions = ($exceptions == true);
+        
+//        $this->Host = HOST;
     }
 
     /**
