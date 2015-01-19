@@ -35,6 +35,7 @@ class Kqlibrary{
 	var $coupon;
 	
 	
+	var $CI;
 	
 	
      public function __construct(){
@@ -48,6 +49,9 @@ class Kqlibrary{
      	$this->user = new User2_m();
      	
      	$this->news = new News2_m();
+     	
+     	$this->CI= & get_instance();
+     	
      	
 	}
 
@@ -463,9 +467,11 @@ limit 1");
 			
 //		$this->umengpush->send_customized_notification(84,'','');
 		
-		$umengpush = new UmengPush();
-		echo $umengpush->test();
+//		$umengpush = new UmengPush();
+//		echo $umengpush->test();
 		
+		$this->CI->load->model('card2_m','card');
+		print_r($this->CI->card->get_id(222));
 	}
 	
 }

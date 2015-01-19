@@ -376,6 +376,35 @@ and status='unused'
 		
 //		echo $mail->Host;
 	}
+	
+	
+	public function testmail2(){
+		
+		$this->load->library('email');
+
+		$this->email->from('forest.zhang@gmail.com', 'Forest');
+		$this->email->to('forest.zhang@quickquan.com');
+		//$this->email->cc('another@another-example.com');
+		//$this->email->bcc('them@their-example.com');
+		
+		$this->email->subject('Email Test');
+		$this->email->message('Testing the email class.');
+		
+		if ($this->email->send()){
+			echo 'success';
+		}
+		else{
+			echo 'failure';
+		}
+
+//echo $this->email->print_debugger();
+	
+	}
+	public function testLib(){
+	
+		$this->kqlibrary->test();
+		
+	}
 	  
 	public function test(){
 
