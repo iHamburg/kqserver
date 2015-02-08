@@ -1,0 +1,221 @@
+
+.pare{
+	position:relative;
+	
+}
+
+.self{
+	position:absolute;
+	left:0px;
+	bottom:5%;	
+}
+
+.location{
+	margin-top:5%;
+}
+
+
+
+
+
+.wid{
+		width:120%;
+		padding:0;
+	}
+
+#an{
+	margin-top: 1px!important;
+}
+.instype{
+	height:130px;
+	border-radius:40px 40px 40px 40px;
+}
+
+.input{font-family:Arial; font-size:50px;}
+.submit{font-family:Arial; font-size:50px; }
+.submit2{font-family:Arial; font-size:55px;color:rgb(255,255,255); }
+.sub_s{font-family:Arial; font-size:36px;}
+.bw{
+	width:100%;
+}
+
+.clicka{
+	background:rgb(137,137,137);
+	
+}
+
+
+#p1{
+	margin-top:5%;
+	margin-left:12%;
+	padding-left:2%;
+	height:40px;
+	line-height:56px;
+	font-family:"方正兰亭黑简", Geneva, sans-serif!important;
+	font-size:20px;
+	font-weight:bold;
+	color:rgb(64,43,14);
+}
+#p2{
+	margin-top:-2%;
+	margin-left:12%;
+	padding-left:2%;
+	height:40px;
+	font-family:"方正兰亭黑简", Geneva, sans-serif!important;
+	font-size:20px;
+	font-weight:bold;
+	color:rgb(64,43,14);
+}
+
+::-webkit-input-placeholder{
+	color:rgb(204,198,191) !important;
+	font-size:18px!important;
+}
+
+#p{
+	height:40px!important;
+	line-height:80px!important;
+	font-family:"方正兰亭黑简"!important;
+	font-size:13px!important;
+	font-weight:bold;
+	color:rgb(64,43,14);
+}
+#p img{
+	margin-right:5%;	
+}
+
+#logo{
+	background:#FFF!important;
+}
+
+#bankLogo{
+	margin-top:17%;	
+	margin-left:-20%;
+}
+
+#big p{
+	font-family:"方正兰亭黑简", Geneva, sans-serif!important;
+	font-size:46px;
+}
+
+#big div{
+	margin-top:2%;
+}
+.ma{
+	margin-top:3%;
+}
+
+.ddd{
+	position:absolute;
+	left:0px;
+	top:50%;
+}
+#quick{
+	margin-top:19%;
+}
+
+#sp{
+	color:rgb(62,42,10);
+	font-size:40px;
+}
+
+#sp a{
+	text-decoration:none;
+	color:rgb(193,25,38);
+}
+.style{
+	width: 20px;
+	height: 20px;
+  	padding: 0 5px 0 0;
+  	display: block;
+  	clear: left;
+  	float: left;
+}
+
+
+
+
+#mask{
+	display:none;
+	 position:absolute;
+	  right:0px;
+	  top:-20%;
+	  z-index:6;
+}
+
+#ccimg{
+	margin-left:22%;
+}
+#sd{
+	vertical-align:middle;
+	margin-left:15%;
+}
+#dd{
+	position:absolute;
+	left:0px;
+	top:0px;
+	z-index:6;
+}
+
+.mab{
+	margin-top:5px!important;
+}
+#lest{
+	margin-bottom:5px!important;
+}
+@media (max-width:360px) {
+	
+	::-webkit-input-placeholder{
+	color:rgb(204,198,191) !important;
+	font-size:18px!important;
+	}
+	
+	#big p{
+	font-family:"方正兰亭黑简", Geneva, sans-serif!important;
+	font-size:18px!important;
+	}
+	
+	.instype{
+	height:45px!important;
+	border-radius:15px 15px 15px 15px!important;
+	}
+	.submit{font-family:Arial; font-size:22px!important; }
+	.submit2{margin-left:-15px;font-family:Arial; font-size:16px!important;}
+	.sub_s{font-family:Arial; font-size:12px!important;}
+	.input{font-family:Arial; font-size:15px!important;}
+	.ma{
+	margin-top:0.1%!important;
+	}
+	
+	
+	
+	
+	#p{
+	margin-left:14%!important;
+	padding-left:-3%!important;
+	height:20px!important;
+	line-height:22px!important;
+	font-size:12px!important;
+	
+	}
+	
+	#sp{
+	font-size:14px!important;
+	}
+	
+	
+	
+	#sp a{
+	color:rgb(193,25,38)!important;
+	}
+	.style{
+	width: 45px;
+	height:45px;
+  	padding: 0 5px 0 0;
+  	display: block;
+  	clear: left;
+  	float: left;
+	}
+}
+
+

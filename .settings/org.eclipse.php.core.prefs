@@ -1,3 +1,5 @@
-#Fri Sep 05 14:17:06 CST 2014
 eclipse.preferences.version=1
 include_path=0;/kq
+org.eclipse.php.core.taskCaseSensitive=disabled
+org.eclipse.php.core.taskPriorities=NORMAL,HIGH,NORMAL,NORMAL
+org.eclipse.php.core.taskTags=TODO,FIXME,XXX,@todo

@@ -239,7 +239,7 @@ class Kqlibrary{
 		$CI =& get_instance();
 
 //		echo 'before download batch';
-		//TODO: Test用
+	
 		$msg = '';
 		foreach ($coupons as $coupon) {
 			$couponId = $coupon['id'];
