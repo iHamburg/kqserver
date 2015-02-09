@@ -1942,9 +1942,9 @@ class PHPMailer
                 if (!defined('PKCS7_TEXT')) {
                     throw new phpmailerException($this->lang('signing') . ' OpenSSL extension missing.');
                 }
-                // @TODO would be nice to use php://temp streams here, but need to wrap for PHP < 5.1
+                //  would be nice to use php://temp streams here, but need to wrap for PHP < 5.1
                 $file = tempnam(sys_get_temp_dir(), 'mail');
-                file_put_contents($file, $body); // @TODO check this worked
+                file_put_contents($file, $body); // check this worked
                 $signed = tempnam(sys_get_temp_dir(), 'signed');
                 if (@openssl_pkcs7_sign(
                     $file,

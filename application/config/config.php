@@ -27,8 +27,8 @@
 |
 */
 //$config['base_url']	= 'http://localhost/codeigniter/';
-$config['base_url']	= 'http://localhost/kq/';
-
+// $config['base_url']	= 'http://localhost/kq/';
+$config['base_url']	= 'http://192.168.1.105/kq/';
 /*
 |--------------------------------------------------------------------------
 | Index File

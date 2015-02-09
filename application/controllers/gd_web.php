@@ -9,11 +9,8 @@ if (! defined ( 'BASEPATH' ))
 
 
 class Gd_web extends CI_Controller{
-
 	
-	//TODO: test
-	//@todo lsdjf
-	//!!!: sdlkfj
+	
 	
 	function __construct(){
 
@@ -24,6 +21,8 @@ class Gd_web extends CI_Controller{
 
 		$this->load->model('gd_web_m',"model");
 
+		
+		session_start();
 	}
 
 	
@@ -32,12 +31,40 @@ class Gd_web extends CI_Controller{
 
 	public function index(){
 
+		$_SESSION['index']= 'gd' ;
+		
 		$data['title'] = '388份掼奶油限量大放送！';
 
 		$this->load->view('GD_home_page',$data);
 
+
+	}
+	
+	public function p1(){
+		
+// 		if($_SESSION['index'] != 'gd'){
+// 			redirect('gd_web/p1','refresh');
+			
+// 		}
+		
+		$_SESSION['index']= 'gd' ;
+		
+		echo 'user'.$_SESSION['user'];
+		
+		$this->load->view('gd/vhome',$data);
 		
 
+	}
+	
+	public function p2(){
+		
+// 		echo 'user'.$_SESSION['user'];
+		
+		if($_SESSION['index'] != 'gd'){
+			redirect('gd_web/p1','refresh');
+				
+		}
+		var_dump($_SESSION);
 	}
 
 	public function beforeLogin(){
@@ -54,7 +81,6 @@ class Gd_web extends CI_Controller{
 	public function login(){
 
 		
-		//TODO: blabala
 		
 
 		if($this->input->post('username')){
@@ -592,10 +618,7 @@ class Gd_web extends CI_Controller{
 
 		$cardsix = substr($card ,0,6);
 
-		
-
-		
-
+	
 		if($cardsix == '622161' ||$cardsix == '622162' ||$cardsix == '622570' ||$cardsix == '622650' ||$cardsix == '622655' ||$cardsix == '622657' ||$cardsix == '622658' ||$cardsix == '622659' ||$cardsix == '622685' ||$cardsix == '622687' ||$cardsix == '625976'|| $cardsix == '625979' ||$cardsix == '628201' ||$cardsix == '628202' ){
 
 			return true;
